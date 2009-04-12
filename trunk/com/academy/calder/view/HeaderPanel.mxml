@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" creationComplete="displayCurrentTime()">
+
+	<mx:Script>
+		<![CDATA[
+			import com.academy.calder.helper.MainViewHelper;
+			import com.academy.calder.business.Manager;
+			
+			private var interval:Number;
+			private const manager:Manager = Manager.getInstance();
+						
+			private function displayCurrentTime():void {
+				var helper:MainViewHelper = MainViewHelper.getSelf();
+		
+				clearInterval(interval);
+				var today:Date = new Date();
+				var today_str:String = Manager.bundle.getMessage("d" + today.day)  + ", " + 
+					Manager.bundle.getMessage("m" + today.month) + " " + today.date + ", " + today.fullYear + "\n" + 
+					Manager.formatTime(today);
+				
+				today_lbl.text = today_str;
+				interval = setInterval(displayCurrentTime, (60 - today.seconds) * 1000);
+			}
+		]]>
+	</mx:Script>
+	<mx:Canvas width="100%" height="100%">
+		<mx:Image source="{Manager.getIcon('headerIcon')}" toolTip="{Manager.bundle.getMessage('homepage')}" horizontalAlign="center" width="100%"/>
+		<mx:HBox width="100%" height="100%" verticalAlign="middle">
+			<mx:Label text="{(manager.userAccount.first ? 'Welcome ' + manager.userAccount.first : '')}"/>
+			<mx:Label id="today_lbl" width="100%" textAlign="right" truncateToFit="false" height="40"/>
+		</mx:HBox>
+	</mx:Canvas>
+</mx:HBox>

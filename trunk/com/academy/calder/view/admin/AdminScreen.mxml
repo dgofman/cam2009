@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:view="com.academy.calder.view.*"
+	xmlns:admin="com.academy.calder.view.admin.*"
+	xmlns:home="com.academy.calder.view.admin.home.*"
+	xmlns:student="com.academy.calder.view.admin.student.*"
+	width="100%"
+	height="100%"
+	verticalGap="0">
+	
+	<mx:Script>
+	<![CDATA[
+		import com.academy.calder.business.Manager;
+	]]>
+	</mx:Script>
+	
+	<view:MenuPanel id="menuPanel"/>
+	
+	<mx:Panel width="100%" height="100%" cornerRadius="10" headerHeight="0"
+			backgroundColor="#CCCCCC" paddingBottom="0" paddingTop="0" paddingLeft="0"	paddingRight="0">
+		
+		<mx:ViewStack id="adminView" width="100%" height="100%">
+			<home:HomeView id="homeView"/>
+			<admin:MemberView id="memberView"/>
+			<student:StudentView id="studentView"/>
+			<admin:TeacherView id="teacherView"/>
+		</mx:ViewStack>
+	
+		<view:FooterBar/>
+	</mx:Panel>
+</mx:VBox>

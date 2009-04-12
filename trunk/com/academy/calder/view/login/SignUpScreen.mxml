@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:login="com.academy.calder.view.login.*" 
+	width="100%" height="100%"
+	styleName="containerCenter">
+		
+	<mx:Script>
+	<![CDATA[
+		import com.academy.calder.model.UserAccount;
+		import com.academy.calder.enum.UserTypes;
+		import com.academy.calder.enum.UserLanguage;
+		import com.academy.calder.business.Manager;
+		import com.academy.calder.business.Services;	
+		
+		private var emailAddress:String;
+		private var userLanguage:String;
+			
+		public function createAccount():void{
+
+			emailAddress = access.email.text;
+			userLanguage = UserLanguage.valueOf(account.language.selectedItem.data).value;
+			
+			Services.send("signup", [
+				account.first.text, 
+				account.last.text, 
+				userLanguage,
+				account.address1.text,
+				account.address2.text,  
+				account.city.text, 
+				account.stateProvince.text, 
+				account.postalCode.text, 
+				account.country.text, 
+				Manager.formatOutputDate(account.dateOfBirth.selectedDate), 
+				account.dayPhone.text, 
+				account.eveningPhone.text, 
+				account.cellPhone.text,
+				emailAddress, 
+				access.username.text,
+				access.password.text
+			],onResult, onFault);
+		}
+		
+		private function clean():void{
+			account.clean();
+			access.clean();
+		}
+		
+		private function onResult(event:Object,  data:Array=null, columns:Array=null):void{
+			Manager.getInstance().userAccount = new UserAccount(
+				event.userId,
+				null,
+				userLanguage,
+				false,
+				UserTypes.Guest
+			);
+			clean();
+			signupView.selectedChild = confirm;
+			confirm.setEmailAddress(emailAddress);
+		}
+		
+		private function onFault(fault:Object):void{
+			if(fault.error_code == "DUPLICATE_ENTRY"){
+				Manager.error(Manager.bundle.getMessage('error_username_exists'), Manager.bundle.getMessage('error_duplicate'));
+			}else{
+				clean();
+				Manager.error(Manager.bundle.getMessage(fault.error_code), Manager.bundle.getMessage('error_signup'));
+				signupView.selectedChild = account;
+			}
+		}
+	]]>
+	</mx:Script>
+	
+	<mx:ViewStack height="100%" id="signupView">
+		<login:SignUpAccountPanel id="account"/>
+		<login:SignUpAccessPanel id="access"/>
+		<login:SignUpConfirmPanel id="confirm"/>
+	</mx:ViewStack>
+</mx:HBox>
+

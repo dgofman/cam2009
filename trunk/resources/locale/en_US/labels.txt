@@ -1,0 +1,62 @@
+languageCode=en_US
+
+&title=Calder Academy
+&copyright=Copyright 2007 Calder Academy Inc. All rights reserved.
+&company=Calder Academy Inc.
+&homepage=http://www.calderacademy.com
+
+&login=Login
+&signup=Sign Up
+&forgot=Forgot Password
+&username=Username
+&password=Password
+&confirmPwd=Confirm Password
+&remember=Remember my username
+&email=Email
+&continue=Continue
+&cancel=Cancel
+&submit=Submit
+&back=Back
+
+&language=Language
+&english=English
+
+&timeFormat=L:NN A
+&dateFormat=MM/DD/YYYY
+
+&m0=January
+&m1=February
+&m2=March
+&m3=April
+&m4=May
+&m5=June
+&m6=July
+&m7=August
+&m8=September
+&m9=October
+&m10=November
+&m11=December
+
+&d0=Sunday
+&d1=Monday
+&d2=Tuesday
+&d3=Wednesday
+&d4=Thursday
+&d5=Friday
+&d6=Saturday
+
+&title1=Enter your personal information
+&first1=First Name
+&last1=Last Name
+&dob1=Birth Date ({0})
+&address1=Address
+&city1=City
+&state1=State / Province
+&zip1=ZIP / Postal Code
+&country1=Country
+&dphone1=Day Phone
+&ephone1=Evening Phone
+&cphone1=Cell Phone
+
+&title2=Online account manager
+&title3=Email Verification

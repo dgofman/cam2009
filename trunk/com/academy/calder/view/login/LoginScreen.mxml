@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" horizontalAlign="center" width="100%" height="100%"
+	creationComplete="onComplete()"
+	verticalAlign="middle">
+
+	<mx:Script>
+	<![CDATA[
+		import com.academy.calder.model.UserAccount;
+		import com.academy.calder.enum.UserTypes;
+		import com.academy.calder.enum.AccountStatus;
+		import com.academy.calder.business.Services;
+		import com.academy.calder.business.Manager;
+		import com.academy.calder.business.LocalShare;	
+		import com.academy.calder.helper.MainViewHelper;
+		import com.academy.calder.component.validator.CAMStringValidator;
+		
+		private const stringValidator:CAMStringValidator = new CAMStringValidator(4, 16, true);
+		private const mainHelper:MainViewHelper = MainViewHelper.getSelf();
+		
+		private function onComplete():void{
+			var loginInfo:Object = LocalShare.getValue("loginInfo", LocalShare.GLOBAL_LEVEL);
+			if(loginInfo != null && loginInfo.remember == true){
+				username.text = loginInfo.username;
+				remember.selected = true;
+			}
+		}
+		
+		private function loginHandler():void{
+			stringValidator.showError(username);
+			stringValidator.showError(password);
+			if(stringValidator.invalidFields.length){
+				return;
+			}
+			Services.send("login", [username.text, password.text], onLoginResult);
+			password.text = "";
+			stringValidator.reset();
+		}
+		
+		private function forgotPassword():void{
+			mainHelper.changeView(MainViewHelper.RESET);
+		}
+		
+		private function register():void{
+			mainHelper.changeView(MainViewHelper.SIGNUP);
+		}
+		
+		private function onLoginResult(list:XMLList, data:Array=null, columns:Array=null):void{
+			if(AccountStatus.valueOf(list.status) == AccountStatus.Inactive){
+				Manager.error(Manager.bundle.getMessage('error_inactive_account'), Manager.bundle.getMessage('error_authentication'));
+			}else{
+				var ua:UserAccount = new UserAccount(
+					list.userId,
+					list.first,
+					list.language,
+					new Boolean(list.admin),
+					UserTypes.valueOf(list.typeId)
+				);
+				Manager.getInstance().userAccount = ua;
+				
+				LocalShare.save("loginInfo", remember.selected ? {username:username.text, remember:true} : null, LocalShare.GLOBAL_LEVEL);
+				
+				if(ua.admin){
+					mainHelper.changeView(MainViewHelper.ADMIN);
+				}else if(ua.type == UserTypes.Guest){
+					mainHelper.changeView(MainViewHelper.GUEST);
+				}else if(ua.type == UserTypes.Employee){
+					mainHelper.changeView(MainViewHelper.TEACHER);
+				}else if(ua.type == UserTypes.Student){
+					mainHelper.changeView(MainViewHelper.STUDENT);
+				}
+			}
+		}
+		
+		private function onFault(fault:Object):void{
+			Manager.error(Manager.bundle.getMessage(fault.error_code), Manager.bundle.getMessage('error_login'));
+		}
+	]]>
+	</mx:Script>
+	
+	
+	<mx:Image source="{Manager.getIcon('loginIcon')}"  scaleContent="true" width="{getStyle('imageWidth')}" height="{getStyle('imageHeight')}"/>
+	<mx:Panel width="350" title="{Manager.bundle.getMessage('tip_loginTitle')}" initialize="{event.target.styleName=getStyle('loginWindowStyleName')}">				
+		<mx:Form width="100%" defaultButton="{loginButton}" id="loginForm">
+			<mx:FormItem width="100%" label="{Manager.bundle.getMessage('username')}:" required="true">
+				<mx:TextInput width="100%" id="username" maxChars="16"
+					toolTip="{Manager.bundle.getMessage('tip_username')}"/>
+			</mx:FormItem>
+	
+			<mx:FormItem width="100%" label="{Manager.bundle.getMessage('password')}:" required="true">
+				<mx:TextInput width="100%" displayAsPassword="true" id="password" maxChars="16"
+					toolTip="{Manager.bundle.getMessage('tip_password')}" text="dgofman"/>
+			</mx:FormItem>
+			
+			<mx:FormItem>
+				<mx:CheckBox label="{Manager.bundle.getMessage('remember')}" width="200" id="remember"
+					toolTip="{Manager.bundle.getMessage('tip_save_login')}"/> 
+			</mx:FormItem>
+		</mx:Form>
+		
+		<mx:LinkButton label="{Manager.bundle.getMessage('signup')}" textDecoration="underline" click="register()" paddingRight="10"
+				toolTip="{Manager.bundle.getMessage('tip_signup')}"/>
+		<mx:ControlBar>
+			<mx:LinkButton label="{Manager.bundle.getMessage('forgot')}?" textDecoration="underline" click="forgotPassword()" textAlign="left"
+				toolTip="{Manager.bundle.getMessage('tip_forgot')}"/>
+			<mx:Spacer width="80%"/>
+			<mx:Button id="loginButton" label="{Manager.bundle.getMessage('login')}" click="loginHandler()"/>
+		</mx:ControlBar>
+	</mx:Panel>
+</mx:HBox>

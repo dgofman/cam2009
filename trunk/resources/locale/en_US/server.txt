@@ -1,0 +1,12 @@
+languageCode=en_US
+
+&AMFPHP_RUNTIME_ERROR=System Error. Please contact to our system administrator. Details: {0}
+&AMFPHP_UNDECLARED_METHOD=Invalid method call. Please contact to our system administrator. Details: {0}
+&INVALID_RESPONSE=Unexpected Response value(s). Please contact to our system administrator.
+
+&SYSTEM_ERROR=Some internal Database Error. Please contact to our system administrator.
+&EMAIL_FAILURE=Sorry, but we cannot process your registration at this time.
+&ACCOUND_NOT_FOUND=Access was denied because the username and/or password was invalid or your account is expired.
+&CREATE_ACCOUNT_ERROR=Cannot create an account at this time. Please contact to our system administrator.
+&INVALID_QUERY=Invalid SQL query syntax invalid or supported arguments list. 
+&DUPLICATE_ENTRY=Duplicate entry error occurs. Please contact to our system administrator.

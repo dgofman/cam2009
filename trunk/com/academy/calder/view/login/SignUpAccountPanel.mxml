@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" 
+	height="100%" styleName="innerPanel"
+	title="{Manager.bundle.getMessage('title1')}">
+	
+	<mx:Script>
+	<![CDATA[
+		import mx.containers.ViewStack;
+		import com.academy.calder.business.Manager;
+		import com.academy.calder.enum.UserLanguage;
+		import com.academy.calder.helper.MainViewHelper;
+		import com.academy.calder.component.validator.CAMDateValidator;
+		import com.academy.calder.component.validator.CAMPhoneValidator;
+		import com.academy.calder.component.validator.CAMStringValidator;
+		import com.academy.calder.component.validator.CAMNumberValidator;
+		
+		private const mainHelper:MainViewHelper = MainViewHelper.getSelf();
+		private const stringValidator:CAMStringValidator = new CAMStringValidator(2, 30, true);
+		private const dateValidator:CAMDateValidator = new CAMDateValidator(dateFormat, true);
+		private const numberValidator:CAMNumberValidator = new CAMNumberValidator(0);
+		private const phoneValidator:CAMPhoneValidator = new CAMPhoneValidator();
+		
+		private function onContinue():void{
+			stringValidator.showError(first);
+			stringValidator.showError(last);
+			dateValidator.showError(dateOfBirth);
+			numberValidator.showError(postalCode);
+			phoneValidator.showError(dayPhone);
+			phoneValidator.showError(eveningPhone);
+			phoneValidator.showError(cellPhone);
+			
+			if( stringValidator.invalidFields.length ||
+				dateValidator.invalidFields.length || 
+				numberValidator.invalidFields.length || 
+				phoneValidator.invalidFields.length){
+				return;
+			}
+			ViewStack(parent).selectedIndex += 1; //Call SignUpAccessPanel view
+		}
+		
+		public function clean():void{
+			first.text = 
+			last.text =
+			dateOfBirth.text =
+			address1.text =
+			address2.text =
+			city.text = 
+			stateProvince.text =
+			postalCode.text =
+			country.text =
+			dateOfBirth.text =
+			dayPhone.text =
+			eveningPhone.text =
+			cellPhone.text = "";
+			stringValidator.reset();
+			dateValidator.reset();
+			language.selectedIndex = 0;
+			numberValidator.reset();
+			phoneValidator.reset();
+		}
+		
+		private function onCancel():void{
+			clean();
+			mainHelper.changeView(MainViewHelper.LOGIN);
+		}
+		
+		private function formatDate(date:Date):String{
+			return (date) ? Manager.formatDate(date) : "";
+		}
+		
+		private function get dateFormat():String{
+			return Manager.getProperty("dateFormat");
+		}
+	]]>
+	</mx:Script>
+	
+	<mx:Canvas width="100%" height="100%" horizontalScrollPolicy="off">
+		<mx:HBox width="100%" height="100%" paddingLeft="10" paddingRight="10">
+			<mx:Form width="100%" height="100%" defaultButton="{submitButton}" id="signupForm">
+
+				<mx:FormItem label="{Manager.bundle.getMessage('first1')}:" required="true">
+					<mx:TextInput width="250" id="first" maxChars="30"
+						toolTip="{Manager.bundle.getMessage('tip_first')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('last1')}:" required="true">
+					<mx:TextInput width="250" id="last" maxChars="30"
+						toolTip="{Manager.bundle.getMessage('tip_last')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('dob1', [dateFormat])}:" required="true">
+					<mx:DateField id="dateOfBirth" labelFunction="formatDate" width="150"
+						toolTip="{Manager.bundle.getMessage('tip_dob')}" editable="true"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('language')}:" required="true">
+					<mx:ComboBox id="language" dataProvider="{Manager.bundle.addChangeListener(UserLanguage.dispalayList)}" width="150"
+						toolTip="{Manager.bundle.getMessage('tip_language')}"/>
+				</mx:FormItem>
+						
+				<mx:FormItem label="{Manager.bundle.getMessage('address1')} 1:">
+					<mx:TextInput width="250" id="address1" maxChars="50"
+						toolTip="{Manager.bundle.getMessage('tip_address')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('address1')} 2:">
+					<mx:TextInput width="250" id="address2" maxChars="50"
+						toolTip="{Manager.bundle.getMessage('tip_address')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('city1')}:">
+					<mx:TextInput width="250" id="city" maxChars="30"
+						toolTip="{Manager.bundle.getMessage('tip_city')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('state1')}:">
+					<mx:TextInput width="250" id="stateProvince" maxChars="20"
+						toolTip="{Manager.bundle.getMessage('tip_state')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('zip1')}:">
+					<mx:TextInput width="250" id="postalCode" maxChars="15"
+						toolTip="{Manager.bundle.getMessage('tip_zip')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('country1')}:">
+					<mx:TextInput width="250" id="country" maxChars="30"
+						toolTip="{Manager.bundle.getMessage('tip_country')}"/>
+				</mx:FormItem>			
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('dphone1')}:">
+					<mx:TextInput width="250" id="dayPhone" maxChars="25"
+						toolTip="{Manager.bundle.getMessage('tip_dphone')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('ephone1')}:">
+					<mx:TextInput width="250" id="eveningPhone" maxChars="25"
+						toolTip="{Manager.bundle.getMessage('tip_ephone')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('cphone1')}:">
+					<mx:TextInput width="250" id="cellPhone" maxChars="25"
+						toolTip="{Manager.bundle.getMessage('tip_cphone')}"/>
+				</mx:FormItem>
+			</mx:Form>
+		</mx:HBox>
+	</mx:Canvas>
+	<mx:ControlBar>
+		<mx:HBox width="100%" horizontalAlign="right">
+			<mx:Button id="submitButton" label="{Manager.bundle.getMessage('continue')}" click="onContinue()"/>
+			<mx:Button id="cancelButton" label="{Manager.bundle.getMessage('cancel')}" click="onCancel()"/>
+		</mx:HBox>
+	</mx:ControlBar>
+</mx:Panel>

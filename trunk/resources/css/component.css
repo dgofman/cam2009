@@ -1,0 +1,57 @@
+Application{
+	paddingTop:5;
+	paddingBottom:5;
+	paddingLeft:5;
+	paddingRight:5;
+	backgroundColor:#000099;
+}
+ControlBar{
+	paddingTop:5;
+	horizontalAlign:right;
+	fontSize:10;
+	color:#0000FF; 
+}
+Alert {
+	paddingRight:10;
+	paddingLeft:10;
+	backgroundColor:#ffffff;
+	color:#000;
+	borderColor:#cccccc;
+	borderThicknessBottom:4;
+	borderThicknessRight:4;
+	borderThicknessLeft:4;
+	titleStyleName:"alertTitle";
+}
+.alertTitle
+{
+	fontWeight:bold;
+	color:#FF0000;
+	fontSize:12px;
+}
+
+LoginScreen{
+	horizontalGap:8;
+	backgroundColor:#cccccc;
+	imageWidth:190;
+	imageHeight:233;
+	loginWindowStyleName:'loginWindowStyle';
+}
+.loginWindowStyle{
+	backgroundColor:#fff;
+	horizontalAlign:right;
+	paddingTop:20;
+	paddingBottom:5;
+	borderThicknessBottom:0;
+	borderThicknessRight:0;
+	borderThicknessLeft:0;
+}
+HeaderPanel{
+	cornerRadius:10;
+	paddingRight:10;
+	paddingLeft:10;
+	color:#FFFFFF;
+	fontSize:13;
+	fontWeight:bold;
+	backgroundColor:#2D253C;
+	borderSkin:ClassReference("com.academy.calder.component.skin.RoundedBorderSkin");
+}

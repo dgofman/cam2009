@@ -1,0 +1,28 @@
+languageCode=en_US
+
+&tip_loginTitle=Please enter your username and password
+&tip_username=Enter your username.
+&tip_password=Enter your password. Please note that password is case-sensitive.
+&tip_pwd=Enter your Password.
+&tip_confirm_pwd=Confirm your password.
+&tip_email=Enter your email address.
+&tip_save_login=Select this option to store your login information (excluding password) on your local desktop.
+&tip_signup=Create your personal account.
+&tip_forgot=Click here to receive your password by e-mail.
+
+&tip_first=Enter your First Name.
+&tip_last=Enter your Last Name.
+&tip_dob=Enter your birth date.
+&tip_language=Select your preferred language.
+&tip_address=Enter your mailing address.
+&tip_city=Enter your city / town.
+&tip_state=Enter your state / province.
+&tip_zip=Enter your zip / postal code.
+&tip_country=Enter your country.
+&tip_dphone=Enter your day phone.
+&tip_ephone=Enter your evening phone.
+&tip_cphone=Enter your cell phone.
+
+&msg_register=Online Account Manager is available at no cost to our students. You must be at least 18 years old to register. If you want to access to your account, please fill all these fields, otherwise press 'Submit' button.
+&msg_confirm=Thank you for registration!<br><br>Your information has been received. You can continue to watch our website.
+&msg_confirm_email=In order to verify that the email address associated with your account is correct, we have sent an email message to {0}. To activate your account, please access your email and click on the link provided.
