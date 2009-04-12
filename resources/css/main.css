@@ -1,0 +1,32 @@
+.defaultIcons{
+	headerIcon:			 Embed(source="/resources/images/header.jpg");
+	loginIcon:			 Embed('/resources/images/calders.jpg');
+}
+.mainBox{
+	verticalGap:3;
+}
+.mainPanel{
+	footerColors:#FFFFFF,#999999;
+	borderAlpha:1;
+	borderColor:#CCCCCC;
+}
+.containerCenter{
+	backgroundColor:#FFFFFF; 
+	horizontalAlign:center;
+	paddingTop:20;
+	paddingBottom:20; 
+}
+.innerPanel{
+	paddingTop:10;
+	paddingBottom:10;
+	paddingLeft:10;
+	paddingRight:10; 
+	cornerRadius:10; 
+	borderColor:#CCCCCC;
+	dropShadowEnabled:false;
+	backgroundColor:#FFFFFF;
+	alpha:1;
+}
+.labelInfo{
+	color:#ff0000;
+}

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:view="com.academy.calder.view.*"
+	width="100%" 
+	height="100%" show="onShow()">
+
+	<mx:Script>
+	<![CDATA[
+		import mx.rpc.events.ResultEvent;
+		import mx.rpc.events.FaultEvent;
+		import com.academy.calder.business.Manager;
+		import com.academy.calder.business.Services;
+		
+		private var studentData:Object;
+		private var selectedField:Object;
+		
+		private function onShow():void{
+			/*if(Manager.selectedUserId){
+				new Services(this, "onResultStudent").getStudentRecord(Manager.selectedUserId);
+			}*/
+		}
+		
+		private function onResultStudent(event:ResultEvent):void{
+			/*if(!Services.isError(event)){
+				studentData = event.result.items[0];
+			}*/
+		}
+		
+		private function onFocusIn(event:Object):void{
+			event.target.oldValue = event.target.text;
+		}
+		
+		private function onFocusOut(event:Object, tableIndex:Number):void{
+			if(event.target.text != event.target.oldValue){
+				selectedField = event.target;
+				update(tableIndex, selectedField.id, selectedField.text);
+			}
+		}
+		
+		private function onComboChange(event:Object, tableIndex:Number):void{
+			update(tableIndex, event.target.id, event.target.selectedIndex + 1);
+		}
+		
+		private function onCheckClick(event:Object, tableIndex:Number):void{
+			update(tableIndex, event.target.id, event.target.selected);
+		}
+		
+		private function update(tableIndex:Number, field:String, value:Object):void{
+			/*if(tableIndex == 1){  //users
+				new Services(this, "onResultUpdate").updateUserRecord(Manager.selectedUserId, field, value, Manager.STUDENT);
+			}else{
+				new Services(this, "onResultUpdate").updateStudentRecord(Manager.selectedUserId, field, value, Manager.STUDENT);
+			}*/
+		}
+		
+		private function onResultUpdate(event:ResultEvent):void{
+			/*if(!Services.isError(event)){
+				var panel:Object = Manager.getAdminStudentPanel();
+				var grid:Object = panel.studentDetailedView.studentDataGrid;
+				grid.editField(grid.selectedIndex, selectedField.id, selectedField.text);
+			}*/
+		}
+		
+		private function onFault(fault:FaultEvent):void{
+			Manager.error("Can not load student data.", "Load Error");
+		}
+	]]>
+	</mx:Script>
+	<mx:Form width="100%" height="100%" id="signupForm" paddingLeft="10" paddingRight="10">
+		
+		<mx:FormItem label="First Name:">
+			<mx:TextInput width="250" id="first" maxChars="30" text="{studentData.first}"
+				toolTip="Enter your First Name." focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Last Name:">
+			<mx:TextInput width="250" id="last" maxChars="30" text="{studentData.last}"
+				toolTip="Enter your Last Name." focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+			
+		<mx:FormItem label="Birth Date (yyyy-mm-dd):">
+			<mx:TextInput width="250" id="dateOfBirth" maxChars="10" text="{studentData.dateOfBirth}"
+				toolTip="Enter student birth date" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+
+		<mx:FormItem label="Address:">
+			<mx:TextInput width="250" id="address1" maxChars="50" text="{studentData.address1}"
+				toolTip="Enter student mailing address" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="City:">
+			<mx:TextInput width="250" id="city" maxChars="30" text="{studentData.city}"
+				toolTip="Enter student city / town" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="State / Province:">
+			<mx:TextInput width="250" id="stateProvince" maxChars="20" text="{studentData.stateProvince}"
+				toolTip="Enter student state / province" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="ZIP / Postal Code:">
+			<mx:TextInput width="250" id="postalCode" maxChars="15" text="{studentData.postalCode}"
+				toolTip="Enter student zip / postal code" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Country:">
+			<mx:TextInput width="250" id="country" maxChars="30" text="{studentData.country}"
+				toolTip="Enter student zip / postal code" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>			
+		
+		<mx:FormItem label="Day Phone:">
+			<mx:TextInput width="250" id="dayPhone" maxChars="13" text="{studentData.dayPhone}"
+				toolTip="Enter student day phone" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Evening Phone:">
+			<mx:TextInput width="250" id="eveningPhone" maxChars="13" text="{studentData.eveningPhone}"
+				toolTip="Enter student evening phone" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Cell Phone:">
+			<mx:TextInput width="250" id="cellPhone" maxChars="13" text="{studentData.cellPhone}"
+				toolTip="Enter student cell phone" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Email:">
+			<mx:TextInput width="250" id="email" maxChars="30" text="{studentData.email}"
+				toolTip="Enter your email address" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 1)"/>
+		</mx:FormItem>
+			
+		<mx:HRule width="100%"/>
+		
+		<mx:FormItem label="Student Type:">
+			<mx:ComboBox width="250" id="studentType" dataProvider="{[{label:'Child', data:1}, {label:'Adult', data:2}]}"
+				toolTip="Enter student type (child or adult)" selectedIndex="{studentData.studentType-1}" change="onComboChange(event, 2)">
+			</mx:ComboBox>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Enroll Date (yyyy-mm-dd):">
+			<mx:TextInput width="250" id="enrollDate" maxChars="10" text="{studentData.enrollDate}"
+				toolTip="Enter student enroll date" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 2)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Mother Phone:">
+			<mx:TextInput width="250" id="motherPhone" maxChars="13" text="{studentData.motherPhone}"
+				toolTip="Enter student mother contact phone" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 2)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Mother Name:">
+			<mx:TextInput width="250" id="motherName" maxChars="30" text="{studentData.motherName}"
+				toolTip="Enter student mother name" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 2)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Mother Primary:">
+			<mx:CheckBox id="motherPrimary" toolTip="Enter mother is primary contact for a student" selected="{studentData.motherPrimary}" click="onCheckClick(event, 2)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Father Phone:">
+			<mx:TextInput width="250" id="fatherPhone" maxChars="13" text="{studentData.fatherPhone}"
+				toolTip="Enter student father contact phone" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 2)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Father Name:">
+			<mx:TextInput width="250" id="fatherName" maxChars="30" text="{studentData.fatherName}"
+				toolTip="Enter student father name" focusIn="onFocusIn(event)" focusOut="onFocusOut(event, 2)"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="Father Primary:">
+			<mx:CheckBox id="fatherPrimary" toolTip="Enter father is primary contact for a student" selected="{studentData.fatherPrimary}" click="onCheckClick(event, 2)"/>
+		</mx:FormItem>
+
+	</mx:Form>
+</mx:Canvas>

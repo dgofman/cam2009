@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Form xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" show="onShow()">
+	<mx:DateFormatter id="dateFormat" formatString="YYYY-MM-DD" />
+	<mx:Script>
+	<![CDATA[
+		import mx.rpc.events.ResultEvent;
+		import mx.rpc.events.FaultEvent;
+		 import com.academy.calder.view.admin.student.details.LessonControl;
+		 import com.academy.calder.business.Manager;
+		 import com.academy.calder.business.Services;
+		 import mx.utils.ArrayUtil;
+			
+		 private var lessonControlClass:LessonControl;
+		 private var lessonControl:Object;
+		 private var tuitionTypeObject:Object;
+		 private var scheduleObject:Object;
+
+		 public function onShow():void{
+		 	 lessonTypeCmb.dataProvider = lessonControlClass.getLessontypesArray();
+		 }
+		
+		 private function modelChangedLessonType():void {
+			for (var i : Number = 0; i < lessonTypeCmb.dataProvider.length; i++) {
+				var lessontype:Object = lessonTypeCmb.dataProvider[i];
+				if (lessontype.lessonTypeId == lessonControl.lessonTypeId) {
+					lessonTypeCmb.enabled = false;
+					lessonTypeCmb.selectedItem = lessontype;
+					break;
+				}
+			}
+			//lessonTypeCmb.dispatchEvent({type:"change"});
+		}
+				
+		private function changeLessonType(){
+			//new Services(this, "onResultEmployee").getEmployeeByLessonTypeId(lessonTypeCmb.selectedItem.lessonTypeId);
+		}
+		
+		private function onResultEmployee(event:ResultEvent):void{
+			/*if(!Services.isError(event)){
+				employeeCmb.dataProvider = event.result.items;
+			}*/
+		}
+		
+		private function modelChangedEmployee():void {
+			for (var i : Number = 0; i < employeeCmb.dataProvider.length; i++) {
+				var employee:Object =  employeeCmb.dataProvider[i];
+				if (employee.employeeUserId == lessonControl.employeeUserId) {
+					employeeCmb.selectedItem = employee;
+					break;
+				}
+			}
+			//employeeCmb.dispatchEvent({type:"change"});
+		}
+		
+		private function changeEmployee(){
+			var lessonTypeId:Number = lessonTypeCmb.selectedItem.lessonTypeId;
+			var userId:Number = employeeCmb.selectedItem.employeeUserId;
+			this.label = lessonControlClass.getLessontypesObject()[lessonTypeCmb.selectedItem.lessonTypeId] + " - " + employeeCmb.selectedItem.name;
+			availableDaysCmb.dataProvider = null;
+			//new Services(this, "onResultSchedule").getLessonSchedule(Manager.selectedUserId, userId);
+		}
+		
+		private function onResultSchedule(event:ResultEvent):void{
+			/*if(!Services.isError(event)){
+				schedule_dg.dataProvider = event.result.items;
+				schedule_dg.selectedIndex = 0;
+				schedule_dg.dispatchEvent({type:"change"});
+			}*/
+		}
+
+		private function changeSchedule():void{
+			/*if(availableDaysCmb.dataProvider == null){
+				var lessonTypeId:Number = lessonTypeCmb.selectedItem.lessonTypeId;
+				var userId:Number = employeeCmb.selectedItem.employeeUserId;
+				new Services(this, "onResultDays").getEmployeeAvailability(userId, lessonTypeId);
+			}else{
+				var item:Object = schedule_dg.selectedItem;
+				if(availableDaysCmb.selectedItem.availableScheduleId != item.availableScheduleId){
+					for(var i:Number = 0; i < availableDaysCmb.dataProvider.length; i++){
+						if(availableDaysCmb.dataProvider[i].availableScheduleId == item.availableScheduleId){
+							availableDaysCmb.selectedIndex = i;
+							break;
+						}
+					}
+					new Services(this, "onResultTuitions").getTuitionsByAvailableScheduleId(item.availableScheduleId);
+				}else{
+					updateScheduleData();
+				}
+			}*/
+		}
+		
+		private function updateScheduleData():void{
+			var item:Object = availableDaysCmb.selectedItem;
+			availableDaysTxt.text = item.effectiveDate + " | From: " + item.startTime + " | Until: " + item.endTime;
+			if(schedule_dg.selectedItem.availableScheduleId != item.availableScheduleId){
+				for(var i:Number = 0; i < schedule_dg.dataProvider.length; i++){
+					if(schedule_dg.dataProvider[i].availableScheduleId == item.availableScheduleId){
+						schedule_dg.selectedIndex = i;
+						break;
+					}
+				}
+			}
+			scheduleObject = schedule_dg.selectedItem;
+			//options_cmb.selectedIndex = (scheduleObject.options - 1);
+			//options_cmb.dispatchEvent({type:"change"});
+			
+			for(var d:Number = 0; d < 7; d++){
+				this["d" + d].selected = (scheduleObject.smtwtfs.charAt(d) == '1');
+			}
+			
+			if(scheduleObject.length){
+				for(var i:Number = 0; i < tuitionTypeCmb.dataProvider.length; i++){
+					if(tuitionTypeCmb.dataProvider[i].length == scheduleObject.length){
+						tuitionTypeCmb.selectedIndex = i;
+						return;
+					}
+				}
+				Manager.error("Error: No Such Lesson Length (" + scheduleObject.length + " min.) in Tuition Types: Check admin for idiots.", "\"Length\" doesn't match TuitionType");
+			}
+		}
+
+		private function onResultDays(event:ResultEvent):void{
+			/*if(!Services.isError(event)){
+				availableDaysCmb.dataProvider = event.result.items;
+			}*/
+		}
+		
+		private function modelChangedAvailDays():void{
+			//availableDaysCmb.dispatchEvent({type:"change"});
+		}
+		
+		private function showAvailDays(item:Object, column:String):String{
+			if(item == availableDaysCmb.selectedItem){
+				for(var i:Number = 0; i < 7; i++){
+					this["d" + i].enabled = (item.smtwtfs.charAt(i) == '1');
+					if(!this["d" + i].enabled) this["d" + i].selected = false;
+				}
+			}
+			if(!item.smtwtfs || item.smtwtfs.length != 7){
+				return "";
+			}else{
+				var days:Array = [];
+				for(var i:Number = 0; i < 7; i++){
+					//if(item.smtwtfs.charAt(i) == '1') days.push(Manager.DAYS[i]);
+				}
+				return days.join(", ");
+			}
+		}
+		
+		private function changeAvailDays():void{
+			var item:Object = availableDaysCmb.selectedItem;
+			/*if(item.availableScheduleId != undefined){
+				new Services(this, "onResultTuitions").getTuitionsByAvailableScheduleId(item.availableScheduleId);
+			}*/
+		}
+		
+		private function onResultTuitions(event:ResultEvent):void{
+			/*if(!Services.isError(event)){
+				tuitionTypeCmb.dataProvider = event.result.items;
+			}*/
+		}
+		
+		private function modelChangedTuition():void {
+			//tuitionTypeCmb.dispatchEvent({type:"change"});
+		}
+		
+		private function changeTuition(){
+			tuitionTypeObject = tuitionTypeCmb.selectedItem;
+			updateScheduleData();
+		}
+		
+		private function formatDate(date:Date):String{
+			return dateFormat.format(date);
+		}
+		
+		private function onFault(fault:FaultEvent):void{
+			Manager.error("Can not load lesson form data.", "Load Error");
+		}
+	]]>
+	</mx:Script>
+
+	<mx:FormItem label="Lesson Type:" required="true" width="100%">
+		<mx:ComboBox width="100%" id="lessonTypeCmb" toolTip="Lesson type list." labelField="description"
+			change="changeLessonType()" data="modelChangedLessonType()"/>
+	</mx:FormItem>
+	<mx:FormItem label="Employee:" required="true" width="100%">
+		<mx:ComboBox width="100%" id="employeeCmb" toolTip="Employee list." labelField="name"
+			change="changeEmployee()" data="modelChangedEmployee()"/>
+	</mx:FormItem>
+	<mx:FormItem label="Available Days:" required="true" width="100%">
+		<mx:ComboBox width="100%" id="availableDaysCmb" toolTip="Employee available days." labelFunction="showAvailDays"
+			change="changeAvailDays()" data="modelChangedAvailDays()"/>
+	</mx:FormItem>
+	<mx:FormItem label="Effective Date:" width="100%">
+		<mx:HBox width="100%">
+			<mx:Label id="availableDaysTxt"/>
+			<mx:Button label="View Calendar"/>
+		</mx:HBox>
+	</mx:FormItem>
+	<mx:HRule width="100%" height="20"/>
+	<mx:HBox width="100%" horizontalGap="15">
+		<mx:VBox height="190">
+			<mx:DataGrid id="schedule_dg" dataProvider="{ArrayUtil.toArray(lessonControl)}" 
+				 change="changeSchedule()"
+				 dragEnabled="false"
+				 editable="false"
+				 height="100%"
+				 horizontalScrollPolicy="auto">
+				 <mx:columns>
+					<mx:Array>
+						<mx:DataGridColumn dataField="startDate"
+										   headerText="Start Date" width="80"/>
+						<mx:DataGridColumn dataField="startTime"
+										   headerText="Start Time" width="80"/>
+						<mx:DataGridColumn dataField="smtwtfs" itemRenderer="com.academy.calder.component.renderer.DaysCellRenderer"
+										   headerText="Days"/> 
+					</mx:Array>
+				 </mx:columns>
+			</mx:DataGrid>
+			<mx:HBox width="100%">
+				<mx:Button label="Add"/>
+				<mx:Button label="Duplicate"/>
+				<mx:Button label="Delete"/>
+			</mx:HBox>
+		</mx:VBox>
+		<mx:VBox width="100%">
+			<mx:ComboBox id="tuitionTypeCmb" toolTip="Tuition type list." labelField="description" width="100%"
+					change="changeTuition()" dataChange="modelChangedTuition()"/>
+			<mx:HBox width="100%" horizontalGap="0">
+				<mx:Label toolTip="Length of lessons." text="Length: {tuitionTypeObject.length} min."/>
+				<mx:Label toolTip="Number of lessons." text=" | Number of lessons: {tuitionTypeObject.calculateNumberOfLessons} | "/>
+				<mx:Label toolTip="Billing Interval."  text="Billing Interval: {tuitionTypeObject.billingInterval}"/>
+			</mx:HBox>
+			<mx:HBox width="100%">
+				<mx:CheckBox label="Sun" id="d0"/>
+				<mx:CheckBox label="Mon" id="d1"/>
+				<mx:CheckBox label="Tue" id="d2"/>
+				<mx:CheckBox label="Wed" id="d3"/>
+				<mx:CheckBox label="Thu" id="d4"/>
+				<mx:CheckBox label="Fri" id="d5"/>
+				<mx:CheckBox label="Sat" id="d6"/>
+			</mx:HBox>
+			<mx:HBox horizontalGap="0">
+				<mx:Form paddingTop="0">
+					<mx:FormItem label="Start Date:" required="true">
+						<mx:DateField labelFunction="formatDate" width="130" text="{scheduleObject.startDate}"/>
+					</mx:FormItem>
+					<mx:FormItem label="Start Time:" required="true">
+						<mx:TextInput width="113" text="{scheduleObject.startTime}"/>
+					</mx:FormItem>
+					<mx:FormItem label="Option:">
+						<!--mx:ComboBox id="options_cmb" change="rate_spr.enabled=(event.target.selectedIndex==2)" dataProvider="{Manager.TUITION_OPTIONS}"/-->
+					</mx:FormItem>
+				</mx:Form>
+				<mx:Form paddingTop="0">
+					<mx:FormItem label="End Date:">
+						<mx:DateField labelFunction="formatDate" width="130" text="{scheduleObject.endDate}"/>
+					</mx:FormItem>
+					<mx:FormItem label="Original rate:">
+						<mx:Label toolTip="Original rate."  text="${tuitionTypeObject.rate}"/>
+					</mx:FormItem>
+					<mx:FormItem label="Student Rate:" id="rate_lbl">
+						<!--mx:NumericStepper id="rate_spr" width="100" minimum="0" maximum="100000"
+							toolTip="Lesson cost." enabled="false" value="{Manager.getNumber(scheduleObject.rate, tuitionTypeObject.rate)}"/-->
+					</mx:FormItem>
+				</mx:Form>
+			</mx:HBox>
+			<mx:HBox width="100%" horizontalAlign="right">
+				<mx:Button label="Validate"/>
+			</mx:HBox>
+		</mx:VBox>
+	</mx:HBox>
+</mx:Form>

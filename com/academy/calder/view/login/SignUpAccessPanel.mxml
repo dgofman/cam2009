@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:component="com.academy.calder.component.*"
+	height="100%" styleName="innerPanel"
+	title="{Manager.bundle.getMessage('title2')}">
+	
+	<mx:Script>
+	<![CDATA[
+		import mx.containers.ViewStack;
+		import com.academy.calder.business.Manager;
+		import com.academy.calder.component.validator.CAMEmailValidator;
+		import com.academy.calder.component.validator.CAMStringValidator;
+				
+		private const stringValidator:CAMStringValidator = new CAMStringValidator(4, 16);
+		private const emailValidator:CAMEmailValidator = new CAMEmailValidator();
+
+		private function onSubmit():void{
+			stringValidator.required = emailValidator.required =
+				(username.text.length + password.text.length + confirm.text.length + email.text.length > 0);
+			stringValidator.showError(username);
+			stringValidator.showError(password);
+			stringValidator.showError(confirm);
+			emailValidator.showError(email);
+			
+			if(stringValidator.invalidFields.length || emailValidator.invalidFields.length){
+				return;
+			}
+			
+			if(password.text.length > 0 && confirm.text.length > 0 && password.text != confirm.text){
+				password.text = "";
+				confirm.text = "";
+				stringValidator.reset();
+				Manager.error(Manager.bundle.getMessage('error_pwd_notmatch'), Manager.bundle.getMessage('error_pwd_confirm'));
+				return;
+			}
+			SignUpScreen(parent.parent).createAccount();
+		}
+		
+		public function clean():void{
+			username.text =
+			password.text =
+			confirm.text =
+			email.text = "";
+			stringValidator.reset();
+			emailValidator.reset();
+		}
+		
+		private function onBack():void{
+			clean();
+			ViewStack(parent).selectedIndex -= 1; //Call SignUpAccountPanel view
+		}
+	]]>
+	</mx:Script>
+	
+	<mx:Canvas width="100%" height="100%" horizontalScrollPolicy="off">
+		<mx:VBox width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" verticalGap="0">
+			<component:CAMLabel width="100%" height="60" styleName="labelInfo" label="{Manager.bundle.getMessage('msg_register')}"/>
+	
+			<mx:Form width="100%" height="100%" defaultButton="{submitButton}" id="signupForm">
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('username')}:" required="true">
+					<mx:TextInput width="250" id="username" maxChars="16" restrict="A-Za-z0-9._"
+						toolTip="{Manager.bundle.getMessage('tip_username')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('password')}:" required="true">
+					<mx:TextInput width="250" displayAsPassword="true" id="password" maxChars="16"
+						toolTip="{Manager.bundle.getMessage('tip_pwd')}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="{Manager.bundle.getMessage('confirmPwd')}:" required="true">
+					<mx:TextInput width="250" displayAsPassword="true" id="confirm" maxChars="16"
+						toolTip="{Manager.bundle.getMessage('tip_confirm_pwd')}"/>
+				</mx:FormItem>
+
+				<mx:FormItem label="{Manager.bundle.getMessage('email')}:" required="true">
+					<mx:TextInput width="250" id="email" maxChars="30"
+						toolTip="{Manager.bundle.getMessage('tip_email')}"/>
+				</mx:FormItem>
+				
+			</mx:Form>
+		</mx:VBox>
+	</mx:Canvas>
+	<mx:ControlBar>
+		<mx:HBox width="100%" horizontalAlign="right">
+			<mx:Button id="submitButton" label="{Manager.bundle.getMessage('submit')}" click="onSubmit()"/>
+			<mx:Button id="backButton" label="{Manager.bundle.getMessage('back')}" click="onBack()"/>
+		</mx:HBox>
+	</mx:ControlBar>
+</mx:Panel>

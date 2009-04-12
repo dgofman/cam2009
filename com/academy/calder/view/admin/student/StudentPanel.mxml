@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:student="com.academy.calder.view.admin.student.*"
+	title="Students"
+	textIndent="15" 
+	fontSize="15"
+	width="100%" 
+	height="100%" 
+	headerHeight="20" 
+	cornerRadius="10"
+	initialize="onInitialize()">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.events.FaultEvent;
+			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.Services;
+		
+			[Embed(source="/resources/images/thumb_on.png")]
+			var thumbOn:String;
+			[Embed(source="/resources/images/thumb_off.png")]
+			var thumbOff:String;
+			[Embed(source="/resources/images/list_on.png")]
+			var listOn:String;
+			[Embed(source="/resources/images/list_off.png")]
+			var listOff:String;
+			[Embed(source="/resources/images/thumb_roll.png")]
+			var thumbRoll:String;
+			[Embed(source="/resources/images/list_roll.png")]
+			var listRoll:String;
+			
+			public var lessontypesArray:Array = [];
+			private var lessontypesObject:Object = {};
+			
+			private function onInitialize():void{
+				/*new Services(this, "onResultStudentList").getStudentList();
+				new Services(this, "onResultLessonTypes").getLessonTypes();
+				studentView.selectedChild.dispatchEvent({type:"initialize"});*/
+			}
+			
+			public function newRow():void{
+				/*Manager.getInstance().studentListData.push({userId:0, currentBalance:0});
+				studentListView.studentDataGrid.modelChanged({eventName:"updateTree"});
+				studentDetailedView.studentDataGrid.modelChanged({eventName:"updateTree"});*/
+			}
+			
+			private function onDelete():void{
+				/*var users:Array = [];
+				for(var i:Number = studentView.selectedChild.studentDataGrid.length - 1; i >= 0; i--){
+					var row:Object = studentView.selectedChild.studentDataGrid.dataProvider[i];
+					if(row.flag == true){
+						users.push(String(row.userId));
+						studentView.selectedChild.studentDataGrid.editField(i, 'flag', false);
+						studentView.selectedChild.studentDataGrid.dataProvider.removeItemAt(i);
+					}
+				}
+				if(users.length == 0){
+					Manager.error("Please select one or more rows before pressing the Delete button.", "Warning"); 
+				}else{
+					new Services(null).deleteUserRecord(users);
+				}*/
+			}
+			
+			private function onChangeView(event:Object):void{
+				var b:Boolean = (event.target.selectedIndex == 0);
+				add_button.visible = b;
+				delete_button.visible = b;
+			}
+			
+			private function onResultLessonTypes(event:ResultEvent):void{
+				/*if(!Services.isError(event)){
+					lessontypesArray = event.result.items;
+					for(var i:Number = 0; i < lessontypesArray.length; i++){
+						var obj:Object = lessontypesArray[i];
+						lessontypesObject[obj.lessonTypeId] = obj.description;
+					}
+				}*/
+			}		
+			
+			private function onResultStudentList(event:ResultEvent):void{
+				/*if(!Services.isError(event)){
+					Manager.getInstance().studentListData = event.result.items;
+					newRow();
+					Manager.selectedUserRowIndex = undefined;
+					for(var i:Number = 0; i < event.result.items.length; i++){
+						var item:Object = event.result.items[i];
+						if(item.userId == Manager.selectedUserId){
+							Manager.selectedUserRowIndex = i;
+							break;
+						}
+					}
+				}*/
+			}
+		
+			private function onFault(fault:FaultEvent):void{
+				Manager.error("Can not load student record.", "Database Error");
+			}
+		]]>
+	</mx:Script>
+
+	<mx:ViewStack width="100%" height="100%" id="studentView" selectedIndex="1" textIndent="0" fontSize="10" change="onChangeView(event)">
+		<student:StudentListView id="studentListView"/>
+		<student:StudentDetailedView id="studentDetailedView"/>
+	</mx:ViewStack>
+	<mx:ControlBar textIndent="0" fontSize="10" width="100%" height="30" paddingTop="0" paddingBottom="0" verticalAlign="middle" horizontalAlign="right">
+		<mx:Image id="listViewLink" source="{studentView.selectedIndex==0?listOn:listOff}" 
+				mouseOver="event.target.source=listRoll"
+				mouseOut="event.target.source=(studentView.selectedIndex==0)?listOn:listOff"
+				mouseDown="studentView.selectedIndex=0"
+				toolTip="Click here to view Student in list view"/>
+
+		<mx:Image id="detailedViewLink" source="{studentView.selectedIndex==1?thumbOn:thumbOff}"
+				mouseOver="event.target.source=thumbRoll"
+				mouseOut="event.target.source=(studentView.selectedIndex==1)?thumbOn:thumbOff"
+				mouseDown="studentView.selectedIndex=1"
+				toolTip="Click here to view Student in detailed view"/>
+
+		<mx:Spacer width="100%"/>
+		<mx:Button id="add_button" label="Add" width="100" click="newRow()"/>
+		<mx:Button id="delete_button" label="Delete" width="100" click="onDelete()"/>
+		<mx:Button id="refresh_button" label="Refresh" width="100" click="onInitialize()"/>
+	</mx:ControlBar>
+</mx:Panel>

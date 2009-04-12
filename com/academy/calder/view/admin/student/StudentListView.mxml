@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+	height="100%"
+	width="100%">
+
+	<mx:CurrencyFormatter id="currencyFormatter" precision="2" rounding="none"
+			decimalSeparatorTo="." thousandsSeparatorTo="," useThousandsSeparator="true"
+			useNegativeSign="true" currencySymbol="$" alignSymbol="left"/>
+
+	<mx:Style>
+		.balance { text-align:left; }
+	</mx:Style>
+	
+	<mx:Script>
+	<![CDATA[
+		import mx.rpc.events.ResultEvent;
+		import mx.rpc.events.FaultEvent;
+		import com.academy.calder.business.Manager;
+		import com.academy.calder.business.Services;
+		
+		private function balanceLabelFunction(item:Object, column:String):String{
+			return currencyFormatter.format(item.currentBalance);
+		}
+		
+		private function onCellEdit(event:Object):void{
+			var name:String = event.target.columns[event.columnIndex].columnName;
+			var row:Object = event.target.selectedItem;
+			//new Services(this).updateUserRecord(row.userId, name, row[name], Manager.STUDENT);
+		}
+		
+		private function onCellChange(event:Object):void{
+			var r:Number = event.target.selectedIndex;
+			var row:Object = event.target.dataProvider[r];
+			//Manager.selectedUserRowIndex = r;
+			//Manager.selectedUserId = row.userId;
+		}
+			
+		private function onResult(event:ResultEvent):void{
+			/*if(!Services.isError(event)){
+				studentDataGrid.editField(studentDataGrid.selectedIndex, 'userId', event.result.userId);
+			}*/
+		}
+		
+		private function onFault(fault:FaultEvent):void{
+			Manager.error("Can not update student record.", "Update Record Error");
+		}
+	]]>
+	</mx:Script>
+
+	<!-- cellEdit="onCellEdit(event)"
+		dataProvider="{Manager.getInstance().studentListData}"
+		 selectedIndex="{Manager.selectedUserRowIndex}"
+		 -->
+	<mx:DataGrid id="studentDataGrid" 
+		 
+		
+		 change="onCellChange(event)"
+		 dragEnabled="false"
+		 editable="true" 
+	     width="100%" 
+		 height="100%"
+		 horizontalScrollPolicy="auto">
+	     <mx:columns>
+	        <mx:Array>
+	            <mx:DataGridColumn dataField="flag" editable="false"
+								   itemRenderer="com.academy.calder.component.renderer.CheckCellRenderer"
+	            				   headerText="Select" width="45"/>
+	            <mx:DataGridColumn dataField="first"
+	            				   headerText="First" width="100"/>
+	            <mx:DataGridColumn dataField="last"
+	            				   headerText="Last" width="100"/>
+				<mx:DataGridColumn dataField="currentBalance" editable="false"
+	            				   headerText="Balance" width="65" textAlign="right"
+								   headerStyleName="balance" labelFunction="balanceLabelFunction"/>  
+				<mx:DataGridColumn dataField="lastPaymentDate" editable="false"
+	            				   headerText="Payment Date" width="130"/> 
+	            <mx:DataGridColumn dataField="dayPhone"
+	            				   headerText="Day Phone" width="100" itemRenderer="com.academy.calder.component.renderer.PhoneCellRenderer"/> 
+	            <mx:DataGridColumn dataField="eveningPhone"
+	            				   headerText="Evening Phone" width="100" itemRenderer="com.academy.calder.component.renderer.PhoneCellRenderer"/> 
+				<mx:DataGridColumn dataField="cellPhone"
+	            				   headerText="Cell Phone" width="100" itemRenderer="com.academy.calder.component.renderer.PhoneCellRenderer"/> 
+				<mx:DataGridColumn dataField="notes"
+	            				   headerText="Notes"/>
+	        </mx:Array>
+	     </mx:columns>
+	</mx:DataGrid>
+</mx:Canvas>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:helper="com.academy.calder.helper.*"
+	xmlns:view="com.academy.calder.view.*"
+	xmlns:login="com.academy.calder.view.login.*" 
+	xmlns:admin="com.academy.calder.view.admin.*" 
+	xmlns:guest="com.academy.calder.view.guest.*"
+	xmlns:student="com.academy.calder.view.student.*"
+	xmlns:teacher="com.academy.calder.view.teacher.*"
+	width="100%" 
+	height="100%"
+	creationComplete="onComplete()"
+	styleName="defaultIcons">
+	
+	<mx:Style source="/resources/css/component.css"/>
+	<mx:Style source="/resources/css/main.css"/>
+	
+	<mx:Script>
+	<![CDATA[
+		import com.academy.calder.business.LanguageService;
+		import com.academy.calder.business.Manager;
+		
+		private function onComplete():void {
+			LanguageService.switchLanguage(
+				Manager.getAppParam("locale", LanguageService.DEFAULT_LANGUAGE), onLanguageComplete);
+		}
+		
+		private function onLanguageComplete():void{
+			currentState = "APPLICATION_READY";
+			pageTitle = Manager.bundle.getMessage('title'); 
+			if(Manager.getAppParam("key") == "confirm"){
+				mainHelper.changeView(MainViewHelper.CONFIRM);
+			}else{
+				mainHelper.changeView(MainViewHelper.LOGIN);
+			}
+		}
+	]]>
+	</mx:Script>
+	
+	<helper:MainViewHelper id="mainHelper"/>
+	
+	<mx:states>
+	    <mx:State name="APPLICATION_READY">
+	        <mx:AddChild>
+				<mx:VBox width="100%" height="100%" styleName="mainBox">
+					<view:HeaderPanel id="headerPanel" height="60"/>
+					<mx:Panel width="100%" height="100%" styleName="mainPanel">
+						<mx:ViewStack id="mainViewStack" width="100%" height="100%">
+							<login:LoginScreen name="{MainViewHelper.LOGIN}"/>
+							<login:SignUpScreen name="{MainViewHelper.SIGNUP}"/>
+							<login:ConfirmScreen name="{MainViewHelper.CONFIRM}"/>
+							<login:PasswordResetScreen name="{MainViewHelper.RESET}"/>
+							<login:PasswordChangeScreen name="{MainViewHelper.CHANGE}"/>
+							<admin:AdminScreen name="{MainViewHelper.ADMIN}"/>
+							<guest:GuestScreen name="{MainViewHelper.GUEST}"/>
+							<student:StudentScreen name="{MainViewHelper.STUDENT}"/>
+							<teacher:TeacherScreen name="{MainViewHelper.TEACHER}"/>
+							<login:SignOutScreen name="{MainViewHelper.SIGNOUT}"/>
+						</mx:ViewStack>
+						<view:FooterBar width="100%"/>
+					</mx:Panel>
+				</mx:VBox>
+			</mx:AddChild>
+	    </mx:State>
+	</mx:states>
+</mx:Application>

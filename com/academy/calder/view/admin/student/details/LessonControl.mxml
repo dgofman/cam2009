@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	width="100%" 
+	height="100%"
+	verticalGap="0"
+	show="onShow()">
+
+	<mx:Script>
+		<![CDATA[
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.events.FaultEvent;
+			import com.academy.calder.view.admin.student.details.LessonControlForm;
+			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.Services;
+			
+			public function getLessontypesArray():Array{
+				//return Manager.getAdminStudentPanel().lessontypesArray;
+				return null;
+			}
+			
+			public function getLessontypesObject():Object{
+				//return Manager.getAdminStudentPanel().lessontypesObject;
+				return null;
+			}
+
+			private function onShow():void{
+				/*accordion.destroyAllChildren();
+				if(Manager.selectedUserId != undefined){
+					new Services(this, "onResultLessonControl").getLessonTypeIds(Manager.selectedUserId);
+				}*/
+			}
+			
+			private function onResultLessonControl(event:ResultEvent):void{
+				/*if(!Services.isError(event)){
+					var lessonControls:Array = event.result.items;
+					for(var i:Number = 0; i < lessonControls.length; i++){
+						addForm(lessonControls[i]);
+					}
+					openForm();
+				}*/
+			}
+
+			private function onFault(fault:FaultEvent):void{
+				Manager.error("Can not load lesson control data.", "Load Error");
+			}
+			
+			private function addForm(lessonControl:Object=null):LessonControlForm{
+				/*var lessontypesObject:Object = getLessontypesObject();
+				var form:MovieClip = accordion.createChild(LessonControlForm, "form" + new Date().getTime(), 
+					{width:"100%", height:"100%", lessonControlClass:this, lessonControl:((lessonControl == undefined) ? {} : lessonControl)});
+				form.label = lessontypesObject[lessonControl.lessonTypeId] + " - " + lessonControl.name;
+				return LessonControlForm(form);*/
+				return null;
+			}
+			
+			private function deleteForm():void{
+				//accordion.destroyChildAt(accordion.selectedIndex);
+			}
+			
+			private function openForm():void{
+				/*accordion.selectedIndex = accordion.numChildren;
+				accordion.getChildAt (accordion.selectedIndex-1).dispatchEvent({type:"show"});*/
+			}
+			
+			private function saveForms():void{
+				/*for(var i:Number = 0; i < accordion.numChildren; i++){
+					var form:MovieClip = accordion.getChildAt(i);
+					Manager.alert(form.label);
+				}*/
+			}
+		]]>
+	</mx:Script>
+	<mx:HBox width="100%" horizontalAlign="right">
+		<mx:Button label="Add" icon="@Embed('/resources/images/add.jpg')" height="20" click="addForm();openForm()"/>
+		<mx:Button label="Delete" icon="@Embed('/resources/images/delete.jpg')" height="20" click="deleteForm()"/>
+		<mx:Button label="Save" icon="@Embed('/resources/images/save.jpg')" height="20" click="saveForms()"/>
+	</mx:HBox>
+	<mx:Accordion id="accordion" width="100%" height="100%"/>
+</mx:VBox>

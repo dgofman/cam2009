@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:component="com.academy.calder.component.*"
+	height="100%" styleName="innerPanel" verticalAlign="middle"
+	title="{Manager.bundle.getMessage('title3')}">
+	
+	<mx:Script>
+	<![CDATA[
+		import mx.containers.ViewStack;
+		import com.academy.calder.business.Manager;
+		import com.academy.calder.helper.MainViewHelper;
+		
+		private const mainHelper:MainViewHelper = MainViewHelper.getSelf();
+		
+		[Bindable]
+		public var emailAddress:String;
+		
+		[Bindable]
+		public var msg_confirm:String;
+		
+		[Bindable]
+		public var msg_confirm_email:String;
+		
+		public function setEmailAddress(email:String):void{
+			emailAddress = email;
+			msg_confirm = Manager.bundle.getMessage('msg_confirm');
+			msg_confirm_email = Manager.bundle.getMessage('msg_confirm_email', [emailAddress]);
+		}
+				
+		private function onContinue():void{
+			ViewStack(parent).selectedIndex = 0; //Select SignUpAccountPanel view
+			if(emailAddress != null && emailAddress.length > 0){
+				mainHelper.changeView(MainViewHelper.LOGIN);
+			}else{
+				mainHelper.changeView(MainViewHelper.GUEST);
+			}
+		}
+	]]>
+	</mx:Script>
+		
+	<component:CAMLabel color="#000000" fontWeight="bold" fontSize="14" width="100%" height="55%" 
+		label="{emailAddress.length ? msg_confirm_email : msg_confirm}"/>
+	<mx:ControlBar>
+		<mx:HBox width="100%" horizontalAlign="right">
+			<mx:Button label="{Manager.bundle.getMessage('continue')}" click="onContinue()"/>
+		</mx:HBox>
+	</mx:ControlBar>
+</mx:Panel>

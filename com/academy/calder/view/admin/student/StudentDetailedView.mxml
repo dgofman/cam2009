@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		xmlns:student="com.academy.calder.view.admin.student.*"
+		height="100%"
+		width="100%" initialize="onInitialize(event)" show="onShow(event)">
+
+	<mx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.Services;
+			
+			private function onInitialize(event:FlexEvent):void{
+				studentDetailsPanel.dispatchEvent(event);
+			}
+			
+			private function onShow(event:FlexEvent):void{
+				studentDetailsPanel.detailTabs.selectedChild.dispatchEvent(event); 
+			}
+			
+			private function onCellChange(event:Object):void{
+				var r:Number = event.target.selectedIndex;
+				var row:Object = event.target.dataProvider[r];
+				//Manager.selectedUserRowIndex = r;
+				//Manager.selectedUserId = row.userId;
+				//studentDetailsPanel.detailTabs.enabled = true;
+				//studentDetailsPanel.detailTabs.selectedChild.dispatchEvent({type:"show"}); 
+			}
+			
+			private function onResult(event:ResultEvent):void{
+				/*if(!Services.isError(event)){
+					studentDataGrid.editField(studentDataGrid.selectedIndex, 'userId', event.result.userId);
+				}*/
+			}
+			
+			private function onFault(fault:FaultEvent):void{
+				//Manager.alert("Can not update student record.", "Update Record Error", fault);
+			}
+		 ]]>
+	</mx:Script>
+ 
+	<mx:HDividedBox width="100%" height="100%">
+		<mx:VBox width="210" height="100%">	
+			<!--dataProvider="{Manager.getInstance().studentListData}"
+				 selectedIndex="{Manager.selectedUserRowIndex}"-->
+			<mx:DataGrid id="studentDataGrid"
+				 
+				 change="onCellChange(event)"
+				 dragEnabled="false"
+				 editable="false" 
+				 width="100%" 
+				 height="100%">		
+				 <mx:columns>
+					<mx:Array>
+						<mx:DataGridColumn dataField="first"
+										   headerText="First" width="100"/>
+						<mx:DataGridColumn dataField="last"
+										   headerText="Last"/>
+					</mx:Array>
+				</mx:columns>
+			</mx:DataGrid>
+		</mx:VBox>
+		<student:StudentDetailsPanel id="studentDetailsPanel" height="100%"/>
+	</mx:HDividedBox>
+</mx:Canvas>

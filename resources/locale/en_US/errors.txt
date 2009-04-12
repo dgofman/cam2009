@@ -1,0 +1,51 @@
+languageCode=en_US
+
+&error_signup=SignUp Error
+&error_login=Login Error
+&error_authentication=Authentication Failed
+&error_inactive_account=You must to activate your account before to use.
+&error_user_account=User Account does not exists. You cannot use reference id.
+&error_pwd_confirm=Confirm Password Error
+&error_pwd_notmatch=Your passwords don't match, please try again.
+&error_duplicate=Duplicate entry
+&error_username_exists=Username is not available. Please try again.
+
+&CAMValidator=
+&error_val_requiredField=This field is required.
+
+&CAMNumberValidator=
+&error_num_decimalPointCount=The decimal separator can only occur once.
+&error_num_exceedsMax=The number entered is too large.
+&error_num_integer=The number must be an integer.
+&error_num_invalidChar=The input contains invalid characters.
+&error_num_invalidFormatChars=One of the formatting parameters is invalid.
+&error_num_lowerThanMin=The number entered is too small.
+&error_num_negative=The number may not be negative.
+&error_num_precision=The number entered has too many digits beyond the decimal point.
+&error_num_separation=The thousands separator must be followed by three digits.
+
+&CAMStringValidator=
+&error_str_tooLong=This string is longer than the maximum allowed length.
+&error_str_tooShort=This string is shorter than the minimum allowed length.
+
+&CAMDateValidator=
+&error_day_formatError=Configuration error: Incorrect formatting string. 
+&error_day_invalidCharError=Invalid characters in your date.
+&error_day_wrongDayError=Please enter a valid day for the month.
+&error_day_wrongLengthError=Please type the date in the format:
+&error_day_wrongMonthError=Please enter a month between 1 and 12.
+&error_day_wrongYearError=Please enter a year between 0 and 9999.
+
+&CAMPhoneValidator=
+&error_phone_invalidCharError=Invalid characters in your phone number.
+&error_phone_wrongLengthError=Your telephone number must be at least 10 digits in length.
+
+&CAMEmailValidator=
+&error_mail_invalidCharError=Invalid characters in your email address.
+&error_mail_invalidDomainError=The domain in your email address is incorrectly formatted. 
+&error_mail_invalidIPDomainError=The IP domain in your email address is incorrectly formatted. 
+&error_mail_invalidPeriodsInDomainError=The domain in your email address has consecutive periods. 
+&error_mail_missingAtSignError=Missing an at character in your email address.
+&error_mail_missingPeriodInDomainError=The domain in your email address is missing a period. 
+&error_mail_missingUsernameError=The username in your email address is missing.
+&error_mail_tooManyAtSignsError=Too many at characters in your email address.
