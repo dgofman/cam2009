@@ -14,6 +14,8 @@
 			
 			private var lessonControls:Array;
 			private var selectedMonthNode:Object;
+			
+			[Bindable]
 			private var lessonDisposition:Array = [ {label:"lesson taken", data:1},
 													{label:"missed, but still charged", data:2},
 													{label:"missed by student, not charged", data:3},
@@ -102,7 +104,7 @@
 				}*/
 			}
 			
-			private function enabledFields(b):void{
+			private function enabledFields(b:Boolean):void{
 				/*deleteButton.enabled = lessonTypeId.enabled = employeeUserId.enabled = length.enabled = disposition.enabled =
 								rate.enabled = startTime.enabled = date.enabled = options.enabled = notes.enabled = b;*/
 			}
