@@ -11,10 +11,16 @@
 		 import mx.utils.ArrayUtil;
 			
 		 private var lessonControlClass:LessonControl;
-		 private var lessonControl:Object;
+		 
+		 [Bindable]
 		 private var tuitionTypeObject:Object;
+		 
+		 [Bindable]
 		 private var scheduleObject:Object;
-
+		
+		 [Bindable]
+	  	 private var lessonControl:Object;
+		
 		 public function onShow():void{
 		 	 lessonTypeCmb.dataProvider = lessonControlClass.getLessontypesArray();
 		 }
@@ -31,7 +37,7 @@
 			//lessonTypeCmb.dispatchEvent({type:"change"});
 		}
 				
-		private function changeLessonType(){
+		private function changeLessonType():void{
 			//new Services(this, "onResultEmployee").getEmployeeByLessonTypeId(lessonTypeCmb.selectedItem.lessonTypeId);
 		}
 		
@@ -52,7 +58,7 @@
 			//employeeCmb.dispatchEvent({type:"change"});
 		}
 		
-		private function changeEmployee(){
+		private function changeEmployee():void{
 			var lessonTypeId:Number = lessonTypeCmb.selectedItem.lessonTypeId;
 			var userId:Number = employeeCmb.selectedItem.employeeUserId;
 			this.label = lessonControlClass.getLessontypesObject()[lessonTypeCmb.selectedItem.lessonTypeId] + " - " + employeeCmb.selectedItem.name;
@@ -91,9 +97,10 @@
 		
 		private function updateScheduleData():void{
 			var item:Object = availableDaysCmb.selectedItem;
+			var i:uint;
 			availableDaysTxt.text = item.effectiveDate + " | From: " + item.startTime + " | Until: " + item.endTime;
 			if(schedule_dg.selectedItem.availableScheduleId != item.availableScheduleId){
-				for(var i:Number = 0; i < schedule_dg.dataProvider.length; i++){
+				for(i = 0; i < schedule_dg.dataProvider.length; i++){
 					if(schedule_dg.dataProvider[i].availableScheduleId == item.availableScheduleId){
 						schedule_dg.selectedIndex = i;
 						break;
@@ -109,7 +116,7 @@
 			}
 			
 			if(scheduleObject.length){
-				for(var i:Number = 0; i < tuitionTypeCmb.dataProvider.length; i++){
+				for(i = 0; i < tuitionTypeCmb.dataProvider.length; i++){
 					if(tuitionTypeCmb.dataProvider[i].length == scheduleObject.length){
 						tuitionTypeCmb.selectedIndex = i;
 						return;
@@ -140,7 +147,7 @@
 				return "";
 			}else{
 				var days:Array = [];
-				for(var i:Number = 0; i < 7; i++){
+				for(i = 0; i < 7; i++){
 					//if(item.smtwtfs.charAt(i) == '1') days.push(Manager.DAYS[i]);
 				}
 				return days.join(", ");
@@ -164,7 +171,7 @@
 			//tuitionTypeCmb.dispatchEvent({type:"change"});
 		}
 		
-		private function changeTuition(){
+		private function changeTuition():void{
 			tuitionTypeObject = tuitionTypeCmb.selectedItem;
 			updateScheduleData();
 		}

@@ -11,6 +11,7 @@
 		import com.academy.calder.business.Manager;
 		import com.academy.calder.business.Services;
 		
+		[Bindable]
 		private var studentData:Object;
 		private var selectedField:Object;
 		

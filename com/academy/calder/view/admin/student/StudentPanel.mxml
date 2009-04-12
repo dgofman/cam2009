@@ -16,19 +16,19 @@
 			import mx.rpc.events.FaultEvent;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.Services;
-		
-			[Embed(source="/resources/images/thumb_on.png")]
-			var thumbOn:String;
-			[Embed(source="/resources/images/thumb_off.png")]
-			var thumbOff:String;
-			[Embed(source="/resources/images/list_on.png")]
-			var listOn:String;
-			[Embed(source="/resources/images/list_off.png")]
-			var listOff:String;
+			
+			[Bindable] [Embed(source="/resources/images/thumb_on.png")]
+			private var thumbOn:String;
+			[Bindable] [Embed(source="/resources/images/thumb_off.png")]
+			private var thumbOff:String;
+			[Bindable] [Embed(source="/resources/images/list_on.png")]
+			private var listOn:String;
+			[Bindable] [Embed(source="/resources/images/list_off.png")]
+			private var listOff:String;
 			[Embed(source="/resources/images/thumb_roll.png")]
-			var thumbRoll:String;
+			private var thumbRoll:String;
 			[Embed(source="/resources/images/list_roll.png")]
-			var listRoll:String;
+			private var listRoll:String;
 			
 			public var lessontypesArray:Array = [];
 			private var lessontypesObject:Object = {};
