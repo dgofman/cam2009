@@ -33,6 +33,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>flexphp</name>
+			<type>2</type>
+			<location>XAMPP_HOME/htdocs/flexphp</location>
+		</link>
+		<link>
 			<name>xampp_bin_ui</name>
 			<type>2</type>
 			<locationURI>XAMPP_HOME/htdocs/ui</locationURI>
