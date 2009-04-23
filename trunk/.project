@@ -33,9 +33,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>bin</name>
+			<name>xampp_bin_ui</name>
 			<type>2</type>
-			<location>C:/xampp/htdocs/ui</location>
+			<locationURI>XAMPP_HOME/htdocs/ui</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
