@@ -10,7 +10,7 @@
 		import com.academy.calder.enum.UserTypes;
 		import com.academy.calder.enum.UserLanguage;
 		import com.academy.calder.business.Manager;
-		import com.academy.calder.business.Services;	
+		import com.academy.calder.business.AMFService;	
 		
 		private var emailAddress:String;
 		private var userLanguage:String;
@@ -20,7 +20,7 @@
 			emailAddress = access.email.text;
 			userLanguage = UserLanguage.valueOf(account.language.selectedItem.data).value;
 			
-			Services.send("signup", [
+			AMFService.send("CAM.signup", [
 				account.first.text, 
 				account.last.text, 
 				userLanguage,

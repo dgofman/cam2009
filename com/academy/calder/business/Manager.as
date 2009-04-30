@@ -30,12 +30,12 @@ package com.academy.calder.business
 			_userAccount = account;
 		}
 		
-		public static function getApplication():CAM{
+		public static function get application():CAM{
 			return Application.application as CAM;
 		}
 		
 		public static function getIcon(icon:String):Class{
-			return getApplication().getStyle(icon);
+			return application.getStyle(icon);
 		}
 		
 		public static function formatTime(date:Date):String{
@@ -73,9 +73,9 @@ package com.academy.calder.business
 		}
 		
 		public static function getAppParam(key:String, defaultValue:String=null):String{
-			if(Manager.getApplication().parameters == null)
+			if(Manager.application.parameters == null)
 				return defaultValue;
-			var value:String = getApplication().parameters[key];
+			var value:String = application.parameters[key];
 			return (value != null) ? value : defaultValue;
 		}
 		
@@ -187,7 +187,7 @@ package com.academy.calder.business
 			so.close();
 		}
 		
-		public static function getApplication():Object{
+		public static function application:Object{
 			return mx.core.Application.application;
 		}
 		
@@ -203,7 +203,7 @@ package com.academy.calder.business
 		}
 		
 		public static function msg(key:String):String{
-			return getApplication().messages[key];
+			return application.messages[key];
 		}
 		
 		public static function getNumber(value:Number, defValue:Number):Number{
@@ -215,15 +215,15 @@ package com.academy.calder.business
 		}
 		
 		public static function changeMainView(index:Number):Void{
-			getApplication().mainView.selectedIndex = index;
+			application.mainView.selectedIndex = index;
 		}
 		
 		public static function changeAdminView(index:Number):Void{
-			getApplication().mainView.admin.adminView.selectedIndex = index;
+			application.mainView.admin.adminView.selectedIndex = index;
 		}
 		
 		public static function getAdminStudentPanel():Object{
-			return getApplication().mainView.admin.adminView.studentView.studentPanel;
+			return application.mainView.admin.adminView.studentView.studentPanel;
 		}*/
 	}
 }

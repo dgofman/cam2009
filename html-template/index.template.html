@@ -15,14 +15,15 @@ body { margin: 0px; overflow:hidden; scroll:no }
 </div>
 <script language="JavaScript" type="text/javascript">
 <!--
-	var src = "CAM.swf";
+	var id = "CAM";
 	var language = "en_US";
+	var gateway = "http://localhost/camphp/gateway.php"
 	var version = null;
 
 	if(new String("${swf}").indexOf("debug") != -1){
 		src = "${swf}";
 	}
-	createSWF(src, language, version);
+	createSWF(id, gateway, language, version);
 // -->
 </script>
 </body>

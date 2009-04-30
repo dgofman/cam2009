@@ -6,8 +6,6 @@ var requiredMajorVersion = 9;
 var requiredMinorVersion = 0;
 // Minor version of Flash required
 var requiredRevision = 0;
-// Path to the WebServices directory
-var webServicesDir = "/oneplace-ws";
 
 var isIE  = (navigator.appVersion.indexOf("MSIE") != -1) ? true : false;
 var isWin = (navigator.appVersion.toLowerCase().indexOf("win") != -1) ? true : false;
@@ -104,7 +102,7 @@ function DetectFlashVer(reqMajorVer, reqMinorVer, reqRevision)
 		var versionMinor      = versionArray[1];
 		var versionRevision   = versionArray[2];
 
-        	// is the major.revision >= requested major.revision AND the minor version >= requested minor
+		// is the major.revision >= requested major.revision AND the minor version >= requested minor
 		if (versionMajor > parseFloat(reqMajorVer)) {
 			return true;
 		} else if (versionMajor == parseFloat(reqMajorVer)) {
@@ -118,7 +116,7 @@ function DetectFlashVer(reqMajorVer, reqMinorVer, reqRevision)
 		return false;
 	}
 }
-function createSWF(src, language, version)
+function createSWF(id, gateway, language, version)
 {
 	// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
 	var hasProductInstall = DetectFlashVer(6, 0, 65);
@@ -127,51 +125,17 @@ function createSWF(src, language, version)
 	var hasRequestedVersion = DetectFlashVer(requiredMajorVersion, requiredMinorVersion, requiredRevision);
 
 	var flashParams = {
+		allowFullScreen:true,
 		align:"middle",
 		quality:"high",
-		bgcolor:"#FFFFFF",
-		allowScriptAccess:"sameDomain",
+		wmode:"transparent",
+		allowScriptAccess:"always",
 		type:"application/x-shockwave-flash"
 	};
-
-	flashParams.toString = function(){
-		var str = 'width="100%" height="100%" ';
-		if (isIE && isWin && !isOpera)
-		{
-			str = '<object id="oneplace" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" ' + str;
-			for (var i in this)
-				str += '><param name="' + i + '" value="' + this[i] + '" /';
-			str += '></object>';
-		} else {
-			str = '<embed id="oneplace" pluginspage="http://www.adobe.com/go/getflashplayer" ' + str;
-			for (var i in this)
-				str += i + '="' + this[i] + '" ';
-			str += '> </embed>';
-		}
-		return str;
-	};
 	
-	var pos;
-	var flashvars = "locale=" +language;
-	var output, MMPlayerType, MMredirectURL, src;
-	MMPlayerType = (isIE == true) ? "ActiveX" : "PlugIn";
-	MMredirectURL = window.location.toString();
-	
-	if(version == null){
+	if(version != null)
 		version = new Date().getTime();
-	}
 	
-	//Get file update information
-	if(MMredirectURL.indexOf("info=true") != -1){
-		alert("Version: " + version +
-			", Last modified: " + modified.replace(/(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, "$2/$3/$1 $4:$5:$6") + 
-			", Document modified: " + document.lastModified);
-	}
-	
-	if((pos = MMredirectURL.indexOf("?")) != -1){
-		flashvars += "&" + MMredirectURL.substring(pos + 1);
-	}
-
 	// Check to see if a player with Flash Product Install is available and the version does not meet the requirements for playback
 	if ( hasProductInstall && !hasRequestedVersion) {
 		// MMdoctitle is the stored document.title value used by the installation process to close the window that started the process
@@ -181,14 +145,13 @@ function createSWF(src, language, version)
 		document.title = document.title.slice(0, 47) + " - Flash Player Installation";
 		flashParams.src = "playerProductInstall.swf";
 		flashParams.flashvars = "MMredirectURL="+MMredirectURL+"&MMplayerType="+MMPlayerType+"&MMdoctitle="+document.title;
-		output = flashParams.toString();
+		output = flashParamsToString(id, flashParams);
 	} else if (hasRequestedVersion) {
 		// if we've detected an acceptable version
 		// embed the Flash Content SWF when all tests are passed
-		// Optional parameters: 'saveLayout=&debug=&demo=&loginId=&password=';
-		flashParams.src = src + '?v=' + version;
-		flashParams.flashvars = flashvars;
-		output = flashParams.toString();
+		flashParams.src = id + '.swf?=' + version;
+		flashParams.flashvars = "locale=" + language + "&gateway=" + gateway;
+		output = flashParamsToString(id, flashParams);
 	} else {  // flash is too old or we can't detect the plugin
 		output = 'Alternate HTML content should be placed here. '
 		+ 'This content requires the Adobe Flash Player. '
@@ -202,10 +165,20 @@ function createSWF(src, language, version)
 		document.write(output);
 	}
 }
-	
-function closeSession ()
-{
-	var d = new Date();
-	d.setTime(d.getTime() + (-1*24*60*60*1000));
-	document.cookie = "JSESSIONID=; expires=" + d.toGMTString() + "; path=/";
+
+function flashParamsToString(id, flashParams){
+	var str = 'width="100%" height="100%" ';
+	if (isIE && isWin && !isOpera)
+	{
+		str = '<object id="' + id + '" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" ' + str;
+		for (var i in flashParams)
+			str += '><param name="' + i + '" value="' + flashParams[i] + '" /';
+		str += '></object>';
+	} else {
+		str = '<embed id="' + id + '" name="' + id + '" pluginspage="http://www.adobe.com/go/getflashplayer" ' + str;
+		for (var i in flashParams)
+			str += i + '="' + flashParams[i] + '" ';
+		str += '> </embed>';
+	}
+	return str;
 }

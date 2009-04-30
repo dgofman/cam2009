@@ -23,8 +23,12 @@ package {
 		private var _type:String;
 	
 		private static var _xpanel_lc:LocalConnection;
-		private static var _localConnectionClient:Object;
-
+		private static var _localConnection:LocalConnection;
+		
+		public static var REMOTE_MESSAGE_OUTPUT:Boolean = true;
+		public static var XPANEL_CONSOLE_OUTPUT:Boolean = true;
+		public static var FIREBUG_CONSOLE_OUTPUT:Boolean = true;
+		
 		private static const xpanelConnectionName:String = "_xpanel1";
 		private static const loggerConnectionName:String = "_logger";
 		
@@ -35,7 +39,7 @@ package {
 		
 		public static const EXTERNAL_LOG_CHANNEL:int =  0; 
 		
-		private static const CHAR_LIMIT:uint = 40000; //LocalConnection error: 2084 The AMF encoding of the arguments cannot exceed 40K. 
+		private static const CHAR_LIMIT:uint = 37400; //LocalConnection error: 2084 The AMF encoding of the arguments cannot exceed 40K. 
 		private static const ARRAY_DELIMITER:String = "\u00B6";
 		
 		private static var _js_bridge_initialized:Boolean = false;
@@ -82,6 +86,10 @@ package {
 			_send(LOGGER_DEBUG, (args is Array ? args.join(", ") : args));
 		}
 		
+		public static function get localConnection():LocalConnection{
+			return _localConnection;
+		}
+		
 		private function js_trace(type:String="log", o:Object=null):void{
 			var loggers:Array = [LOGGER_DEBUG, LOGGER_INFORMATION, LOGGER_WARNING, LOGGER_ERROR];
 			for(var i:uint = 0; i < loggers.length; i++){
@@ -94,27 +102,37 @@ package {
 		}
 
 		public static function send(channel:uint, ...args):void{
-			if(_localConnectionClient == null)
-				_localConnectionClient = _connect(-1).client;
-			_localConnectionClient.$send(args, channel);
+			try{
+				if(_localConnection == null)
+					_localConnection = _connect(-1);
+				_localConnection.client.$send(args, channel);
+			}catch(e:Error){
+				trace(e);
+			}
 		}
 
 		private static function _send(logger:Logger, o:Object):void{
 			try{
 				var str:String = (typeof o == "xml" ? o.toXMLString() : toString(o));
 				//Send message to Flex Logger
-				send(EXTERNAL_LOG_CHANNEL, getTimer(), str, logger.level);
+				if(REMOTE_MESSAGE_OUTPUT == true)
+					send(EXTERNAL_LOG_CHANNEL, getTimer(), str, logger.level);
 				//Send message to FireBug console
-				ExternalInterface.call("console." + logger.type, formatDate(new Date()) + "  " + str);
+				if(FIREBUG_CONSOLE_OUTPUT == true)
+					ExternalInterface.call("console." + logger.type, formatDate(new Date()) + "  " + str);
 				//Send message to XPanel
-				if(_xpanel_lc == null){
-					_xpanel_lc = new LocalConnection();
-					_xpanel_lc.allowDomain("*");
+				if(XPANEL_CONSOLE_OUTPUT == true){
+					if(_xpanel_lc == null){
+						_xpanel_lc = new LocalConnection();
+						_xpanel_lc.allowDomain("*");
+					}
+					_xpanel_lc.addEventListener(StatusEvent.STATUS, function (event:StatusEvent):void{});
+					while(str && str.length){
+						var truncate:String = str.substring(0, Logger.CHAR_LIMIT);
+						_xpanel_lc.send(xpanelConnectionName, "dispatchMessage", getTimer(), truncate, logger.level);
+						str = str.substring(Logger.CHAR_LIMIT);
+					}
 				}
-				if(str && str.length > CHAR_LIMIT)
-					str = str.substring(0, CHAR_LIMIT); 
-				_xpanel_lc.addEventListener(StatusEvent.STATUS, function (event:StatusEvent):void{});
-				_xpanel_lc.send(xpanelConnectionName, "dispatchMessage", getTimer(), str, logger.level);
 			}
 			catch (err:Error){
 				// ignored.
@@ -138,19 +156,23 @@ package {
 								event.target.client.hasOwnProperty('request')){
 						var channel:int = event.target.client.$channel;
 						var request:Object = event.target.client.request;
-						if(request.channel != EXTERNAL_LOG_CHANNEL)				
+						if(request.channel != EXTERNAL_LOG_CHANNEL){
 							trace("Warning Undeliverable Messages: " + channel + " -> " + request.channel + "\n" + request.params);
+							_localConnection = null;
+						}
 					}
 					lastStatus = event.level;
 				}
 			);
 			//Workaround against Adobe bug: https://bugs.adobe.com/jira/browse/SDK-13565
 			lc.client.$send = function(params:*, channel:int):void{
+				lastStatus = null;
 				var msg:String = (params is Array ? params.join(ARRAY_DELIMITER) : String(params));
 				lc.client.request = {channel:channel, params:params}
 				lc.send(loggerConnectionName + channel, "$progress", "INIT_STATUS");
 				while(msg && msg.length){
-					lc.send(loggerConnectionName + channel, "$progress", "SENDING_STATUS", msg.substring(0, Logger.CHAR_LIMIT));
+					var truncate:String = msg.substring(0, Logger.CHAR_LIMIT);
+					lc.send(loggerConnectionName + channel, "$progress", "SENDING_STATUS", truncate);
 					msg = msg.substring(Logger.CHAR_LIMIT);
 				}
 				lc.send(loggerConnectionName + channel, "$progress", "COMPLETE_STATUS");
@@ -179,7 +201,7 @@ package {
 					lc.connect(loggerConnectionName + channel);
 					if(lc.client.$status is Function)
 						lc.client.$status(channel, "ready", "Connection opened.");
-					_localConnectionClient = lc.client;
+					_localConnection = lc;
 				} catch (error:ArgumentError) {
 					lc.send(loggerConnectionName + channel, "$terminate", channel);
 					_connectionInterval = setInterval(_connect, 500, channel, resultHandler, statusHandler);

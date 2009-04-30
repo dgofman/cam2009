@@ -11,7 +11,7 @@
 			import mx.rpc.events.FaultEvent;
 			import com.academy.calder.view.admin.student.details.LessonControlForm;
 			import com.academy.calder.business.Manager;
-			import com.academy.calder.business.Services;
+			import com.academy.calder.business.AMFService;
 			
 			public function getLessontypesArray():Array{
 				//return Manager.getAdminStudentPanel().lessontypesArray;
