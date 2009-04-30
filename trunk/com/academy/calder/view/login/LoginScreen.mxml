@@ -8,7 +8,7 @@
 		import com.academy.calder.model.UserAccount;
 		import com.academy.calder.enum.UserTypes;
 		import com.academy.calder.enum.AccountStatus;
-		import com.academy.calder.business.Services;
+		import com.academy.calder.business.AMFService;
 		import com.academy.calder.business.Manager;
 		import com.academy.calder.business.LocalShare;	
 		import com.academy.calder.helper.MainViewHelper;
@@ -31,7 +31,7 @@
 			if(stringValidator.invalidFields.length){
 				return;
 			}
-			Services.send("login", [username.text, password.text], onLoginResult);
+			AMFService.send('CAM.login', [username.text, password.text], onLoginResult);
 			password.text = "";
 			stringValidator.reset();
 		}
@@ -44,16 +44,16 @@
 			mainHelper.changeView(MainViewHelper.SIGNUP);
 		}
 		
-		private function onLoginResult(list:XMLList, data:Array=null, columns:Array=null):void{
-			if(AccountStatus.valueOf(list.status) == AccountStatus.Inactive){
+		private function onLoginResult(result:Object, data:Array=null, columns:Array=null):void{
+			if(AccountStatus.valueOf(result.status) == AccountStatus.Inactive){
 				Manager.error(Manager.bundle.getMessage('error_inactive_account'), Manager.bundle.getMessage('error_authentication'));
 			}else{
 				var ua:UserAccount = new UserAccount(
-					list.userId,
-					list.first,
-					list.language,
-					new Boolean(list.admin),
-					UserTypes.valueOf(list.typeId)
+					result.userId,
+					result.first,
+					result.language,
+					new Boolean(result.admin),
+					UserTypes.valueOf(result.typeId)
 				);
 				Manager.getInstance().userAccount = ua;
 				

@@ -3,12 +3,12 @@
 	<mx:DateFormatter id="dateFormat" formatString="YYYY-MM-DD" />
 	<mx:Script>
 	<![CDATA[
-		import mx.rpc.events.ResultEvent;
-		import mx.rpc.events.FaultEvent;
-		 import com.academy.calder.view.admin.student.details.LessonControl;
-		 import com.academy.calder.business.Manager;
-		 import com.academy.calder.business.Services;
 		 import mx.utils.ArrayUtil;
+		 import mx.rpc.events.ResultEvent;
+		 import mx.rpc.events.FaultEvent;
+		 import com.academy.calder.business.Manager;
+		 import com.academy.calder.business.AMFService;
+		 import com.academy.calder.view.admin.student.details.LessonControl;
 			
 		 private var lessonControlClass:LessonControl;
 		 
