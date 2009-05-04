@@ -1,6 +1,6 @@
 <?php
 
-$PHP_DIR = realpath("../../php_scripts");
+$PHP_DIR = realpath("php_scripts");
 
 require_once($PHP_DIR."/global.php");
 
