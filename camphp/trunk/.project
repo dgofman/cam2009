@@ -25,10 +25,5 @@
 			<type>2</type>
 			<location>XAMPP_HOME/htdocs/zend_framework/library</location>
 		</link>
-		<link>
-			<name>php_scripts</name>
-			<type>2</type>
-			<location>XAMPP_HOME/php_scripts</location>
-		</link>
 	</linkedResources>
 </projectDescription>
