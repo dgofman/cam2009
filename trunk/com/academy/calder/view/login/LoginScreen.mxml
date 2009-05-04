@@ -31,7 +31,7 @@
 			if(stringValidator.invalidFields.length){
 				return;
 			}
-			AMFService.send('CAM.login', [username.text, password.text], onLoginResult);
+			AMFService.send('CAM.login', [username.text, password.text], onLoginResult, onLoginFault);
 			password.text = "";
 			stringValidator.reset();
 		}
@@ -44,7 +44,11 @@
 			mainHelper.changeView(MainViewHelper.SIGNUP);
 		}
 		
-		private function onLoginResult(result:Object, data:Array=null, columns:Array=null):void{
+		private function onLoginFault(fault:Object):void{
+			Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_login'));
+		}
+		
+		private function onLoginResult(result:Object):void{
 			if(AccountStatus.valueOf(result.status) == AccountStatus.Inactive){
 				Manager.error(Manager.bundle.getMessage('error_inactive_account'), Manager.bundle.getMessage('error_authentication'));
 			}else{
@@ -52,14 +56,13 @@
 					result.userId,
 					result.first,
 					result.language,
-					new Boolean(result.admin),
 					UserTypes.valueOf(result.typeId)
 				);
 				Manager.getInstance().userAccount = ua;
 				
 				LocalShare.save("loginInfo", remember.selected ? {username:username.text, remember:true} : null, LocalShare.GLOBAL_LEVEL);
 				
-				if(ua.admin){
+				if(ua.type == UserTypes.Admin){
 					mainHelper.changeView(MainViewHelper.ADMIN);
 				}else if(ua.type == UserTypes.Guest){
 					mainHelper.changeView(MainViewHelper.GUEST);
@@ -69,10 +72,6 @@
 					mainHelper.changeView(MainViewHelper.STUDENT);
 				}
 			}
-		}
-		
-		private function onFault(fault:Object):void{
-			Manager.error(Manager.bundle.getMessage(fault.error_code), Manager.bundle.getMessage('error_login'));
 		}
 	]]>
 	</mx:Script>
@@ -88,7 +87,7 @@
 	
 			<mx:FormItem width="100%" label="{Manager.bundle.getMessage('password')}:" required="true">
 				<mx:TextInput width="100%" displayAsPassword="true" id="password" maxChars="16"
-					toolTip="{Manager.bundle.getMessage('tip_password')}" text="dgofman"/>
+					toolTip="{Manager.bundle.getMessage('tip_password')}"/>
 			</mx:FormItem>
 			
 			<mx:FormItem>
