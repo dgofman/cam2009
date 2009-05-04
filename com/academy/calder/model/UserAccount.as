@@ -11,16 +11,12 @@ package com.academy.calder.model
 		
 		private var _language:String;
 		
-		private var _admin:Boolean;
-		
 		private var _type:UserTypes;
 		
-		public function UserAccount(id:Number, first:String, language:String,
-										admin:Boolean, type:UserTypes){
+		public function UserAccount(id:Number, first:String, language:String, type:UserTypes){
 			_id = id;
 			_first = first;
 			_language = language;
-			_admin = admin;
 			_type = type;
 		}
 		
@@ -35,11 +31,7 @@ package com.academy.calder.model
 		public function get language():String{
 			return _language;
 		}
-		
-		public function get admin():Boolean{
-			return _admin;
-		}
-		
+
 		public function get type():UserTypes{
 			return _type;
 		}

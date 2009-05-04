@@ -68,9 +68,11 @@
 			return (date) ? Manager.formatDate(date) : "";
 		}
 		
+		[Bindable]
 		private function get dateFormat():String{
 			return Manager.getProperty("dateFormat");
 		}
+		private function set dateFormat(value:String):void{}
 	]]>
 	</mx:Script>
 	

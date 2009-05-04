@@ -50,7 +50,6 @@
 				event.userId,
 				null,
 				userLanguage,
-				false,
 				UserTypes.Guest
 			);
 			clean();
