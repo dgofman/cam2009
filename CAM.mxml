@@ -40,10 +40,11 @@
 			}
 			Manager.instance.cookieParams = new URLVariables('JSESSIONID=' + event);
 			
-			var mainViewName:String = LocalShare.getValue("mainView", LocalShare.GLOBAL_LEVEL) as String;
+			var mainViewName:String = LocalShare.getValue(MainViewHelper.VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
 			var params:URLVariables = new URLVariables(ExternalInterface.call("getCookie"));
 			if(mainViewName != null && params != null && params['JSESSIONID'] == event){
 				mainHelper.changeView(mainViewName);
+				mainHelper.dispatchEvent(new Event(MainViewHelper.MAINVIEW_CHANGE));
 			}else{
 				if(Manager.getAppParam("key") == "confirm"){
 					mainHelper.changeView(MainViewHelper.CONFIRM);

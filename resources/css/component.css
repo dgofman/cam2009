@@ -53,5 +53,5 @@ HeaderPanel{
 	fontSize:13;
 	fontWeight:bold;
 	backgroundColor:#2D253C;
-	borderSkin:ClassReference("com.academy.calder.component.skin.RoundedBorderSkin");
+	borderSkin:ClassReference("com.academy.calder.skins.RoundedBorderSkin");
 }

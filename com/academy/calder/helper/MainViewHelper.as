@@ -18,8 +18,11 @@ package com.academy.calder.helper
 		public static const TEACHER:String = "teacher";
 		public static const SIGNOUT:String = "signout";
 		
+		public static const VIEW_SHARE_ID:String = "mainView";
+		public static const MAINVIEW_CHANGE:String = "mainViewChange";
+		
 		public function changeView(name:String):void{
-			LocalShare.save("mainView", name, LocalShare.GLOBAL_LEVEL);
+			LocalShare.save(VIEW_SHARE_ID, name, LocalShare.GLOBAL_LEVEL);
 			if(mainViewStack.getChildByName(name) is Container)
 				mainViewStack.selectedChild = mainViewStack.getChildByName(name) as Container;
 		}

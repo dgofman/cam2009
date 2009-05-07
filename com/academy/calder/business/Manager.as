@@ -1,5 +1,6 @@
 package com.academy.calder.business
 {
+	import com.academy.calder.helper.MainViewHelper;
 	import com.academy.calder.model.UserAccount;
 	
 	import flash.net.URLVariables;
@@ -68,8 +69,8 @@ package com.academy.calder.business
 			return dateFormatter.format(date);
 		}
 		
-		public static function changeMainView(name:String):void{
-			application.mainHelper.changeView(name);
+		public static function signout():void{
+			application.mainHelper.changeView(MainViewHelper.SIGNOUT);
 		}
 		
 		public static function getAppParam(key:String, defaultValue:String=null):String{

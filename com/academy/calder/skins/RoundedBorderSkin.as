@@ -1,8 +1,7 @@
-package com.academy.calder.component.skin
+package com.academy.calder.skins
 {
-	import flash.display.Graphics;
-    import mx.graphics.RectangularDropShadow;
-    import mx.skins.RectangularBorder;
+	import mx.graphics.RectangularDropShadow;
+	import mx.skins.RectangularBorder;
     
     public class RoundedBorderSkin extends RectangularBorder {
 	

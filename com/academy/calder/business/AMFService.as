@@ -26,8 +26,8 @@ package com.academy.calder.business
 			var faultHandler:Function = function(event:*):void{
 				CursorManager.removeBusyCursor();
 				if(onFault != null){
-					if(event is NetStatusEvent && event.info.level == "error")
-						onFault(event.info.code + ":" + event.info.details);
+					if(event is NetStatusEvent)
+						onFault({code:event.info.code,  description:event.info.description, detail:event.info.details});
 					else
 						onFault(event);
 				}
