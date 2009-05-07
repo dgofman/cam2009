@@ -7,7 +7,7 @@
 			import com.academy.calder.business.Manager;
 			
 			private var interval:Number;
-			private const manager:Manager = Manager.getInstance();
+			private const manager:Manager = Manager.instance;
 						
 			private function displayCurrentTime():void {
 				var helper:MainViewHelper = MainViewHelper.getSelf();

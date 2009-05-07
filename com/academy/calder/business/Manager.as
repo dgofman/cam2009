@@ -2,26 +2,34 @@ package com.academy.calder.business
 {
 	import com.academy.calder.model.UserAccount;
 	
+	import flash.net.URLVariables;
+	
 	import mx.controls.Alert;
 	import mx.core.Application;
 	import mx.formatters.DateFormatter;
-	import mx.rpc.events.FaultEvent;
-	import mx.utils.StringUtil;
 	
 	public class Manager{
 		
-		private static var instance:Manager;
+		private static var _instance:Manager;
 		
 		private var _userAccount:UserAccount;
+		private var _cookieParams:URLVariables;
 		
 		public static const bundle:ResourceBundle = new ResourceBundle();
 
-		public static function getInstance():Manager{
-			if(!instance)
-				instance = new Manager();
-			return instance;
+		public static function get instance():Manager{
+			if(!_instance)
+				_instance = new Manager();
+			return _instance;
 		}
 		
+		public function get cookieParams():URLVariables{
+			return _cookieParams;
+		}
+		public function set cookieParams(value:URLVariables):void{
+			_cookieParams = value;
+		}
+
 		[Bindable]
 		public function get userAccount():UserAccount{
 			return _userAccount;
@@ -60,16 +68,8 @@ package com.academy.calder.business
 			return dateFormatter.format(date);
 		}
 		
-		public static function getE4X(keys:Array, values:Array):XMLList{
-			var list:XMLList = <></>;
-			for(var r:int = 0; r < values.length; r++){
-				var xml:XML = new XML("<r id='" + r + "'></r>");
-				for(var i:int = 0; i < keys.length; i++){
-					xml.appendChild(StringUtil.substitute("<{0}><![CDATA[{1}]]></{0}>",  [keys[i], values[r][i]]));
-				}
-				list += xml;
-			}
-			return list;
+		public static function changeMainView(name:String):void{
+			application.mainHelper.changeView(name);
 		}
 		
 		public static function getAppParam(key:String, defaultValue:String=null):String{
