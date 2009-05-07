@@ -1,34 +1,22 @@
-﻿<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml"
-          xmlns:view="com.foxracing.dealer.view.*"
-          title=""
-		  backgroundColor="#FCA34C"
-		  cornerRadius="5"
-		  headerHeight="0"
-		  paddingTop="0"
-		  paddingBottom="0"
-		  width="100%"
-		  height="26"
-		  verticalAlign="middle"
-		  >
+﻿<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	verticalAlign="middle" fontSize="12" backgroundColor="#FCA34C" color="#000099" fontWeight="bold" 
+	paddingLeft="10" paddingRight="10" horizontalGap="10" height="23" width="100%">
 
 	<mx:Script>
 	<![CDATA[
 		import com.academy.calder.business.Manager;
-		
-		private function changeView(index:Number):void{
-			//Manager.changeAdminView(index);
+		import com.academy.calder.helper.MainViewHelper;
+
+		private function changeView(name:String):void{
+			Manager.changeMainView(name);
 		}
 	]]>
 	</mx:Script>
 	
-	<mx:HBox verticalAlign="middle" fontSize="12" color="#000099" fontWeight="bold" paddingBottom="0" paddingTop="0" horizontalGap="10" width="100%">
-		<!--mx:Link label="Home" toolTip="Goto homepage." click="changeView(Manager.ADMIN_HOME_VIEW)"/>
-		<mx:Link label="Members" toolTip="View member permission" click="changeView(Manager.ADMIN_MEMBER_VIEW)"/>
-		<mx:Link label="Students" toolTip="Show students" click="changeView(Manager.ADMIN_STUDENT_VIEW)"/>
-		<mx:Link label="Teachers" toolTip="Show teachers" click="changeView(Manager.ADMIN_TEACHER_VIEW)"/>
+	<mx:LinkButton label="Home" toolTip="Goto homepage." click="changeView(MainViewHelper.ADMIN)"/>
+	<mx:LinkButton label="Students" toolTip="Show students" click="changeView(MainViewHelper.STUDENT)"/>
+	<mx:LinkButton label="Teachers" toolTip="Show teachers" click="changeView(MainViewHelper.TEACHER)"/>
 
-		<mx:Spacer width="100%"/>
-			<mx:Link label="Sign Out" toolTip="Sign out of the network" click="Manager.changeMainView(Manager.SIGNOUT_VIEW)"/>
-		<mx:Spacer/-->		
-	</mx:HBox>
-</mx:Panel>
+	<mx:Spacer width="100%"/>
+	<mx:LinkButton label="Sign Out" toolTip="Sign out of the network" click="changeView(MainViewHelper.SIGNOUT)"/>
+</mx:HBox>

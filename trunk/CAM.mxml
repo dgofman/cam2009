@@ -17,22 +17,44 @@
 	
 	<mx:Script>
 	<![CDATA[
-		import com.academy.calder.business.LanguageService;
+		import com.academy.calder.business.LocalShare;
 		import com.academy.calder.business.Manager;
+		import com.academy.calder.business.AMFService;
+		import com.academy.calder.business.LanguageService;
 		
 		private function onComplete():void {
 			LanguageService.switchLanguage(
-				Manager.getAppParam("locale", LanguageService.DEFAULT_LANGUAGE), onLanguageComplete);
+				Manager.getAppParam("locale", LanguageService.DEFAULT_LANGUAGE), onLanguageComplete);			
 		}
-		
+
 		private function onLanguageComplete():void{
 			currentState = "APPLICATION_READY";
-			pageTitle = Manager.bundle.getMessage('title'); 
-			if(Manager.getAppParam("key") == "confirm"){
-				mainHelper.changeView(MainViewHelper.CONFIRM);
-			}else{
-				mainHelper.changeView(MainViewHelper.LOGIN);
+			pageTitle = Manager.bundle.getMessage('title');
+			AMFService.send('CAM.getSessionId', null, onSessionResult, onLoginFault);
+		}
+		
+		private function onSessionResult(event:*):void{			
+			if(event == null){
+				AMFService.send('CAM.getSessionId', null, onSessionResult, onLoginFault);
+				return;
 			}
+			Manager.instance.cookieParams = new URLVariables('JSESSIONID=' + event);
+			
+			var mainViewName:String = LocalShare.getValue("mainView", LocalShare.GLOBAL_LEVEL) as String;
+			var params:URLVariables = new URLVariables(ExternalInterface.call("getCookie"));
+			if(mainViewName != null && params != null && params['JSESSIONID'] == event){
+				mainHelper.changeView(mainViewName);
+			}else{
+				if(Manager.getAppParam("key") == "confirm"){
+					mainHelper.changeView(MainViewHelper.CONFIRM);
+				}else{
+					mainHelper.changeView(MainViewHelper.LOGIN);
+				}
+			}
+		}
+		
+		private function onLoginFault(fault:Object):void{
+			Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_session'));
 		}
 	]]>
 	</mx:Script>

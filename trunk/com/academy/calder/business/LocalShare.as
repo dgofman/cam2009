@@ -53,10 +53,10 @@ package com.academy.calder.business
 		}
 		
 		private static function getUserId():String{
-			if(!Manager.getInstance().userAccount){
-				throw new Error(Manager.bundle.getMessage("error_user_account"));
-			}
-			return LanguageService.getUserLanguageCode() + '_' + Manager.getInstance().userAccount.id;
+			if(Manager.instance.userAccount)
+				return LanguageService.getUserLanguageCode() + '_' + Manager.instance.userAccount.id;
+			else
+				return null;
 		}
 	}
 }

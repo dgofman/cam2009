@@ -25,7 +25,5 @@
 			<student:StudentView id="studentView"/>
 			<admin:TeacherView id="teacherView"/>
 		</mx:ViewStack>
-	
-		<view:FooterBar/>
 	</mx:Panel>
 </mx:VBox>

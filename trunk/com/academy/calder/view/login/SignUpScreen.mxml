@@ -46,7 +46,7 @@
 		}
 		
 		private function onResult(event:Object,  data:Array=null, columns:Array=null):void{
-			Manager.getInstance().userAccount = new UserAccount(
+			Manager.instance.userAccount = new UserAccount(
 				event.userId,
 				null,
 				userLanguage,
