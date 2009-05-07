@@ -1,12 +1,14 @@
 package com.academy.calder.helper
 {
-	import mx.core.IMXMLObject;
 	import flash.errors.IllegalOperationError;
-	import flash.utils.getQualifiedClassName;
-	import flash.utils.getDefinitionByName;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.utils.getDefinitionByName;
+	import flash.utils.getQualifiedClassName;
 	
-	internal class ViewHelper implements IMXMLObject
+	import mx.core.IMXMLObject;
+	
+	internal class ViewHelper extends EventDispatcher implements IMXMLObject
 	{
 		private static const viewHelpers:Object = {};
 		

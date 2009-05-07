@@ -1,0 +1,23 @@
+﻿<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	verticalAlign="middle" fontSize="12" backgroundColor="#FCA34C" color="#000099" fontWeight="bold" 
+	paddingLeft="10" paddingRight="10" horizontalGap="10" height="23" width="100%">
+
+	<mx:Script>
+	<![CDATA[
+		import com.academy.calder.business.Manager;
+		import com.academy.calder.helper.AdminViewHelper;
+
+		private function changeView(name:String):void{
+			AdminViewHelper.getSelf().changeView(name);
+		}
+	]]>
+	</mx:Script>
+	
+	<mx:LinkButton label="Home" toolTip="Goto homepage." click="changeView(AdminViewHelper.HOME)"/>
+	<mx:LinkButton label="Users" toolTip="Show users" click="changeView(AdminViewHelper.USER)"/>
+	<mx:LinkButton label="Students" toolTip="Show students" click="changeView(AdminViewHelper.STUDENT)"/>
+	<mx:LinkButton label="Teachers" toolTip="Show teachers" click="changeView(AdminViewHelper.TEACHER)" toggle="true" selected="true"/>
+
+	<mx:Spacer width="100%"/>
+	<mx:LinkButton label="Sign Out" toolTip="Sign out of the network" click="Manager.signout()"/>
+</mx:HBox>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:component="com.academy.calder.component.*"
+	xmlns:links="com.academy.calder.view.admin.links.*"
+	width="100%" height="100%" horizontalGap="0">
+	
+	<mx:Script>
+	<![CDATA[
+		import mx.events.ItemClickEvent;
+		import com.academy.calder.business.Manager;
+		
+		[Embed('/resources/images/btn_arrow.png')]
+		private static const BUTTON_ARROW:Class;
+		
+		private function clickHandler(event:ItemClickEvent):void{
+
+		}
+	]]>
+	</mx:Script>
+	
+	<mx:Style>
+		.arrowButton{
+			fillColors:#CCCCCC,#999999;
+			themeColor:#408080;
+			color:#FFFFFF;
+			textAlign:left;
+		}
+	</mx:Style>
+
+	<mx:ToggleButtonBar horizontalGap="5" itemClick="clickHandler(event)" 
+		dataProvider="{linkViewStack}" buttonStyleName="arrowButton" direction="vertical"/>
+
+	<mx:Panel id="panel" 
+		textIndent="15" 
+		fontSize="15"
+		color="#000099"
+		width="100%" 
+		height="100%" 
+		headerHeight="20" 
+		cornerRadius="10">
+		
+		<mx:ViewStack width="100%" height="100%" id="linkViewStack">
+			<links:NoticeLink id="noticeLink" label="Important Notice" icon="{BUTTON_ARROW}"/>
+			<links:NoticeLink id="newsLink" label="What's New" icon="{BUTTON_ARROW}"/>
+			<links:NoticeLink id="toDoLink" label="To Do's" icon="{BUTTON_ARROW}"/>
+			<links:NoticeLink id="startLink" label="Getting Started" icon="{BUTTON_ARROW}"/>
+		</mx:ViewStack>
+		<mx:ControlBar textIndent="0" fontSize="10" width="100%" height="30" paddingTop="0" paddingBottom="0" verticalAlign="middle" horizontalAlign="right">
+			<mx:Button label="Delete" width="100"/>
+		</mx:ControlBar>
+	</mx:Panel>
+	
+</mx:HBox>
