@@ -1,5 +1,7 @@
 <?php
 
+@session_start();
+
 $PHP_DIR = realpath("php_scripts");
 
 require_once($PHP_DIR."/global.php");
@@ -12,6 +14,10 @@ class CAM {
 		$this->CREATE_ACCOUNT="INSERT INTO account (userId, username, password) values (%u, '%s', PASSWORD('%s'))";
 		$this->SELECT_ACCOUNT="SELECT CONCAT(userId,0+created_time) FROM account WHERE userId='%s'";
 	}
+	
+	public function getSessionId(){
+		return $_COOKIE["PHPSESSID"];
+	} 
 
 	public function login($username, $password){
 		$mysql = MYSQL::getInstance();
