@@ -5,6 +5,7 @@ package com.academy.calder.helper
 	import mx.containers.ViewStack;
 	import mx.core.Container;
 	
+	[Bindable]
 	public class MainViewHelper extends ViewHelper
 	{
 		public static const LOGIN:String   = "login";
