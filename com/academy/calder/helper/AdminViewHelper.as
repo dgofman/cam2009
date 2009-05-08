@@ -8,8 +8,11 @@ package com.academy.calder.helper
 	import mx.containers.ViewStack;
 	import mx.core.Container;
 	
+	[Bindable]
 	public class AdminViewHelper extends ViewHelper
 	{
+		private var _viewName:String;
+		
 		public static const HOME:String    = "adminHome";
 		public static const USER:String    = "userMember";
 		public static const STUDENT:String = "adminStudent";
@@ -33,12 +36,20 @@ package com.academy.calder.helper
 		
 		public function changeView(name:String):void{
 			LocalShare.save(VIEW_SHARE_ID, name, LocalShare.GLOBAL_LEVEL);
-			if(adminViewStack.getChildByName(name) is Container)
-				adminViewStack.selectedChild = adminViewStack.getChildByName(name) as Container;
+			viewName = name;
 		}
 		
 		public function get adminViewStack():ViewStack{
 			return getView().adminViewStack;
+		}
+		
+		public function get viewName():String{
+			return _viewName;
+		}
+		public function set viewName(value:String):void{
+			_viewName = value;
+			if(adminViewStack.getChildByName(value) is Container)
+				adminViewStack.selectedChild = adminViewStack.getChildByName(value) as Container;
 		}
 				
 		public function getView():AdminScreen{

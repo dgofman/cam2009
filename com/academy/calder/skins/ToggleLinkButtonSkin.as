@@ -23,13 +23,13 @@ package com.academy.calder.skins {
 						0, 0, w, h, cornerRadius,
 						0, 0);
 					break;		
-				case "selectedUpSkin":			
-				case "selectedOverSkin":
 				case "overSkin":
 					drawRoundRect(
 						0, 0, w, h, cornerRadius,
 						rollOverColor, 1);
 					break;
+				case "selectedUpSkin":			
+				case "selectedOverSkin":
 				case "selectedDownSkin":
 				case "downSkin":
 					drawRoundRect(

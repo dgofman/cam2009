@@ -9,6 +9,7 @@ package com.academy.calder.business
 	import mx.core.Application;
 	import mx.formatters.DateFormatter;
 	
+	[Bindable]
 	public class Manager{
 		
 		private static var _instance:Manager;
@@ -31,7 +32,6 @@ package com.academy.calder.business
 			_cookieParams = value;
 		}
 
-		[Bindable]
 		public function get userAccount():UserAccount{
 			return _userAccount;
 		}

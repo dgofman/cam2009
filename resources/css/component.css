@@ -55,3 +55,8 @@ HeaderPanel{
 	backgroundColor:#2D253C;
 	borderSkin:ClassReference("com.academy.calder.skins.RoundedBorderSkin");
 }
+LinkButton {
+	rollOverColor:#D8F8FE;
+	selectionColor:#78ADFE;
+    skin: ClassReference("com.academy.calder.skins.ToggleLinkButtonSkin");
+}
