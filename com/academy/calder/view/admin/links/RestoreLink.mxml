@@ -27,7 +27,10 @@
 						AMFService.send('CAM.restoreMessage', ids, onRestoreResult, onFault);
 				}
 			}
-
+			
+			public function onCreate():void{
+			}
+			
 			private function onRestoreResult(result:Object):void{
 				if(result && result is Array){
 					for(var i:Number = dataGrid.dataProvider.length - 1; i >= 0; i--){
