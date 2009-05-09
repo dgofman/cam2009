@@ -55,6 +55,7 @@
 					}else{
 						dataGrid.dataProvider.addItemAt(result, 0);
 					}
+					create.record = {};
 					createViewStack.selectedIndex = 0;
 				}
 			}
