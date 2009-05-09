@@ -41,11 +41,22 @@
 			}
 			
 			private function onSubmit():void{
-				
+				AMFService.send('CAM.createMessage', ['news', create.priority.selectedItem.value, create.subject.text, create.body.text], onCreateMessageResult, onFault);
 			}
 			
 			private function onCancel():void{
 				createViewStack.selectedIndex = 0;
+			}
+			
+			private function onCreateMessageResult(result:Object):void{
+				if(result != null){
+					if(dataGrid.dataProvider == null){
+						dataGrid.dataProvider = [result];
+					}else{
+						dataGrid.dataProvider.addItemAt(result, 0);
+					}
+					createViewStack.selectedIndex = 0;
+				}
 			}
 			
 			private function onDeleteNewsResult(result:Object):void{
