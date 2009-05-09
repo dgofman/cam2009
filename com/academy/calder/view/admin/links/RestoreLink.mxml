@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
+				xmlns:home="com.academy.calder.view.admin.home.*"
+				width="100%" height="100%" horizontalGap="6" show="onRefresh()"
+				implements="com.academy.calder.view.admin.IMessageAction">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ListEvent;
+			import mx.events.CollectionEvent;
+			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.AMFService;
+			import com.academy.calder.enum.MessageStatusEnum;
+
+			public function onRefresh():void{
+				AMFService.send('CAM.deleted', null, onDeletedResult, onFault);
+			}
+
+			public function onDelete():void{
+				if(dataGrid.dataProvider != null){
+					var ids:Array = [];
+					for(var i:uint = 0; i < dataGrid.dataProvider.length; i++){
+						var data:Object = dataGrid.dataProvider[i];
+						if(data.flag == true)
+							ids.push(data.messageId);
+					}
+					if(ids.length)
+						AMFService.send('CAM.restoreMessage', ids, onRestoreResult, onFault);
+				}
+			}
+
+			private function onRestoreResult(result:Object):void{
+				if(result && result is Array){
+					for(var i:Number = dataGrid.dataProvider.length - 1; i >= 0; i--){
+						var data:Object = dataGrid.dataProvider[i];
+						if(result.indexOf(data.messageId) != -1)
+							dataGrid.dataProvider.removeItemAt(i);
+					}
+				}
+			}
+			
+			private function onDeletedResult(result:Object):void{
+				dataGrid.dataProvider = result;
+			}
+			
+			private function onFault(fault:Object):void{
+				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_restore'));
+			}
+		]]>
+	</mx:Script>
+	<mx:DataGrid id="dataGrid" width="100%" height="100%">
+		<mx:columns>
+			<mx:Array>
+				<mx:DataGridColumn dataField="flag" headerText="" resizable="false"
+						itemRenderer="com.academy.calder.component.renderer.CheckCellRenderer" width="15"/>
+				<mx:DataGridColumn dataField="type" headerText="Type" width="60"/>
+				<mx:DataGridColumn dataField="subject" headerText="Subject"/>
+				<mx:DataGridColumn dataField="priority" headerText="Priority" width="60"/>
+				<mx:DataGridColumn dataField="createdTime" headerText="Created" width="150"/>
+				<mx:DataGridColumn dataField="updatedTime" headerText="Deleted" width="150"/>			
+			</mx:Array>
+		 </mx:columns>
+	</mx:DataGrid>
+</mx:HDividedBox>
