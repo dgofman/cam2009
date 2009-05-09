@@ -29,11 +29,11 @@ package com.academy.calder.helper
 		}
 		
 		public function get mainViewStack():ViewStack{
-			return getView().mainViewStack;
+			return view.mainViewStack;
 		}
 				
-		public function getView():CAM{
-            return view as CAM;
+		public function get view():CAM{
+            return _view as CAM;
         }
         
         public static function getSelf():MainViewHelper{
