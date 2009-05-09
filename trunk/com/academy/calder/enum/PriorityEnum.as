@@ -1,14 +1,14 @@
 package com.academy.calder.enum
 {
-	public class AccountStatus
+	public class PriorityEnum
 	{
-        public static const Active:AccountStatus   = new AccountStatus(1);
-        public static const Disable:AccountStatus  = new AccountStatus(2);
-		public static const Inactive:AccountStatus = new AccountStatus(3);
+        public static const High:PriorityEnum    = new PriorityEnum(1);
+        public static const Medium:PriorityEnum  = new PriorityEnum(2);
+		public static const Low:PriorityEnum     = new PriorityEnum(3);
 
         private var _value:int;
 
-        public function AccountStatus(value:int){
+        public function PriorityEnum(value:int){
             _value = value;
         }
         
@@ -16,10 +16,10 @@ package com.academy.calder.enum
             return _value;
         }
                 
-       public static function valueOf(value:int):AccountStatus
+       public static function valueOf(value:int):PriorityEnum
         {
             for(var i:uint = 0; i < list.length; i++){
-            	var type:AccountStatus = list[i];
+            	var type:PriorityEnum = list[i];
             	if(value == type.value)
             		return type;
             }
@@ -33,9 +33,9 @@ package com.academy.calder.enum
         public static function get list():Array
         {
             return [
-	                Inactive,
-	                Active,
-	        		Disable
+	                High,
+	                Medium,
+	        		Low
 	               			];
         }
     }

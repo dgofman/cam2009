@@ -1,23 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
 				xmlns:home="com.academy.calder.view.admin.home.*"
-				width="100%" height="100%" horizontalGap="6">
+				width="100%" height="100%" horizontalGap="6"
+				creationComplete="onComplete()" show="getNoticeData()">
 	<mx:Script>
 		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.events.CollectionEvent;
+			import com.academy.calder.vo.UserVO;
+			import com.academy.calder.vo.NoticeVO;
+			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.AMFService;
+			import com.academy.calder.helper.AdminViewHelper;
+			import com.academy.calder.enum.MessageStatusEnum;
 			
+			[Bindable]
+			private var _helper:AdminViewHelper = AdminViewHelper.getSelf();
+			
+			[Bindable]
+			private var _details:NoticeVO;
+			[Bindable]
+			private var _reporter:UserVO;
+			
+			private var _cachedUsers:Object = {};
+			
+			private function onComplete():void{
+				this.currentState = "addControlButtons";
+			}
+			
+			private function getNoticeData():void{
+				AMFService.send('CAM.notice', null, onNoticeResult, onFault);
+			}
+			
+			private function getNoticeDetails():void{
+				var data:Object = dataGrid.selectedItem;
+				if(data != null)
+					AMFService.send('CAM.noticeDetails', [data.messageId], onNoticeDetailsResult, onFault);
+			}
+			
+			private function deleteNotices():void{
+				_details = null;
+				_reporter = null;
+				if(dataGrid.dataProvider != null){
+					var ids:Array = [];
+					for(var i:uint = 0; i < dataGrid.dataProvider.length; i++){
+						var data:Object = dataGrid.dataProvider[i];
+						if(data.flag == true)
+							ids.push(data.messageId);
+					}
+					if(ids.length)
+						AMFService.send('CAM.deleteNotices', ids, onNoticeDeleteResult, onFault);
+				}
+			}
+
+			private function onNoticeDeleteResult(result:Object):void{
+				if(result && result is Array){
+					for(var i:Number = dataGrid.dataProvider.length - 1; i >= 0; i--){
+						var data:Object = dataGrid.dataProvider[i];
+						if(result.indexOf(data.messageId) != -1)
+							dataGrid.dataProvider.removeItemAt(i);
+					}
+				}
+			}
+			
+			private function getReporter():void{
+				var data:Object = dataGrid.selectedItem;
+				if(data != null){
+					_reporter = _cachedUsers[data.userId];
+					if(_reporter == null)
+						AMFService.send('CAM.reporter', [data.userId], onReporterResult, onFault);
+				}
+			}
+			
+			private function onItemClick(event:ListEvent):void{
+				if(event.columnIndex != 0) //Checkbox
+					tabNav.selectedChild.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
+			}
+			
+			private function onReporterResult(result:Object):void{
+				_reporter = new UserVO(result);
+				_cachedUsers[_reporter.userId] = _reporter; 
+			}
+			
+			private function onNoticeResult(result:Object):void{
+				_details = null;
+				_reporter = null;
+				dataGrid.dataProvider = result;
+			}
+			
+			private function onNoticeDetailsResult(result:Object):void{
+				_details = new NoticeVO();
+				if(dataGrid.selectedIndex != -1){
+					_details.body = result.body;
+					_details.subject = dataGrid.selectedItem.subject;
+					_details.createdTime = dataGrid.selectedItem.createdTime;
+					dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
+					dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
+				}
+			}
+			
+			private function onFault(fault:Object):void{
+				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_notice'));
+			}
 		]]>
 	</mx:Script>
-	<mx:DataGrid width="300" height="100%">
+	<mx:DataGrid id="dataGrid" width="300" height="100%" itemClick="onItemClick(event)">
 		<mx:columns>
 			<mx:Array>
-				<mx:DataGridColumn dataField="flag" headerText=""
+				<mx:DataGridColumn dataField="flag" headerText="" resizable="false"
 						itemRenderer="com.academy.calder.component.renderer.CheckCellRenderer" width="15"/>
-				<mx:DataGridColumn dataField="reporter" headerText="Reporter"/>
-				<mx:DataGridColumn dataField="date" headerText="Date" width="80"/>
+				<mx:DataGridColumn dataField="subject" headerText="Subject" 
+						itemRenderer="com.academy.calder.component.renderer.MessageCellRenderer"/>
+				<mx:DataGridColumn dataField="createdTime" headerText="Date" width="80" 
+						itemRenderer="com.academy.calder.component.renderer.MessageCellRenderer"/>
 			</mx:Array>
 		 </mx:columns>
 	</mx:DataGrid>	   
-	<mx:TabNavigator borderStyle="solid"
+	<mx:TabNavigator id="tabNav" borderStyle="solid"
 		  paddingTop="5"
 		  paddingBottom="5"
 		  paddingLeft="5"
@@ -25,11 +125,56 @@
 		  height="100%"
 		  width="100%">
 		
-		<mx:VBox width="100%" height="100%" label="Message Body">
-			<mx:Label width="100%" height="100%"/>
+		<mx:VBox width="100%" height="100%" label="Message Body" show="getNoticeDetails()">
+			<mx:HBox width="100%">
+				<mx:Label text="Subject:" fontWeight="bold"/>
+				<mx:Label text="{_details.subject}" width="100%"/>
+			</mx:HBox>
+			<mx:HBox width="100%">
+				<mx:Label text="Date:" fontWeight="bold"/>
+				<mx:Label text="{_details.createdTime}" width="100%"/>
+			</mx:HBox>
+			<mx:Text text="{_details.body}" width="100%" height="100%"/>
 		</mx:VBox>
-		<mx:Form width="100%" height="100%" label="Reporter Profile">
+		<mx:Form width="100%" height="100%" label="Reporter Profile" show="getReporter()">
+			<mx:FormItem label="Account ID:">
+				<mx:Label text="{_reporter.accountId}"/>
+			</mx:FormItem>
+			<mx:FormItem label="First Name:">
+				<mx:Label text="{_reporter.first}"/>
+			</mx:FormItem>
+			<mx:FormItem label="Last Name:">
+				<mx:Label text="{_reporter.last}"/>
+			</mx:FormItem>
+			<mx:FormItem label="Name ???:">
+				<mx:Label text="{_reporter.namesoundex}"/>
+			</mx:FormItem>
+			<mx:FormItem label="Language:">
+				<mx:Label text="{_reporter.language}"/>
+			</mx:FormItem>
+			<mx:FormItem label="Sex:">
+				<mx:Label text="{_reporter.sex}"/>
+			</mx:FormItem>
+			<mx:FormItem label="Date Of Birth:">
+				<mx:Label text="{_reporter.dateOfBirth}"/>
+			</mx:FormItem>
+			<mx:FormItem label="Notes:" width="100%" height="100%">
+				<mx:Text text="{_reporter.notes}" width="100%" height="100%"/>
+			</mx:FormItem>
 		</mx:Form>
 		
 	</mx:TabNavigator>
+	
+	<mx:states>
+        <mx:State name="addControlButtons">
+			<mx:AddChild relativeTo="{_helper.adminView.controlBar}">
+				<mx:target>
+					<mx:HBox width="100%">
+						<mx:Button label="Refresh" click="getNoticeData()"/>
+						<mx:Button label="Delete" click="deleteNotices()"/>
+					</mx:HBox>
+				</mx:target>
+			</mx:AddChild>
+		</mx:State>
+    </mx:states>
 </mx:HDividedBox>

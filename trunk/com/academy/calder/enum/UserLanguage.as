@@ -24,8 +24,8 @@ package com.academy.calder.enum
         
         public static function valueOf(value:*):UserLanguage
         {
-            for(var i:uint = 0; i < list().length; i++){
-            	var type:UserLanguage = list()[i];
+            for(var i:uint = 0; i < list.length; i++){
+            	var type:UserLanguage = list[i];
             	if(value == type.value || value == type.stringValue)
             		return type;
             }
@@ -38,18 +38,18 @@ package com.academy.calder.enum
         
         public static function get dispalayList():Array{
 			var types:Array = [];
-			for(var i:uint = 0; i < list().length; i++){
-				var type:UserLanguage = list()[i];
+			for(var i:uint = 0; i < list.length; i++){
+				var type:UserLanguage = list[i];
 				types[i] = {label:Manager.bundle.getMessage(type.stringValue), data:type.value};
 			}
 			return types;
         }
 
-        public static function list():Array
+        public static function get list():Array
         {
             return [
 	                English
-	               				];
+	               	];
         }
     }
 }

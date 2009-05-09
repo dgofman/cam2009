@@ -1,7 +1,7 @@
 languageCode=en_US
 
 &title=Calder Academy
-&copyright=Copyright 2007 Calder Academy Inc. All rights reserved.
+&copyright=Copyright 2009 Calder Academy Inc. All rights reserved.
 &company=Calder Academy Inc.
 &homepage=http://www.calderacademy.com
 

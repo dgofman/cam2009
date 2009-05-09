@@ -2,11 +2,13 @@ package com.academy.calder.helper
 {
 	import com.academy.calder.business.LocalShare;
 	import com.academy.calder.view.admin.AdminScreen;
+	import com.academy.calder.view.admin.AdminView;
 	
 	import flash.events.Event;
 	
 	import mx.containers.ViewStack;
 	import mx.core.Container;
+	import mx.events.FlexEvent;
 	
 	[Bindable]
 	public class AdminViewHelper extends ViewHelper
@@ -31,6 +33,7 @@ package com.academy.calder.helper
 			if(adminViewName != null){
 				changeView(adminViewName);
 				dispatchEvent(new Event(ADMINVIEW_CHANGE));
+				view.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
 			}
 		}
 		
@@ -40,7 +43,14 @@ package com.academy.calder.helper
 		}
 		
 		public function get adminViewStack():ViewStack{
-			return getView().adminViewStack;
+			return view.adminViewStack;
+		}
+		
+		public function get adminView():AdminView{
+			return adminViewStack.getChildByName(HOME) as AdminView;
+		}
+		private function set adminView(value:AdminView):void{
+			adminViewStack.selectedChild = value;
 		}
 		
 		public function get viewName():String{
@@ -52,8 +62,8 @@ package com.academy.calder.helper
 				adminViewStack.selectedChild = adminViewStack.getChildByName(value) as Container;
 		}
 				
-		public function getView():AdminScreen{
-            return view as AdminScreen;
+		public function get view():AdminScreen{
+            return _view as AdminScreen;
         }
         
         public static function getSelf():AdminViewHelper{

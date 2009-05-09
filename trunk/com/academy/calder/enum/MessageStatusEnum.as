@@ -1,14 +1,14 @@
 package com.academy.calder.enum
 {
-	public class AccountStatus
+	public class MessageStatusEnum
 	{
-        public static const Active:AccountStatus   = new AccountStatus(1);
-        public static const Disable:AccountStatus  = new AccountStatus(2);
-		public static const Inactive:AccountStatus = new AccountStatus(3);
+        public static const Read:MessageStatusEnum    = new MessageStatusEnum(1);
+        public static const Unread:MessageStatusEnum  = new MessageStatusEnum(2);
+		public static const Delete:MessageStatusEnum  = new MessageStatusEnum(3);
 
         private var _value:int;
 
-        public function AccountStatus(value:int){
+        public function MessageStatusEnum(value:int){
             _value = value;
         }
         
@@ -16,10 +16,10 @@ package com.academy.calder.enum
             return _value;
         }
                 
-       public static function valueOf(value:int):AccountStatus
+       public static function valueOf(value:int):MessageStatusEnum
         {
             for(var i:uint = 0; i < list.length; i++){
-            	var type:AccountStatus = list[i];
+            	var type:MessageStatusEnum = list[i];
             	if(value == type.value)
             		return type;
             }
@@ -33,10 +33,10 @@ package com.academy.calder.enum
         public static function get list():Array
         {
             return [
-	                Inactive,
-	                Active,
-	        		Disable
-	               			];
+	                Read,
+	                Unread,
+	        		Delete
+	               	];
         }
     }
 }

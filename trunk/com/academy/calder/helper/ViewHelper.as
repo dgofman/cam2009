@@ -12,17 +12,17 @@ package com.academy.calder.helper
 	{
 		private static const viewHelpers:Object = {};
 		
-		protected var view:Object;
-		protected var id:String;
+		protected var _view:Object;
+		protected var _id:String;
 			
 		public function initialized(document:Object, id:String):void {
-			this.view = document;
-			this.id = id;
+			_view = document;
+			_id = id;
 			if(getDefinitionByName(className).getSelf == null){
 				throw new IllegalOperationError("Abstract method 'getSelf' must be implemented in subclass.");
 			}
-			view.addEventListener(Event.ADDED, registerView);
-     		view.addEventListener(Event.REMOVED, unregisterView);
+			_view.addEventListener(Event.ADDED, registerView);
+     		_view.addEventListener(Event.REMOVED, unregisterView);
 		}
 		
 		private function get className():String{
@@ -30,15 +30,15 @@ package com.academy.calder.helper
 		}
 		
 		private function registerView(event:Event):void{
-         	if(event.target == view){
+         	if(event.target == _view){
 				viewHelpers[className] = this;
 			}
       	}
 		
 		private function unregisterView(event:Event):void{
-			if(event.target == view){
-				view.removeEventListener(Event.ADDED, registerView);
-     			view.removeEventListener(Event.REMOVED, unregisterView);
+			if(event.target == _view){
+				_view.removeEventListener(Event.ADDED, registerView);
+     			_view.removeEventListener(Event.REMOVED, unregisterView);
 				delete viewHelpers[className];
    			}
 		}
