@@ -1,45 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
 				xmlns:home="com.academy.calder.view.admin.home.*"
-				width="100%" height="100%" horizontalGap="6"
-				creationComplete="onComplete()" show="getNoticeData()">
+				width="100%" height="100%" horizontalGap="6" show="onRefresh()"
+				implements="com.academy.calder.view.admin.IMessageAction">
 	<mx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
 			import mx.events.ListEvent;
 			import mx.events.CollectionEvent;
 			import com.academy.calder.vo.UserVO;
-			import com.academy.calder.vo.NoticeVO;
+			import com.academy.calder.vo.MessageVO;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
-			import com.academy.calder.helper.AdminViewHelper;
 			import com.academy.calder.enum.MessageStatusEnum;
-			
+
 			[Bindable]
-			private var _helper:AdminViewHelper = AdminViewHelper.getSelf();
-			
-			[Bindable]
-			private var _details:NoticeVO;
+			private var _details:MessageVO;
 			[Bindable]
 			private var _reporter:UserVO;
 			
 			private var _cachedUsers:Object = {};
-			
-			private function onComplete():void{
-				this.currentState = "addControlButtons";
-			}
-			
-			private function getNoticeData():void{
+
+			public function onRefresh():void{
+				_details = null;
+				_reporter = null;
 				AMFService.send('CAM.notice', null, onNoticeResult, onFault);
 			}
-			
-			private function getNoticeDetails():void{
-				var data:Object = dataGrid.selectedItem;
-				if(data != null)
-					AMFService.send('CAM.noticeDetails', [data.messageId], onNoticeDetailsResult, onFault);
-			}
-			
-			private function deleteNotices():void{
+
+			public function onDelete():void{
 				_details = null;
 				_reporter = null;
 				if(dataGrid.dataProvider != null){
@@ -50,11 +38,17 @@
 							ids.push(data.messageId);
 					}
 					if(ids.length)
-						AMFService.send('CAM.deleteNotices', ids, onNoticeDeleteResult, onFault);
+						AMFService.send('CAM.deleteMessage', ids, onMessageDeleteResult, onFault);
 				}
 			}
+			
+			private function getNoticeDetails():void{
+				var data:Object = dataGrid.selectedItem;
+				if(data != null)
+					AMFService.send('CAM.messageBody', [data.messageId], onMessageBodyResult, onFault);
+			}
 
-			private function onNoticeDeleteResult(result:Object):void{
+			private function onMessageDeleteResult(result:Object):void{
 				if(result && result is Array){
 					for(var i:Number = dataGrid.dataProvider.length - 1; i >= 0; i--){
 						var data:Object = dataGrid.dataProvider[i];
@@ -84,15 +78,13 @@
 			}
 			
 			private function onNoticeResult(result:Object):void{
-				_details = null;
-				_reporter = null;
 				dataGrid.dataProvider = result;
 			}
 			
-			private function onNoticeDetailsResult(result:Object):void{
-				_details = new NoticeVO();
+			private function onMessageBodyResult(result:Object):void{
+				_details = new MessageVO();
 				if(dataGrid.selectedIndex != -1){
-					_details.body = result.body;
+					_details.body = result as String;
 					_details.subject = dataGrid.selectedItem.subject;
 					_details.createdTime = dataGrid.selectedItem.createdTime;
 					dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
@@ -162,19 +154,5 @@
 				<mx:Text text="{_reporter.notes}" width="100%" height="100%"/>
 			</mx:FormItem>
 		</mx:Form>
-		
 	</mx:TabNavigator>
-	
-	<mx:states>
-        <mx:State name="addControlButtons">
-			<mx:AddChild relativeTo="{_helper.adminView.controlBar}">
-				<mx:target>
-					<mx:HBox width="100%">
-						<mx:Button label="Refresh" click="getNoticeData()"/>
-						<mx:Button label="Delete" click="deleteNotices()"/>
-					</mx:HBox>
-				</mx:target>
-			</mx:AddChild>
-		</mx:State>
-    </mx:states>
 </mx:HDividedBox>

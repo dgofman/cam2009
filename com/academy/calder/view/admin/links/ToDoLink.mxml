@@ -1,35 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
 				xmlns:home="com.academy.calder.view.admin.home.*"
-				width="100%" height="100%" horizontalGap="6">
+				width="100%" height="100%" horizontalGap="6" show="onRefresh()"
+				implements="com.academy.calder.view.admin.IMessageAction">
 	<mx:Script>
 		<![CDATA[
+			import mx.events.ListEvent;
+			import mx.events.CollectionEvent;
+			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.AMFService;
+			import com.academy.calder.enum.MessageStatusEnum;
+
+			private function onItemClick(event:ListEvent):void{
+				if(event.columnIndex != 0) //Checkbox
+					AMFService.send('CAM.messageBody', [dataGrid.selectedItem.messageId], onMessageBodyResult, onFault);
+			}
 			
+			public function onRefresh():void{
+				todo.text = "";
+				AMFService.send('CAM.todo', null, onTodoResult, onFault);
+			}
+
+			public function onDelete():void{
+				todo.text = "";
+				if(dataGrid.dataProvider != null){
+					var ids:Array = [];
+					for(var i:uint = 0; i < dataGrid.dataProvider.length; i++){
+						var data:Object = dataGrid.dataProvider[i];
+						if(data.flag == true)
+							ids.push(data.messageId);
+					}
+					if(ids.length)
+						AMFService.send('CAM.deleteMessage', ids, onDeleteTodoResult, onFault);
+				}
+			}
+
+			private function onDeleteTodoResult(result:Object):void{
+				if(result && result is Array){
+					for(var i:Number = dataGrid.dataProvider.length - 1; i >= 0; i--){
+						var data:Object = dataGrid.dataProvider[i];
+						if(result.indexOf(data.messageId) != -1)
+							dataGrid.dataProvider.removeItemAt(i);
+					}
+				}
+			}
+			
+			private function onMessageBodyResult(result:Object):void{
+				todo.text = result as String;
+				if(dataGrid.selectedIndex != -1){
+					dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
+					dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
+				}
+			}
+			
+			private function onTodoResult(result:Object):void{
+				dataGrid.dataProvider = result;
+			}
+			
+			private function onFault(fault:Object):void{
+				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_todo'));
+			}
 		]]>
 	</mx:Script>
-	<mx:DataGrid width="300" height="100%">
+	<mx:DataGrid id="dataGrid" width="300" height="100%" itemClick="onItemClick(event)">
 		<mx:columns>
 			<mx:Array>
-				<mx:DataGridColumn dataField="flag" headerText=""
+				<mx:DataGridColumn dataField="flag" headerText="" resizable="false"
 						itemRenderer="com.academy.calder.component.renderer.CheckCellRenderer" width="15"/>
-				<mx:DataGridColumn dataField="subject" headerText="Subject"/>
-				<mx:DataGridColumn dataField="date" headerText="Date" width="80"/>
+				<mx:DataGridColumn dataField="subject" headerText="Subject" 
+						itemRenderer="com.academy.calder.component.renderer.MessageCellRenderer"/>
+				<mx:DataGridColumn dataField="createdTime" headerText="Date" width="80" 
+						itemRenderer="com.academy.calder.component.renderer.MessageCellRenderer"/>
 			</mx:Array>
 		 </mx:columns>
 	</mx:DataGrid>	   
-	<mx:TabNavigator borderStyle="solid"
-		  paddingTop="5"
-		  paddingBottom="5"
-		  paddingLeft="5"
-		  paddingRight="5"
-		  height="100%"
-		  width="100%">
-		
-		<mx:VBox width="100%" height="100%" label="Message Body">
-			<mx:Label width="100%" height="100%"/>
-		</mx:VBox>
-		<mx:Form width="100%" height="100%" label="Reporter Profile">
-		</mx:Form>
-		
-	</mx:TabNavigator>
+	<mx:Text id="todo" width="100%" height="100%"/>
 </mx:HDividedBox>

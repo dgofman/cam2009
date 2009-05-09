@@ -1,7 +1,7 @@
 package com.academy.calder.vo
 {
 	[Bindable]
-	public class NoticeVO
+	public class MessageVO
 	{
 		public var subject:String;
 		public var createdTime:String;
