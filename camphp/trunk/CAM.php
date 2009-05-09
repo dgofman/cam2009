@@ -12,9 +12,11 @@ class CAM {
 		$this->LOGIN="SELECT A.first, A.language, B.userId, B.typeOf, B.status+0 AS status FROM person A, user B WHERE A.personId=B.personId AND username='%s' AND password=PASSWORD('%s')";
 		$this->PERSON="SELECT A.accountId, A.first, A.last, A.namesoundex, A.language, A.sex, A.dateOfBirth, A.notes, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.userId='%s'";
 		$this->MESSAGE_DETAILS="SELECT body FROM messages WHERE messageId='%s'";
+		$this->MESSAGE_CREATE="INSERT INTO messages (userId, type, priority, subject, body) VALUES ('%s', '%s', '%s', '%s', '%s')";
 		$this->MESSAGE_UPDATE="UPDATE messages SET status='read', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
 		$this->MESSAGE_DELETE="UPDATE messages SET status='delete', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
 		$this->MESSAGE_RESTORE="UPDATE messages SET status='unread', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
+		$this->MESSAGE="SELECT messageId, userId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE messageId='%s'";
 		$this->NOTICE="SELECT messageId, userId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='notice' AND status <> 'delete' ORDER BY createdTime";
 		$this->NEWS="SELECT messageId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='news' AND status <> 'delete' ORDER BY createdTime";
 		$this->TODO="SELECT messageId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='todo' AND status <> 'delete' ORDER BY createdTime";
@@ -72,6 +74,21 @@ class CAM {
 			return NULL;
 		else
 			return $result[0]["body"];
+	}
+	
+	public function createMessage($type, $priority, $subject, $body){
+		$mysql = MYSQL::getInstance();
+		$sql1 = escape($this->MESSAGE_CREATE, $_SESSION["USER_ID"], $type, $priority, $subject, $body);
+		$rs = $mysql->query($sql1);
+		if($rs == true){
+			$messageId = $mysql->insert();
+			$sql2 = escape($this->MESSAGE, $messageId);
+			$rs = $mysql->query($sql2);
+			$result = $mysql->result($rs);
+			return (count($result) == 0 ? NULL : $result[0]);
+		}else{
+			return NULL;
+		}
 	}
 	
 	public function deleteMessage(){
