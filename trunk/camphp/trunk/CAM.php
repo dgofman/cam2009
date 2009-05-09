@@ -14,9 +14,11 @@ class CAM {
 		$this->MESSAGE_DETAILS="SELECT body FROM messages WHERE messageId='%s'";
 		$this->MESSAGE_UPDATE="UPDATE messages SET status='read', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
 		$this->MESSAGE_DELETE="UPDATE messages SET status='delete', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
+		$this->MESSAGE_RESTORE="UPDATE messages SET status='unread', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
 		$this->NOTICE="SELECT messageId, userId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='notice' AND status <> 'delete' ORDER BY createdTime";
 		$this->NEWS="SELECT messageId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='news' AND status <> 'delete' ORDER BY createdTime";
 		$this->TODO="SELECT messageId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='todo' AND status <> 'delete' ORDER BY createdTime";
+		$this->DELETED="SELECT messageId, priority, type, subject, createdTime, updatedTime FROM messages WHERE status='delete' ORDER BY createdTime";
 		
 		//$this->CREATE_USER="INSERT INTO users (first, last, language, address1, address2, city, stateProvince, postalCode, country, dateOfBirth, dayPhone, eveningPhone, cellPhone, email) values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
 		//$this->CREATE_ACCOUNT="INSERT INTO account (userId, username, password) values (%u, '%s', PASSWORD('%s'))";
@@ -86,6 +88,20 @@ class CAM {
 		return $deletedIds;
 	}
 	
+	public function restoreMessage(){
+		$ids  = func_get_args();
+		$restoreIds = array();
+		$mysql = MYSQL::getInstance();
+		foreach($ids as $messageId) {
+		    $sql = escape($this->MESSAGE_RESTORE, $_SESSION["USER_ID"], $messageId);
+			$rs = $mysql->query($sql);
+			if($rs == true)
+				array_push($restoreIds, $messageId);
+		}
+		$mysql->close();
+		return $restoreIds;
+	}
+	
 	public function news(){
 		$mysql = MYSQL::getInstance();
 		$rs = $mysql->query($this->NEWS);
@@ -96,6 +112,13 @@ class CAM {
 	public function todo(){
 		$mysql = MYSQL::getInstance();
 		$rs = $mysql->query($this->TODO);
+		$result = $mysql->result($rs);
+		return $result;
+	}
+
+	public function deleted(){
+		$mysql = MYSQL::getInstance();
+		$rs = $mysql->query($this->DELETED);
 		$result = $mysql->result($rs);
 		return $result;
 	}
