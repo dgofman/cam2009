@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
 				xmlns:home="com.academy.calder.view.admin.home.*"
+				xmlns:links="com.academy.calder.view.admin.links.*"
 				width="100%" height="100%" horizontalGap="6" show="onRefresh()"
 				implements="com.academy.calder.view.admin.IMessageAction">
 	<mx:Script>
@@ -34,7 +35,19 @@
 						AMFService.send('CAM.deleteMessage', ids, onDeleteNewsResult, onFault);
 				}
 			}
-
+			
+			public function onCreate():void{
+				createViewStack.selectedIndex = 1;
+			}
+			
+			private function onSubmit():void{
+				
+			}
+			
+			private function onCancel():void{
+				createViewStack.selectedIndex = 0;
+			}
+			
 			private function onDeleteNewsResult(result:Object):void{
 				if(result && result is Array){
 					for(var i:Number = dataGrid.dataProvider.length - 1; i >= 0; i--){
@@ -73,6 +86,11 @@
 						itemRenderer="com.academy.calder.component.renderer.MessageCellRenderer"/>
 			</mx:Array>
 		 </mx:columns>
-	</mx:DataGrid>	   
-	<mx:Text id="news" width="100%" height="100%"/>
+	</mx:DataGrid>
+	<mx:ViewStack id="createViewStack" width="100%" height="100%">
+		<mx:Canvas width="100%" height="100%">
+			<mx:Text id="news" width="100%" height="100%"/>		
+		</mx:Canvas>
+		<links:CreateMessage id="create" submit="onSubmit()" cancel="onCancel()"/>
+	</mx:ViewStack>
 </mx:HDividedBox>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%"
+	paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5">
+	
+	<mx:Metadata>
+		[Event("submit")]
+		[Event("cancel")]
+	</mx:Metadata>
+
+	<mx:Label text="Subject:"/>
+	<mx:TextInput id="subject" width="100%" maxChars="250"/>
+	<mx:Label text="Body:"/>
+	<mx:TextArea id="body" width="100%" height="100%"/>
+	<mx:HBox width="100%" horizontalAlign="right">
+		<mx:Button label="Submit" click="dispatchEvent(new Event('submit'))"/>
+		<mx:Button label="Cancel" click="dispatchEvent(new Event('cancel'))"/>
+	</mx:HBox>
+</mx:VBox>

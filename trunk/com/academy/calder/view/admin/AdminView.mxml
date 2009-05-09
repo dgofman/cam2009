@@ -51,6 +51,8 @@
 			<mx:HBox width="100%">
 				<mx:Button label="Refresh" click="IMessageAction(linkViewStack.selectedChild).onRefresh()"/>
 				<mx:Button label="{linkViewStack.selectedChild == restore ? 'Restore' : 'Delete'}" click="IMessageAction(linkViewStack.selectedChild).onDelete()"/>
+				<mx:Spacer width="100%"/>
+				<mx:Button label="New" visible="{linkViewStack.selectedChild != restore}" click="IMessageAction(linkViewStack.selectedChild).onCreate()"/>
 			</mx:HBox>
 		</mx:ControlBar>
 	</mx:Panel>
