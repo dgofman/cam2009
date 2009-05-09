@@ -1,14 +1,9 @@
 <?php
 	# database connect information
-//	define("SERVER_DB1", "calderon_schooladmin");
-//	define("SERVER_DBHOST", "localhost");
-//	define("SERVER_DBUSER", "calderon_chand");
-//	define("SERVER_DBPASS", "april2009");
-	define("SERVER_DB1", "calderon_schooladmin2");
-	define("SERVER_DB2", "calderon_schooladmin");
-	define("SERVER_DBHOST", "localhost");
-	define("SERVER_DBUSER", "root");
-	define("SERVER_DBPASS", "");
+	define("SERVER_DATABASE", isset($_ENV["MYSQL_DB"]) ? $_ENV["MYSQL_DB"] : "calderon_schooladmin");
+	define("SERVER_DBHOST",   isset($_ENV["MYSQL_DBHOST"]) ? $_ENV["SERVER_DBHOST"] : "localhost");
+	define("SERVER_DBUSER",   isset($_ENV["MYSQL_DBUSER"]) ? $_ENV["SERVER_DBUSER"] : "root");
+	define("SERVER_DBPASS",   isset($_ENV["MYSQL_DBPASS"]) ? $_ENV["SERVER_DBPASS"] : "");
 	
 	//Hard code in class.smtp.php line 100
 	//define("SMTP_HOST", "ssl://smtp.gmail.com");

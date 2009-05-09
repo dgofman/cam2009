@@ -244,7 +244,7 @@ function strip_html_tags( $text )
 
 		function connect() {
 			$this->handle = mysql_connect(SERVER_DBHOST, SERVER_DBUSER, SERVER_DBPASS);
-			mysql_select_db(SERVER_DB2);
+			mysql_select_db(SERVER_DATABASE);
 			return mysql_query("BEGIN", $this->handle);
 		}
 
