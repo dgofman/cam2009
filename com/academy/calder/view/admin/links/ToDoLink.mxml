@@ -13,8 +13,10 @@
 			import com.academy.calder.enum.MessageStatusEnum;
 
 			private function onItemClick(event:ListEvent):void{
-				if(event.columnIndex != 0) //Checkbox
+				if(event.columnIndex != 0) {//Checkbox
+					createViewStack.selectedIndex = 0;
 					AMFService.send('CAM.messageBody', [dataGrid.selectedItem.messageId], onMessageBodyResult, onFault);
+				}
 			}
 			
 			public function onRefresh():void{
