@@ -93,8 +93,10 @@
 			}
 			
 			private function onItemClick(event:ListEvent):void{
-				if(event.columnIndex != 0) //Checkbox
+				if(event.columnIndex != 0) {//Checkbox
+					createViewStack.selectedIndex = 0;
 					tabNav.selectedChild.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
+				}
 			}
 			
 			private function onReporterResult(result:Object):void{
