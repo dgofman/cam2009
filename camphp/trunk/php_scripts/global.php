@@ -212,12 +212,12 @@ function strip_html_tags( $text )
 		}
 	}
 	
-	function error($messageId, $message=NULL){
+	function error($messageId=0, $message=NULL){
 		$params;
 		if($message == NULL)
 			$params = getMsg($messageId);
 		else
-			$params = array($message, 0);
+			$params = array($message, $messageId);
 		MYSQL::getInstance()->close();
 		throw new Exception($params[0], $params[1]);
 	}
@@ -259,8 +259,10 @@ function strip_html_tags( $text )
 		
 		function &result($rs, $close=true){
 			$result = array();
-			while($row = mysql_fetch_assoc($rs))
-				array_push($result, $row);
+			if($rs){
+				while($row = mysql_fetch_assoc($rs))
+					array_push($result, $row);
+			}
 			if($close == true)
 				$this->close();
 			return $result;
