@@ -34,7 +34,7 @@
 			private var lessontypesObject:Object = {};
 			
 			private function onInitialize():void{
-				/*new Services(this, "onResultStudentList").getStudentList();
+			/*	new Services(this, "onResultStudentList").getStudentList();
 				new Services(this, "onResultLessonTypes").getLessonTypes();
 				studentView.selectedChild.dispatchEvent({type:"initialize"});*/
 			}
