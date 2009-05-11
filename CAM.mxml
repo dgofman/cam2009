@@ -41,9 +41,11 @@
 			Manager.instance.cookieParams = new URLVariables('JSESSIONID=' + event);
 			
 			var mainViewName:String = LocalShare.getValue(MainViewHelper.VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
-			var params:URLVariables = new URLVariables(ExternalInterface.call("getCookie"));
+			var oldCookie:String = ExternalInterface.call("getCookie");
+			var params:URLVariables = new URLVariables(oldCookie as String && oldCookie.length ? oldCookie : null);
 			if(mainViewName != null && params != null && params['JSESSIONID'] == event){
 				mainHelper.changeView(mainViewName);
+				Logger.info(MainViewHelper.VIEW_SHARE_ID + "=" + mainViewName);
 				mainHelper.dispatchEvent(new Event(MainViewHelper.MAINVIEW_CHANGE));
 			}else{
 				if(Manager.getAppParam("key") == "confirm"){
@@ -65,7 +67,7 @@
 	<mx:states>
 	    <mx:State name="APPLICATION_READY">
 	        <mx:AddChild>
-				<mx:VBox width="100%" height="100%" styleName="mainBox">
+				<mx:VBox width="100%" height="100%" verticalGap="3">
 					<view:HeaderPanel id="headerPanel" height="60"/>
 					<mx:Panel width="100%" height="100%" styleName="mainPanel">
 						<mx:ViewStack id="mainViewStack" width="100%" height="100%">

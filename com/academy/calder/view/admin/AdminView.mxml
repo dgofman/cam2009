@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
 	xmlns:component="com.academy.calder.component.*"
-	xmlns:links="com.academy.calder.view.admin.links.*"
+	xmlns:links="com.academy.calder.view.admin.links.*" styleName="innerView"
 	width="100%" height="100%" horizontalGap="0" show="onShow(event)">
 	
 	<mx:Script>

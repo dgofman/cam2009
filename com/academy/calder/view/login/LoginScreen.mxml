@@ -5,7 +5,7 @@
 
 	<mx:Script>
 	<![CDATA[
-		import com.academy.calder.model.UserAccount;
+		import com.academy.calder.vo.UserVO;
 		import com.academy.calder.enum.UserTypes;
 		import com.academy.calder.enum.AccountStatus;
 		import com.academy.calder.business.AMFService;
@@ -49,34 +49,28 @@
 		}
 		
 		private function onLoginResult(result:Object):void{
-			if(AccountStatus.valueOf(result.status) == AccountStatus.Inactive){
+			Manager.instance.currentUser = new UserVO(result);
+			if(Manager.instance.currentUser.status != AccountStatus.Active){
 				Manager.error(Manager.bundle.getMessage('error_inactive_account'), Manager.bundle.getMessage('error_authentication'));
-			}else{
-				Manager.instance.userAccount = new UserAccount(
-					result.userId,
-					result.first,
-					result.language,
-					UserTypes.valueOf(result.typeId)
-				);
+				return;
+			}
+			LocalShare.save("loginInfo", remember.selected ? {username:username.text, remember:true} : null, LocalShare.GLOBAL_LEVEL);
 
-				LocalShare.save("loginInfo", remember.selected ? {username:username.text, remember:true} : null, LocalShare.GLOBAL_LEVEL);
-
-				ExternalInterface.call("setCookie", "JSESSIONID", Manager.instance.cookieParams['JSESSIONID']);
-				
-				switch(Manager.instance.userAccount.type){
-					case UserTypes.Admin:
-						mainHelper.changeView(MainViewHelper.ADMIN);
-						break;
-					case UserTypes.Guest:
-						mainHelper.changeView(MainViewHelper.GUEST);
-						break;
-					case UserTypes.Employee:
-						mainHelper.changeView(MainViewHelper.TEACHER);
-						break;
-					case UserTypes.Student:
-						mainHelper.changeView(MainViewHelper.STUDENT);
-						break;
-				}
+			ExternalInterface.call("setCookie", "JSESSIONID", Manager.instance.cookieParams['JSESSIONID']);
+			
+			switch(Manager.instance.currentUser.typeOf){
+				case UserTypes.Admin:
+					mainHelper.changeView(MainViewHelper.ADMIN);
+					break;
+				case UserTypes.Guest:
+					mainHelper.changeView(MainViewHelper.GUEST);
+					break;
+				case UserTypes.Employee:
+					mainHelper.changeView(MainViewHelper.TEACHER);
+					break;
+				case UserTypes.Student:
+					mainHelper.changeView(MainViewHelper.STUDENT);
+					break;
 			}
 		}
 	]]>

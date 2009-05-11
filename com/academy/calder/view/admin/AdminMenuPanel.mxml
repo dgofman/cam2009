@@ -11,7 +11,8 @@
 		private var _helper:AdminViewHelper = AdminViewHelper.getSelf();
 		
 		private function onComplete():void{
-			_helper.viewName = AdminViewHelper.HOME;
+			if(_helper.viewName == null)
+				changeView(AdminViewHelper.HOME);
 		}
 		
 		private function changeView(name:String):void{

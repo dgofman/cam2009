@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
 	xmlns:login="com.academy.calder.view.login.*" 
-	width="100%" height="100%"
-	styleName="containerCenter">
+	width="100%" height="100%">
 		
 	<mx:Script>
 	<![CDATA[
-		import com.academy.calder.model.UserAccount;
 		import com.academy.calder.enum.UserTypes;
-		import com.academy.calder.enum.UserLanguage;
 		import com.academy.calder.business.Manager;
 		import com.academy.calder.business.AMFService;	
 		
@@ -17,7 +14,7 @@
 			
 		public function createAccount():void{
 
-			emailAddress = access.email.text;
+			/*emailAddress = access.email.text;
 			userLanguage = UserLanguage.valueOf(account.language.selectedItem.data).value;
 			
 			AMFService.send("CAM.signup", [
@@ -37,7 +34,7 @@
 				emailAddress, 
 				access.username.text,
 				access.password.text
-			],onResult, onFault);
+			],onResult, onFault);*/
 		}
 		
 		private function clean():void{
@@ -46,7 +43,7 @@
 		}
 		
 		private function onResult(event:Object,  data:Array=null, columns:Array=null):void{
-			Manager.instance.userAccount = new UserAccount(
+			/*Manager.instance.userAccount = new UserAccount(
 				event.userId,
 				null,
 				userLanguage,
@@ -54,7 +51,7 @@
 			);
 			clean();
 			signupView.selectedChild = confirm;
-			confirm.setEmailAddress(emailAddress);
+			confirm.setEmailAddress(emailAddress);*/
 		}
 		
 		private function onFault(fault:Object):void{

@@ -53,8 +53,8 @@ package com.academy.calder.business
 		}
 		
 		private static function getUserId():String{
-			if(Manager.instance.userAccount)
-				return LanguageService.getUserLanguageCode() + '_' + Manager.instance.userAccount.id;
+			if(Manager.instance.currentUser != null)
+				return LanguageService.getUserLanguageCode() + '_' + Manager.instance.currentUser.userId;
 			else
 				return null;
 		}

@@ -1,5 +1,6 @@
 package com.academy.calder.enum
 {
+	[Bindable]
 	public class MessageStatusEnum
 	{
         public static const Read:MessageStatusEnum    = new MessageStatusEnum(1);

@@ -30,6 +30,7 @@ package com.academy.calder.helper
 		
 		private function onMainViewChange(event:Event):void{
 			var adminViewName:String = LocalShare.getValue(VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
+			Logger.info(VIEW_SHARE_ID + "="+adminViewName);
 			if(adminViewName != null){
 				changeView(adminViewName);
 				dispatchEvent(new Event(ADMINVIEW_CHANGE));

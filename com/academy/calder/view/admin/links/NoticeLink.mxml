@@ -25,7 +25,7 @@
 			public function onRefresh():void{
 				_details = null;
 				_reporter = null;
-				AMFService.send('CAM.notice', null, onNoticeResult, onFault);
+				AMFService.send('Admin.notice', null, onNoticeResult, onFault);
 			}
 
 			public function onDelete():void{
@@ -39,7 +39,7 @@
 							ids.push(data.messageId);
 					}
 					if(ids.length)
-						AMFService.send('CAM.deleteMessage', ids, onMessageDeleteResult, onFault);
+						AMFService.send('Admin.deleteMessage', ids, onMessageDeleteResult, onFault);
 				}
 			}
 			
@@ -48,7 +48,7 @@
 			}
 			
 			private function onSubmit():void{
-				AMFService.send('CAM.createMessage', ['notice', create.priority.selectedItem.value, create.subject.text, create.body.text], onCreateMessageResult, onFault);
+				AMFService.send('Admin.createMessage', ['notice', create.priority.selectedItem.value, create.subject.text, create.body.text], onCreateMessageResult, onFault);
 			}
 			
 			private function onCancel():void{
@@ -70,7 +70,7 @@
 			private function getNoticeDetails():void{
 				var data:Object = dataGrid.selectedItem;
 				if(data != null)
-					AMFService.send('CAM.messageBody', [data.messageId], onMessageBodyResult, onFault);
+					AMFService.send('Admin.messageBody', [data.messageId], onMessageBodyResult, onFault);
 			}
 
 			private function onMessageDeleteResult(result:Object):void{
@@ -88,7 +88,7 @@
 				if(data != null){
 					_reporter = _cachedUsers[data.userId];
 					if(_reporter == null)
-						AMFService.send('CAM.reporter', [data.userId], onReporterResult, onFault);
+						AMFService.send('CAM.person', [data.userId], onReporterResult, onFault);
 				}
 			}
 			
@@ -160,6 +160,12 @@
 				<mx:FormItem label="Account ID:">
 					<mx:Label text="{_reporter.accountId}"/>
 				</mx:FormItem>
+				<mx:FormItem label="Username:">
+					<mx:Label text="{_reporter.username}"/>
+				</mx:FormItem>
+				<mx:FormItem label="User Type:">
+					<mx:Label text="{_reporter.typeOf.label}"/>
+				</mx:FormItem>
 				<mx:FormItem label="First Name:">
 					<mx:Label text="{_reporter.first}"/>
 				</mx:FormItem>
@@ -168,9 +174,6 @@
 				</mx:FormItem>
 				<mx:FormItem label="Name ???:">
 					<mx:Label text="{_reporter.namesoundex}"/>
-				</mx:FormItem>
-				<mx:FormItem label="Language:">
-					<mx:Label text="{_reporter.language}"/>
 				</mx:FormItem>
 				<mx:FormItem label="Sex:">
 					<mx:Label text="{_reporter.sex}"/>

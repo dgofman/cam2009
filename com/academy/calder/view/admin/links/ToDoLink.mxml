@@ -15,13 +15,13 @@
 			private function onItemClick(event:ListEvent):void{
 				if(event.columnIndex != 0) {//Checkbox
 					createViewStack.selectedIndex = 0;
-					AMFService.send('CAM.messageBody', [dataGrid.selectedItem.messageId], onMessageBodyResult, onFault);
+					AMFService.send('Admin.messageBody', [dataGrid.selectedItem.messageId], onMessageBodyResult, onFault);
 				}
 			}
 			
 			public function onRefresh():void{
 				todo.text = "";
-				AMFService.send('CAM.todo', null, onTodoResult, onFault);
+				AMFService.send('Admin.todo', null, onTodoResult, onFault);
 			}
 
 			public function onDelete():void{
@@ -34,7 +34,7 @@
 							ids.push(data.messageId);
 					}
 					if(ids.length)
-						AMFService.send('CAM.deleteMessage', ids, onDeleteTodoResult, onFault);
+						AMFService.send('Admin.deleteMessage', ids, onDeleteTodoResult, onFault);
 				}
 			}
 			
@@ -43,7 +43,7 @@
 			}
 			
 			private function onSubmit():void{
-				AMFService.send('CAM.createMessage', ['todo', create.priority.selectedItem.value, create.subject.text, create.body.text], onCreateMessageResult, onFault);
+				AMFService.send('Admin.createMessage', ['todo', create.priority.selectedItem.value, create.subject.text, create.body.text], onCreateMessageResult, onFault);
 			}
 			
 			private function onCancel():void{

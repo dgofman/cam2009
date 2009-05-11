@@ -13,8 +13,8 @@ package com.academy.calder.business
 	public class AMFService
 	{
 		private static var GATEWAY_URL:String = "http://localhost/camphp/gateway.php";
-
-		private static var gateway:NetConnection = null;
+		
+		private static var logTarget:TraceTarget;
 		private static var faultHandlerRef:Function;
 
 		public static function send(class_method:String, parameters:Array=null, onResult:Function=null, onFault:Function=null):void{
@@ -32,7 +32,7 @@ package com.academy.calder.business
 						onFault(event);
 				}
 			};
-			if(gateway == null){
+			if(logTarget == null){
 				var logTarget:TraceTarget = new TraceTarget();
 		        logTarget.level = LogEventLevel.ALL;
 		        logTarget.includeDate = true;
@@ -40,11 +40,12 @@ package com.academy.calder.business
 		        logTarget.includeCategory = true;
 		        logTarget.includeLevel = true;
 		        Log.addTarget(logTarget);
+		 	}
 		        
-				gateway = new NetConnection();
-				gateway.objectEncoding = ObjectEncoding.AMF3;
-				gateway.connect(Manager.getAppParam("gateway", GATEWAY_URL));
-			}
+			var gateway:NetConnection = new NetConnection();
+			gateway.objectEncoding = ObjectEncoding.AMF3;
+			gateway.connect(Manager.getAppParam("gateway", GATEWAY_URL));
+
 			CursorManager.setBusyCursor();
 			if(faultHandlerRef != null)
 				gateway.removeEventListener(NetStatusEvent.NET_STATUS, faultHandlerRef);

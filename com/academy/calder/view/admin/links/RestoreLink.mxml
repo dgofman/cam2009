@@ -12,7 +12,7 @@
 			import com.academy.calder.enum.MessageStatusEnum;
 
 			public function onRefresh():void{
-				AMFService.send('CAM.deleted', null, onDeletedResult, onFault);
+				AMFService.send('Admin.restore', null, onDeletedResult, onFault);
 			}
 
 			public function onDelete():void{
@@ -24,7 +24,7 @@
 							ids.push(data.messageId);
 					}
 					if(ids.length)
-						AMFService.send('CAM.restoreMessage', ids, onRestoreResult, onFault);
+						AMFService.send('Admin.restoreMessage', ids, onRestoreResult, onFault);
 				}
 			}
 			

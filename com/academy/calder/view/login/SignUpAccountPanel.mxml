@@ -7,7 +7,6 @@
 	<![CDATA[
 		import mx.containers.ViewStack;
 		import com.academy.calder.business.Manager;
-		import com.academy.calder.enum.UserLanguage;
 		import com.academy.calder.helper.MainViewHelper;
 		import com.academy.calder.component.validator.CAMDateValidator;
 		import com.academy.calder.component.validator.CAMPhoneValidator;
@@ -54,7 +53,7 @@
 			cellPhone.text = "";
 			stringValidator.reset();
 			dateValidator.reset();
-			language.selectedIndex = 0;
+			//language.selectedIndex = 0;
 			numberValidator.reset();
 			phoneValidator.reset();
 		}
@@ -95,10 +94,10 @@
 						toolTip="{Manager.bundle.getMessage('tip_dob')}" editable="true"/>
 				</mx:FormItem>
 				
-				<mx:FormItem label="{Manager.bundle.getMessage('language')}:" required="true">
+				<!--mx:FormItem label="{Manager.bundle.getMessage('language')}:" required="true">
 					<mx:ComboBox id="language" dataProvider="{Manager.bundle.addChangeListener(UserLanguage.dispalayList)}" width="150"
 						toolTip="{Manager.bundle.getMessage('tip_language')}"/>
-				</mx:FormItem>
+				</mx:FormItem-->
 						
 				<mx:FormItem label="{Manager.bundle.getMessage('address1')} 1:">
 					<mx:TextInput width="250" id="address1" maxChars="50"
