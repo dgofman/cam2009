@@ -12,5 +12,8 @@ $server->setClass('CAM');
 require_once('Admin.php');
 $server->setClass('Admin');
 
+require_once('Student.php');
+$server->setClass('Student');
+
 echo($server->handle());
 ?>
