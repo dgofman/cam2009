@@ -1,3 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml">
-</mx:Panel>
+<mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
+				xmlns:home="com.academy.calder.view.admin.home.*"
+				xmlns:links="com.academy.calder.view.admin.links.*"
+				width="100%" height="100%" horizontalGap="6" >
+				
+	<mx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.events.CollectionEvent;
+			import com.academy.calder.vo.UserVO;
+			import com.academy.calder.vo.MessageVO;
+			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.AMFService;
+			import com.academy.calder.enum.StudentStatusEnum;
+
+			[Bindable]
+			private var _details:MessageVO;
+			[Bindable]
+			private var _reporter:UserVO;
+			
+			private var _cachedUsers:Object = {};
+
+		/*	public function onRefresh():void{
+				_details = null;
+				_reporter = null;
+				AMFService.send('CAM.notice', null, onNoticeResult, onFault);
+			}*/
+
+		/*	public function onDelete():void{
+				_details = null;
+				_reporter = null;
+				if(dataGrid.dataProvider != null){
+					var ids:Array = [];
+					for(var i:uint = 0; i < dataGrid.dataProvider.length; i++){
+						var data:Object = dataGrid.dataProvider[i];
+						if(data.flag == true)
+							ids.push(data.messageId);
+					}
+					if(ids.length)
+						AMFService.send('CAM.deleteMessage', ids, onMessageDeleteResult, onFault);
+				}
+			}	*/
+			
+	/*		public function onCreate():void{
+				createViewStack.selectedIndex = 1;
+			}*/
+			
+	/*		private function onSubmit():void{
+				AMFService.send('CAM.createMessage', ['notice', create.priority.selectedItem.value, create.subject.text, create.body.text], onCreateMessageResult, onFault);
+			}*/
+			
+	/*		private function onCancel():void{
+				createViewStack.selectedIndex = 0;
+			}*/
+			
+	/*		private function onCreateMessageResult(result:Object):void{
+				if(result != null){
+					if(dataGrid.dataProvider == null){
+						dataGrid.dataProvider = [result];
+					}else{
+						dataGrid.dataProvider.addItemAt(result, 0);
+					}
+					create.record = {};
+					createViewStack.selectedIndex = 0;
+				}
+			}*/
+			
+		/*	private function getNoticeDetails():void{
+				var data:Object = dataGrid.selectedItem;
+				if(data != null)
+					AMFService.send('CAM.messageBody', [data.messageId], onMessageBodyResult, onFault);
+			}	*/
+
+		/*	private function onMessageDeleteResult(result:Object):void{
+				if(result && result is Array){
+					for(var i:Number = dataGrid.dataProvider.length - 1; i >= 0; i--){
+						var data:Object = dataGrid.dataProvider[i];
+						if(result.indexOf(data.messageId) != -1)
+							dataGrid.dataProvider.removeItemAt(i);
+					}
+				}
+			}	*/
+			
+		/*	private function getReporter():void{
+				var data:Object = dataGrid.selectedItem;
+				if(data != null){
+					_reporter = _cachedUsers[data.userId];
+					if(_reporter == null)
+						AMFService.send('CAM.reporter', [data.userId], onReporterResult, onFault);
+				}
+			}	*/
+			
+			private function onItemClick(event:ListEvent):void{
+				if(event.columnIndex != 0) {//Checkbox
+					createViewStack.selectedIndex = 0;
+					tabNav.selectedChild.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
+				}
+			}
+			
+	/*		private function onReporterResult(result:Object):void{
+				_reporter = new UserVO(result);
+				_cachedUsers[_reporter.userId] = _reporter; 
+			}	*/
+			
+			
+			public function onShow():void{
+				_details = null;
+				_reporter = null;
+				AMFService.send('CAM.showStudents', null, onShowResult, onFault);
+			}
+			
+			
+			
+			private function onShowResult(result:Object):void{
+				dataGrid.dataProvider = result;
+			}
+			
+	/*		private function onMessageBodyResult(result:Object):void{
+				_details = new MessageVO();
+				if(dataGrid.selectedIndex != -1){
+					_details.body = result as String;
+					_details.subject = dataGrid.selectedItem.subject;
+					_details.createdTime = dataGrid.selectedItem.createdTime;
+					dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
+					dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
+				}
+			}	*/
+			
+			private function onFault(fault:Object):void{
+				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_notice'));
+			}
+		]]>
+	</mx:Script>
+	
+	<mx:VBox height="100%" >
+		
+	<mx:FormItem label="Search">
+		<mx:TextInput id="search" width="242" />
+		<mx:Button id="show" label="Show All" click="onShow()"/>
+	</mx:FormItem>
+	
+	<mx:DataGrid id="dataGrid" width="300" height="100%" itemClick="onItemClick(event)">
+		<mx:columns>
+			<mx:Array>
+				<mx:DataGridColumn dataField="students" headerText="Students" 
+				itemRenderer="com.academy.calder.component.renderer.StudentCellRenderer" />
+			</mx:Array>
+		 </mx:columns>
+	</mx:DataGrid>
+	</mx:VBox>
+	
+	<mx:ViewStack id="createViewStack" width="100%" height="100%">
+		<mx:TabNavigator id="tabNav" borderStyle="solid"
+			  paddingTop="5"
+			  paddingBottom="5"
+			  paddingLeft="5"
+			  paddingRight="5"
+			  height="100%"
+			  width="100%">
+			
+			<mx:VBox width="100%" height="100%" label="Message Body" >
+				<mx:HBox width="100%">
+					<mx:Label text="Subject:" fontWeight="bold"/>
+					<mx:Label text="{_details.subject}" width="100%"/>
+				</mx:HBox>
+				<mx:HBox width="100%">
+					<mx:Label text="Date:" fontWeight="bold"/>
+					<mx:Label text="{_details.createdTime}" width="100%"/>
+				</mx:HBox>
+				<mx:Text text="{_details.body}" width="100%" height="100%"/>
+			</mx:VBox>
+			<mx:Form width="100%" height="100%" label="Student Profile" >
+				<mx:FormItem label="Account ID:">
+					<mx:Label text="{_reporter.accountId}"/>
+				</mx:FormItem>
+				<mx:FormItem label="First Name:">
+					<mx:Label text="{_reporter.first}"/>
+				</mx:FormItem>
+				<mx:FormItem label="Last Name:">
+					<mx:Label text="{_reporter.last}"/>
+				</mx:FormItem>
+				<mx:FormItem label="Name ???:">
+					<mx:Label text="{_reporter.namesoundex}"/>
+				</mx:FormItem>
+				<mx:FormItem label="Language:">
+					<mx:Label text="{_reporter.language}"/>
+				</mx:FormItem>
+				<mx:FormItem label="Sex:">
+					<mx:Label text="{_reporter.sex}"/>
+				</mx:FormItem>
+				<mx:FormItem label="Date Of Birth:">
+					<mx:Label text="{_reporter.dateOfBirth}"/>
+				</mx:FormItem>
+				<mx:FormItem label="Notes:" width="100%" height="100%">
+					<mx:Text text="{_reporter.notes}" width="100%" height="100%"/>
+				</mx:FormItem>
+			</mx:Form>
+		</mx:TabNavigator>
+	
+	</mx:ViewStack> 
+</mx:HDividedBox>
