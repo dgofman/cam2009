@@ -54,7 +54,7 @@
 	
 	<mx:Canvas width="100%" height="100%" horizontalScrollPolicy="off">
 		<mx:VBox width="100%" height="100%" paddingLeft="10" paddingRight="10" paddingTop="10" verticalGap="0">
-			<component:CAMLabel width="100%" height="60" styleName="labelInfo" label="{Manager.bundle.getMessage('msg_register')}"/>
+			<component:CAMLabel width="100%" height="60" label="{Manager.bundle.getMessage('msg_register')}"/>
 	
 			<mx:Form width="100%" height="100%" defaultButton="{submitButton}" id="signupForm">
 				

@@ -5,6 +5,9 @@ Application{
 	paddingRight:5;
 	backgroundColor:#000099;
 }
+Button{
+	fillAlphas:1,1;
+}
 ControlBar{
 	paddingTop:5;
 	horizontalAlign:right;

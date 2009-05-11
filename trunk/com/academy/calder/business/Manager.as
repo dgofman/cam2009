@@ -1,7 +1,7 @@
 package com.academy.calder.business
 {
 	import com.academy.calder.helper.MainViewHelper;
-	import com.academy.calder.model.UserAccount;
+	import com.academy.calder.vo.UserVO;
 	
 	import flash.net.URLVariables;
 	
@@ -14,7 +14,7 @@ package com.academy.calder.business
 		
 		private static var _instance:Manager;
 		
-		private var _userAccount:UserAccount;
+		private var _currentUser:UserVO;
 		private var _cookieParams:URLVariables;
 		
 		public static const bundle:ResourceBundle = new ResourceBundle();
@@ -32,11 +32,11 @@ package com.academy.calder.business
 			_cookieParams = value;
 		}
 
-		public function get userAccount():UserAccount{
-			return _userAccount;
+		public function get currentUser():UserVO{
+			return _currentUser;
 		}
-		public function set userAccount(account:UserAccount):void{
-			_userAccount = account;
+		public function set currentUser(account:UserVO):void{
+			_currentUser = account;
 		}
 		
 		public static function get application():CAM{

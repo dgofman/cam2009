@@ -1,3 +1,125 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml">
-</mx:Panel>
+<mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
+				xmlns:home="com.academy.calder.view.admin.home.*"
+				xmlns:links="com.academy.calder.view.admin.links.*" styleName="innerView"
+				width="100%" height="100%" horizontalGap="6" show="onRefresh()">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ListEvent;
+			import mx.events.CollectionEvent;
+			import com.academy.calder.vo.UserVO;
+			import com.academy.calder.enum.Gender;
+			import com.academy.calder.enum.UserTypes;
+			import com.academy.calder.enum.PrivilegeEnum;
+			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.AMFService;
+			import com.academy.calder.enum.AccountStatus;
+			import com.academy.calder.enum.MessageStatusEnum;
+			
+			private static const FIELD_WIDTH:uint = 200;
+			private static const DEFAULT_LOCALE:String = "en_US";
+			
+			[Bindable]
+			private var _user:UserVO;
+			
+			[Bindable]
+			private var _localeIndex:uint;
+			
+			[Bindable]
+			private static var _languages:Array;
+
+			private function onItemClick(event:ListEvent):void{
+				AMFService.send('CAM.person', [dataGrid.selectedItem.userId], onUserInfoResult, onFault);
+			}
+			
+			public function onRefresh():void{
+				_user = null;
+				findLocaleIndex();
+				AMFService.send('CAM.users', [status.selectedItem ? status.selectedItem.value : null], onUserResult, onFault);
+			}
+
+			private function onUserResult(result:Object):void{
+				dataGrid.dataProvider = result;
+			}
+			
+			private function onUserInfoResult(result:Object):void{
+				_user = new UserVO(result);
+				findLocaleIndex();
+			}
+			
+			private function onLocaleResult(result:Object):void{
+				_languages = result as Array;
+				findLocaleIndex();
+			}
+			
+			private function findLocaleIndex():void{
+				if(_languages == null){
+					AMFService.send('CAM.locale', null, onLocaleResult);
+				}else{
+					var name:String = (_user && _user.localeName) ? _user.localeName : DEFAULT_LOCALE;
+					for(var i:uint = 0; i < _languages.length; i++){
+						if(_languages[i].localeName == name){
+							_localeIndex = i;
+							break;
+						}
+					}
+				}
+			}
+		
+			private function onFault(fault:Object):void{
+				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_usres'));
+			}
+		]]>
+	</mx:Script>
+	<mx:VBox width="300" height="100%">
+		<mx:DataGrid id="dataGrid" width="100%" height="100%" itemClick="onItemClick(event)">
+			<mx:columns>
+				<mx:Array>
+					<mx:DataGridColumn dataField="last" headerText="Last"/>
+					<mx:DataGridColumn dataField="first" headerText="First"/>
+				</mx:Array>
+			 </mx:columns>
+		</mx:DataGrid>
+		<mx:ComboBox id="status" width="150" dataProvider="{AccountStatus.list}" change="onRefresh()"/>
+	</mx:VBox>
+	<mx:VBox width="100%" height="100%">
+		<mx:Form width="100%" height="100%">
+			<mx:FormItem label="{Manager.bundle.getMessage('first')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_user.first}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('last')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_user.last}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('namesoundex')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_user.namesoundex}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('username')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_user.username}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('password')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('dob')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_user.dateOfBirth}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('accountId')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_user.accountId}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('sex')}:">
+				<mx:ComboBox dataProvider="{Gender.list}" width="{FIELD_WIDTH}" selectedItem="{_user.sex}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('userType')}:">
+				<mx:ComboBox dataProvider="{UserTypes.list}" width="{FIELD_WIDTH}" selectedItem="{_user.typeOf}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('privileges')}:">
+				<mx:ComboBox dataProvider="{PrivilegeEnum.list}" width="{FIELD_WIDTH}" selectedItem="{_user.privileges}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('userStatus')}:">
+				<mx:ComboBox dataProvider="{AccountStatus.userList}" width="{FIELD_WIDTH}" selectedItem="{_user.status}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('language')}:">
+				<mx:ComboBox dataProvider="{_languages}" width="{FIELD_WIDTH}" selectedIndex="{_localeIndex}" labelField="language"/>
+			</mx:FormItem>
+		</mx:Form>
+	</mx:VBox>
+</mx:HDividedBox>
