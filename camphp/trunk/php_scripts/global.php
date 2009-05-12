@@ -262,6 +262,8 @@ function strip_html_tags( $text )
 			if($rs){
 				while($row = mysql_fetch_assoc($rs))
 					array_push($result, $row);
+			}else if($this->getErrorNo() != 0){
+				error($this->getErrorNo(), $this->getError());
 			}
 			if($close == true)
 				$this->close();
