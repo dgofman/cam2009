@@ -17,8 +17,10 @@ body { margin: 0px; overflow:hidden; scroll:no }
 <!--
 	var id = "CAM";
 	var language = "en_US";
-	var gateway = "http://localhost/camphp/gateway.php"
 	var version = null;
+	var gateway = "http://localhost/camphp/gateway.php";
+	if(document.location.host)
+		gateway = "http://" + document.location.host + "/camphp/gateway.php";
 
 	if(new String("${swf}").indexOf("debug") != -1){
 		src = "${swf}";
