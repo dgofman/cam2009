@@ -12,10 +12,10 @@ class Admin {
 		$this->MESSAGE_UPDATE="UPDATE messages SET status='read', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
 		$this->MESSAGE_DELETE="UPDATE messages SET status='delete', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
 		$this->MESSAGE_RESTORE="UPDATE messages SET status='unread', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
-		$this->MESSAGE="SELECT messageId, userId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE messageId='%s'";
-		$this->NOTICE="SELECT messageId, userId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='notice' AND status <> 'delete' ORDER BY createdTime DESC";
-		$this->NEWS="SELECT messageId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='news' AND status <> 'delete' ORDER BY createdTime DESC";
-		$this->TODO="SELECT messageId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='todo' AND status <> 'delete' AND userId='%s' ORDER BY createdTime DESC";
+		$this->MESSAGE="SELECT messageId, userId, priority, status, subject, createdTime FROM messages WHERE messageId='%s'";
+		$this->NOTICE="SELECT messageId, userId, priority, status, subject, createdTime FROM messages WHERE type='notice' AND status <> 'delete' ORDER BY createdTime DESC";
+		$this->NEWS="SELECT messageId, priority, status, subject, createdTime FROM messages WHERE type='news' AND status <> 'delete' ORDER BY createdTime DESC";
+		$this->TODO="SELECT messageId, priority, status, subject, createdTime FROM messages WHERE type='todo' AND status <> 'delete' AND userId='%s' ORDER BY createdTime DESC";
 		$this->RESTORE="SELECT messageId, priority, type, subject, createdTime, updatedTime FROM messages WHERE status='delete' ORDER BY createdTime DESC";
 	}
 	

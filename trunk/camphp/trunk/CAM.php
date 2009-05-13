@@ -7,8 +7,8 @@ require_once($PHP_DIR."/global.php");
 class CAM {
 
 	function CAM(){
-		$this->LOGIN="SELECT A.first, A.localeName, B.userId, B.typeOf, B.status+0 AS status FROM person A, user B WHERE A.personId=B.personId AND username='%s' AND password=PASSWORD('%s')";
-		$this->PERSON="SELECT A.accountId, A.personId, A.first, A.last, A.namesoundex, A.sex+0 AS sex, A.dateOfBirth, A.localeName, A.notes, B.username, B.privileges+0 AS privileges, B.status+0 AS status, B.typeOf+0 as typeOf, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.userId='%s'";
+		$this->LOGIN="SELECT A.first, A.localeName, B.userId, B.typeOf, B.status FROM person A, user B WHERE A.personId=B.personId AND username='%s' AND password=PASSWORD('%s')";
+		$this->PERSON="SELECT A.accountId, A.personId, A.first, A.last, A.namesoundex, A.sex, A.dateOfBirth, A.localeName, A.notes, B.username, B.privileges, B.status, B.typeOf, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.userId='%s'";
 		$this->USERS="SELECT A.personId, A.last, A.first, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.status %s ORDER BY A.last";
 		$this->LOCALE="SELECT localeName, language FROM locale";
 	}
@@ -49,7 +49,7 @@ class CAM {
 	
 	public function users($status){
 		$mysql = MYSQL::getInstance();
-		if($status == NULL){
+		if($status == "any"){
 			$sql = escape($this->USERS, "IS NOT NULL");
 		}else{
 			$sql = escape($this->USERS, "=$status");
