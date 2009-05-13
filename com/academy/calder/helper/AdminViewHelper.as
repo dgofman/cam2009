@@ -14,6 +14,7 @@ package com.academy.calder.helper
 	public class AdminViewHelper extends ViewHelper
 	{
 		private var _viewName:String;
+		private var _selectedIndex:int;
 		
 		public static const HOME:String    = "adminHome";
 		public static const USER:String    = "userMember";
@@ -62,11 +63,18 @@ package com.academy.calder.helper
 			if(adminViewStack.getChildByName(value) is Container)
 				adminViewStack.selectedChild = adminViewStack.getChildByName(value) as Container;
 		}
-				
+		
+		public function get selectedIndex():int{
+			return _selectedIndex;
+		}
+		private function set selectedIndex(value:int):void{
+			_selectedIndex = value;
+		}
+			
 		public function get view():AdminScreen{
             return _view as AdminScreen;
         }
-        
+
         public static function getSelf():AdminViewHelper{
         	return getViewHelper(AdminViewHelper);
         }

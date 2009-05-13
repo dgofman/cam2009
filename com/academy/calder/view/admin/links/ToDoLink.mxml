@@ -8,14 +8,21 @@
 		<![CDATA[
 			import mx.events.ListEvent;
 			import mx.events.CollectionEvent;
+			import com.academy.calder.vo.MessageVO;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
 			import com.academy.calder.enum.MessageStatusEnum;
-
+			import com.academy.calder.helper.AdminViewHelper;
+			
+			private const model:AdminViewHelper = AdminViewHelper.getSelf();
+			
+			[Bindable]
+			private var _message:MessageVO;
+			
 			private function onItemClick(event:ListEvent):void{
 				if(event.columnIndex != 0) {//Checkbox
 					createViewStack.selectedIndex = 0;
-					AMFService.send('Admin.messageBody', [dataGrid.selectedItem.messageId], onMessageBodyResult, onFault);
+					AMFService.send('Admin.messageDetails', [dataGrid.selectedItem.messageId], onMessageDetailsResult, onFault);
 				}
 			}
 			
@@ -40,24 +47,33 @@
 			
 			public function onCreate():void{
 				createViewStack.selectedIndex = 1;
+				messageView.message = new MessageVO();
+			}
+			
+			public function onEdit():void{
+				createViewStack.selectedIndex = 1;
+				messageView.message = _message;
 			}
 			
 			private function onSubmit():void{
-				AMFService.send('Admin.createMessage', ['todo', create.priority.selectedItem.value, create.subject.text, create.body.text], onCreateMessageResult, onFault);
+				AMFService.send('Admin.createMessage', ['todo', messageView.priority.selectedItem.value, 
+																messageView.subject.text,
+																messageView.body.text,
+																messageView.message.messageId], onSubmitMessageResult, onFault);
 			}
 			
 			private function onCancel():void{
 				createViewStack.selectedIndex = 0;
 			}
-			
-			private function onCreateMessageResult(result:Object):void{
+
+			private function onSubmitMessageResult(result:Object):void{
 				if(result != null){
 					if(dataGrid.dataProvider == null){
 						dataGrid.dataProvider = [result];
 					}else{
 						dataGrid.dataProvider.addItemAt(result, 0);
 					}
-					create.record = {};
+					messageView.message = null;
 					createViewStack.selectedIndex = 0;
 				}
 			}
@@ -72,11 +88,13 @@
 				}
 			}
 			
-			private function onMessageBodyResult(result:Object):void{
-				todo.text = result as String;
-				if(dataGrid.selectedIndex != -1){
-					dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
-					dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
+			private function onMessageDetailsResult(result:Object):void{
+				_message = new MessageVO(result);
+				if(dataGrid.dataProvider != null){
+					if(dataGrid.selectedIndex != -1){
+						dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
+						dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
+					}
 				}
 			}
 			
@@ -89,6 +107,9 @@
 			}
 		]]>
 	</mx:Script>
+	
+	<mx:Binding source="dataGrid.selectedIndex" destination="model.selectedIndex"/>
+	
 	<mx:DataGrid id="dataGrid" width="300" height="100%" itemClick="onItemClick(event)">
 		<mx:columns>
 			<mx:Array>
@@ -103,8 +124,8 @@
 	</mx:DataGrid>	  
 	<mx:ViewStack id="createViewStack" width="100%" height="100%">
 		<mx:Canvas width="100%" height="100%">
-			<mx:Text id="todo" width="100%" height="100%"/>		
+			<mx:Text id="todo" text="{_message}" width="100%" height="100%"/>		
 		</mx:Canvas>
-		<links:CreateMessage id="create" submit="onSubmit()" cancel="onCancel()"/>
+		<links:MessageView id="messageView" submit="onSubmit()" cancel="onCancel()"/>
 	</mx:ViewStack> 
 </mx:HDividedBox>

@@ -3,10 +3,11 @@
 	paddingBottom="5" paddingTop="5" paddingLeft="5" paddingRight="5">
 	<mx:Script>
 		<![CDATA[
+			import com.academy.calder.vo.MessageVO;
 			import com.academy.calder.enum.PriorityEnum;
 			
 			[Bindable]
-			public var record:Object;
+			public var message:MessageVO = new MessageVO();
 		]]>
 	</mx:Script>
 	
@@ -16,11 +17,11 @@
 	</mx:Metadata>
 
 	<mx:Label text="Priority:"/>
-	<mx:ComboBox id="priority" dataProvider="{PriorityEnum.list}" selectedIndex="{isNaN(record.index) ? 0 : record.index}"/>
+	<mx:ComboBox id="priority" dataProvider="{PriorityEnum.list}" selectedItem="{message.priority}"/>
 	<mx:Label text="Subject:"/>
-	<mx:TextInput id="subject" width="100%" maxChars="250" text="{record.subject}"/>
+	<mx:TextInput id="subject" width="100%" maxChars="250" text="{message.subject}"/>
 	<mx:Label text="Body:"/>
-	<mx:TextArea id="body" width="100%" height="100%" text="{record.body}"/>
+	<mx:TextArea id="body" width="100%" height="100%" text="{message.body}"/>
 	<mx:HBox width="100%" horizontalAlign="right">
 		<mx:Button label="Submit" click="dispatchEvent(new Event('submit'))"/>
 		<mx:Button label="Cancel" click="dispatchEvent(new Event('cancel'))"/>

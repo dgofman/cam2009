@@ -8,9 +8,12 @@
 	<![CDATA[
 		import mx.events.ItemClickEvent;
 		import com.academy.calder.business.Manager;
+		import com.academy.calder.helper.AdminViewHelper;
 		
 		[Embed('/resources/images/btn_arrow.png')]
 		private static const BUTTON_ARROW:Class;
+		
+		private const model:AdminViewHelper = AdminViewHelper.getSelf();
 		
 		private function onShow(event:Event):void{
 			linkViewStack.selectedChild.dispatchEvent(event)
@@ -50,9 +53,13 @@
 		<mx:ControlBar id="controlBar" textIndent="0" width="100%" height="30" paddingTop="0" paddingBottom="0">
 			<mx:HBox width="100%">
 				<mx:Button label="Refresh" click="IMessageAction(linkViewStack.selectedChild).onRefresh()"/>
-				<mx:Button label="{linkViewStack.selectedChild == restore ? 'Restore' : 'Delete'}" click="IMessageAction(linkViewStack.selectedChild).onDelete()"/>
+				<mx:Button label="{linkViewStack.selectedChild == restore ? 'Restore' : 'Delete'}"
+					click="IMessageAction(linkViewStack.selectedChild).onDelete()" enabled="{model.selectedIndex != -1}"/>
 				<mx:Spacer width="100%"/>
-				<mx:Button label="New..." visible="{linkViewStack.selectedChild != restore}" click="IMessageAction(linkViewStack.selectedChild).onCreate()"/>
+				<mx:Button label="Edit" visible="{linkViewStack.selectedChild != restore}" enabled="{model.selectedIndex != -1}"
+						click="IMessageAction(linkViewStack.selectedChild).onEdit()"/>
+				<mx:Button label="New..." visible="{linkViewStack.selectedChild != restore}"
+						click="IMessageAction(linkViewStack.selectedChild).onCreate()"/>
 			</mx:HBox>
 		</mx:ControlBar>
 	</mx:Panel>

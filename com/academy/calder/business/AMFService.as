@@ -27,6 +27,7 @@ package com.academy.calder.business
 			};
 			var faultHandler:Function = function(event:*):void{
 				CursorManager.removeBusyCursor();
+				Logger.error(class_method + ": " + ObjectUtil.toString(event));
 				if(onFault != null){
 					if(event is NetStatusEvent)
 						onFault({code:event.info.code,  description:event.info.description, detail:event.info.details});
