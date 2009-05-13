@@ -10,6 +10,9 @@
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
 			import com.academy.calder.enum.MessageStatusEnum;
+			import com.academy.calder.helper.AdminViewHelper;
+			
+			private const model:AdminViewHelper = AdminViewHelper.getSelf();
 
 			public function onRefresh():void{
 				AMFService.send('Admin.restore', null, onDeletedResult, onFault);
@@ -31,6 +34,9 @@
 			public function onCreate():void{
 			}
 			
+			public function onEdit():void{
+			}
+			
 			private function onRestoreResult(result:Object):void{
 				if(result && result is Array){
 					for(var i:Number = dataGrid.dataProvider.length - 1; i >= 0; i--){
@@ -50,6 +56,9 @@
 			}
 		]]>
 	</mx:Script>
+	
+	<mx:Binding source="dataGrid.selectedIndex" destination="model.selectedIndex"/>
+	
 	<mx:DataGrid id="dataGrid" width="100%" height="100%">
 		<mx:columns>
 			<mx:Array>
