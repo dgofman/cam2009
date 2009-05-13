@@ -7,11 +7,10 @@ require_once($PHP_DIR."/global.php");
 class Admin {
 
 	function Admin(){
-		$this->MESSAGE_DETAILS="SELECT body FROM messages WHERE messageId='%s'";
+		$this->MESSAGE_DETAILS="SELECT messageId, body, subject, priority, createdTime FROM messages WHERE messageId='%s'";
 		$this->MESSAGE_CREATE="INSERT INTO messages (userId, type, priority, subject, body) VALUES ('%s', '%s', '%s', '%s', '%s')";
-		$this->MESSAGE_UPDATE="UPDATE messages SET status='read', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
-		$this->MESSAGE_DELETE="UPDATE messages SET status='delete', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
-		$this->MESSAGE_RESTORE="UPDATE messages SET status='unread', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
+		$this->MESSAGE_UPDATE="UPDATE messages SET status='unread', updatedTime=NOW(), updatedBy='%s', priority='%s', subject='%s', body='%s' WHERE messageId='%s'";
+		$this->MESSAGE_STATUS="UPDATE messages SET status='%s', updatedTime=NOW(), updatedBy='%s' WHERE messageId='%s'";
 		$this->MESSAGE="SELECT messageId, userId, priority, status, subject, createdTime FROM messages WHERE messageId='%s'";
 		$this->NOTICE="SELECT messageId, userId, priority, status, subject, createdTime FROM messages WHERE type='notice' AND status <> 'delete' ORDER BY createdTime DESC";
 		$this->NEWS="SELECT messageId, priority, status, subject, createdTime FROM messages WHERE type='news' AND status <> 'delete' ORDER BY createdTime DESC";
@@ -19,25 +18,33 @@ class Admin {
 		$this->RESTORE="SELECT messageId, priority, type, subject, createdTime, updatedTime FROM messages WHERE status='delete' ORDER BY createdTime DESC";
 	}
 	
-	public function messageBody($messageId){
+	public function messageDetails($messageId, $update=TRUE){
 		$mysql = MYSQL::getInstance();
-		$sql1 = escape($this->MESSAGE_UPDATE, $_SESSION["USER_ID"], $messageId);
-		$mysql->query($sql1);
+		if($update){
+			$sql1 = escape($this->MESSAGE_STATUS, "read", $_SESSION["USER_ID"], $messageId);
+			$mysql->query($sql1);
+		}
 		$sql2 = escape($this->MESSAGE_DETAILS, $messageId);
 		$rs = $mysql->query($sql2);
 		$result = $mysql->result($rs);
 		if(count($result) == 0)
 			return NULL;
 		else
-			return $result[0]["body"];
+			return $result[0];
 	}
 	
-	public function createMessage($type, $priority, $subject, $body){
+	public function createMessage($type, $priority, $subject, $body, $messageId){
 		$mysql = MYSQL::getInstance();
-		$sql1 = escape($this->MESSAGE_CREATE, $_SESSION["USER_ID"], $type, $priority, $subject, $body);
-		$rs = $mysql->query($sql1);
-		if($rs == true){
-			$messageId = $mysql->insert();
+		if(isset($messageId)){
+			$sql1 = escape($this->MESSAGE_UPDATE, $_SESSION["USER_ID"], $priority, $subject, $body, $messageId);
+			$rs = $mysql->query($sql1);
+		}else{
+			$sql1 = escape($this->MESSAGE_CREATE, $_SESSION["USER_ID"], $type, $priority, $subject, $body);
+			$rs = $mysql->query($sql1);
+			if($rs)
+				$messageId = $mysql->insert();
+		}
+		if(isset($messageId)){
 			$sql2 = escape($this->MESSAGE, $messageId);
 			$rs = $mysql->query($sql2);
 			$result = $mysql->result($rs);
@@ -52,7 +59,7 @@ class Admin {
 		$deletedIds = array();
 		$mysql = MYSQL::getInstance();
 		foreach($ids as $messageId) {
-		    $sql = escape($this->MESSAGE_DELETE, $_SESSION["USER_ID"], $messageId);
+		    $sql = escape($this->MESSAGE_STATUS, "delete", $_SESSION["USER_ID"], $messageId);
 			$rs = $mysql->query($sql);
 			if($rs == true)
 				array_push($deletedIds, $messageId);
@@ -66,7 +73,7 @@ class Admin {
 		$restoreIds = array();
 		$mysql = MYSQL::getInstance();
 		foreach($ids as $messageId) {
-		    $sql = escape($this->MESSAGE_RESTORE, $_SESSION["USER_ID"], $messageId);
+		    $sql = escape($this->MESSAGE_STATUS, "unread", $_SESSION["USER_ID"], $messageId);
 			$rs = $mysql->query($sql);
 			if($rs == true)
 				array_push($restoreIds, $messageId);

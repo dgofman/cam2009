@@ -49,10 +49,10 @@ class CAM {
 	
 	public function users($status){
 		$mysql = MYSQL::getInstance();
-		if($status == "any"){
+		if(!isset($status) || $status == "any"){
 			$sql = escape($this->USERS, "IS NOT NULL");
 		}else{
-			$sql = escape($this->USERS, "=$status");
+			$sql = escape($this->USERS, "='$status'");
 		}
 		$rs = $mysql->query($sql);
 		return $mysql->result($rs);
