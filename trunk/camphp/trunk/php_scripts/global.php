@@ -34,7 +34,7 @@
 	function escape($query) {
 		$args  = func_get_args();
 		$query = array_shift($args);
-		$args  = array_map('mysql_real_escape_string', $args);
+		//$args  = array_map('mysql_real_escape_string', $args);
 		array_unshift($args,$query);
 		return call_user_func_array('sprintf',$args);
 	}
