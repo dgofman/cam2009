@@ -15,7 +15,7 @@ class Admin {
 		$this->MESSAGE="SELECT messageId, userId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE messageId='%s'";
 		$this->NOTICE="SELECT messageId, userId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='notice' AND status <> 'delete' ORDER BY createdTime DESC";
 		$this->NEWS="SELECT messageId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='news' AND status <> 'delete' ORDER BY createdTime DESC";
-		$this->TODO="SELECT messageId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='todo' AND status <> 'delete' ORDER BY createdTime DESC";
+		$this->TODO="SELECT messageId, priority+0 AS priority, status+0 AS status, subject, createdTime FROM messages WHERE type='todo' AND status <> 'delete' AND userId='%s' ORDER BY createdTime DESC";
 		$this->RESTORE="SELECT messageId, priority, type, subject, createdTime, updatedTime FROM messages WHERE status='delete' ORDER BY createdTime DESC";
 	}
 	
@@ -91,7 +91,8 @@ class Admin {
 	
 	public function todo(){
 		$mysql = MYSQL::getInstance();
-		$rs = $mysql->query($this->TODO);
+		$sql = escape($this->TODO, $_SESSION["USER_ID"]);
+		$rs = $mysql->query($sql);
 		$result = $mysql->result($rs);
 		return $result;
 	}

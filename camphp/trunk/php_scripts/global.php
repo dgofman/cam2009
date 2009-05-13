@@ -257,7 +257,22 @@ function strip_html_tags( $text )
 			return mysql_fetch_row($result);
 		}
 		
-		function &result($rs, $close=true){
+		function &enum($table, $field){
+			$rs = $this->query("SHOW COLUMNS FROM $table WHERE FIELD='$field'");
+			$result = array();
+			if($rs){
+				while($row = mysql_fetch_row($rs)){
+					$options = explode("','",preg_replace("/(enum|set)\('(.+?)'\)/","\\2", $row[1]));
+					array_push($result, array($row[0] => $options));
+				}
+			}else if($this->getErrorNo() != 0){
+				error($this->getErrorNo(), $this->getError());
+			}
+			$this->close();
+			return $result;
+		}
+		
+		function &result($rs, $close=TRUE){
 			$result = array();
 			if($rs){
 				while($row = mysql_fetch_assoc($rs))
@@ -265,7 +280,7 @@ function strip_html_tags( $text )
 			}else if($this->getErrorNo() != 0){
 				error($this->getErrorNo(), $this->getError());
 			}
-			if($close == true)
+			if($close)
 				$this->close();
 			return $result;
 		}
