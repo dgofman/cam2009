@@ -5,26 +5,24 @@ package com.academy.calder.enum
 	[Bindable]
 	public class Gender
 	{
-		public static const Male:Gender    = new Gender(1, "male");
-        public static const Female:Gender  = new Gender(2, "female");
+		public static const Male:Gender    = new Gender("male");
+        public static const Female:Gender  = new Gender("female");
 
-        private var _value:int;
-		private var _stringValue:String;
-		
-		public function Gender(value:int, stringValue:String){
+        private var _value:String;
+
+		public function Gender(value:String){
 			_value = value;
-			_stringValue = stringValue;
 		}
         
-        public function get value():int{
+        public function get value():String{
             return _value;
         }
         
         public function get label():String{
-			return Manager.bundle.getMessage(_stringValue);
+			return Manager.bundle.getMessage(_value);
 		}
                 
-        public static function valueOf(value:int):Gender
+        public static function valueOf(value:String):Gender
         {
             for(var i:uint = 0; i < list.length; i++){
             	var type:Gender = list[i];
@@ -35,7 +33,7 @@ package com.academy.calder.enum
         }
 
         public function toString():String{
-        	return _stringValue;
+        	return _value;
         }
         
         public static function get list():Array

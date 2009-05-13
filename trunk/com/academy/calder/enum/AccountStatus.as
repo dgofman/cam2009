@@ -5,28 +5,26 @@ package com.academy.calder.enum
 	[Bindable]
 	public class AccountStatus
 	{
-		public static const Any:AccountStatus      = new AccountStatus(NaN, 'any');
-        public static const Active:AccountStatus   = new AccountStatus(1, 'active');
-        public static const Disable:AccountStatus  = new AccountStatus(2, 'disable');
-		public static const Inactive:AccountStatus = new AccountStatus(3, 'inactive');
+		public static const Any:AccountStatus      = new AccountStatus('any');
+        public static const Active:AccountStatus   = new AccountStatus('active');
+        public static const Disable:AccountStatus  = new AccountStatus('disable');
+		public static const Inactive:AccountStatus = new AccountStatus('inactive');
 
-        private var _value:Number;
-        private var _stringValue:String;
+        private var _value:String;
 
-        public function AccountStatus(value:Number, stringValue:String){
+        public function AccountStatus(value:String){
             _value = value;
-            _stringValue = stringValue;
         }
         
-        public function get value():Number{
+        public function get value():String{
             return _value;
         }
         
         public function get label():String{
-            return Manager.bundle.getMessage(_stringValue);
+            return Manager.bundle.getMessage(_value);
         }
                 
-        public static function valueOf(value:int):AccountStatus
+        public static function valueOf(value:String):AccountStatus
         {
             for(var i:uint = 0; i < list.length; i++){
             	var type:AccountStatus = list[i];
@@ -37,7 +35,7 @@ package com.academy.calder.enum
         }
 
         public function toString():String{
-        	return _stringValue;
+        	return _value;
         }
         
         public static function get list():Array
@@ -50,7 +48,7 @@ package com.academy.calder.enum
 	               			];
         }
         
-        public static function get userList():Array
+        public static function get dbEnum():Array
         {
             return [
 	                Active,
