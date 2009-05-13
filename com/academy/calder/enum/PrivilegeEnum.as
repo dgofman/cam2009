@@ -5,29 +5,27 @@ package com.academy.calder.enum
 	[Bindable]
 	public class PrivilegeEnum
 	{
-		public static const CRUDO:PrivilegeEnum  = new PrivilegeEnum(1, 'crudo');
-        public static const CRUD:PrivilegeEnum   = new PrivilegeEnum(2, 'crud');
-        public static const CRU:PrivilegeEnum    = new PrivilegeEnum(3, 'cru');
-		public static const RU:PrivilegeEnum     = new PrivilegeEnum(4, 'ru');
-		public static const R:PrivilegeEnum      = new PrivilegeEnum(5, 'r');
+		public static const CRUDO:PrivilegeEnum  = new PrivilegeEnum('crudo');
+        public static const CRUD:PrivilegeEnum   = new PrivilegeEnum('crud');
+        public static const CRU:PrivilegeEnum    = new PrivilegeEnum('cru');
+		public static const RU:PrivilegeEnum     = new PrivilegeEnum('ru');
+		public static const R:PrivilegeEnum      = new PrivilegeEnum('r');
 		
-		private var _value:int;
-		private var _stringValue:String;
-		
-		public function PrivilegeEnum(value:int, stringValue:String){
+		private var _value:String;
+
+		public function PrivilegeEnum(value:String){
 			_value = value;
-			_stringValue = stringValue;
 		}
 		
-		public function get value():int{
+		public function get value():String{
 			return _value;
 		}
 		   
 		public function get label():String{
-			return Manager.bundle.getMessage(_stringValue);
+			return Manager.bundle.getMessage(_value);
 		}
                
-        public static function valueOf(value:int):PrivilegeEnum
+        public static function valueOf(value:String):PrivilegeEnum
         {
             for(var i:uint = 0; i < list.length; i++){
             	var type:PrivilegeEnum = list[i];
@@ -38,7 +36,7 @@ package com.academy.calder.enum
         }
 
         public function toString():String{
-        	return _stringValue;
+        	return _value;
         }
         
         public static function get list():Array

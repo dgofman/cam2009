@@ -9,6 +9,7 @@ package com.academy.calder.business
 	import mx.logging.LogEventLevel;
 	import mx.logging.targets.TraceTarget;
 	import mx.managers.CursorManager;
+	import mx.utils.ObjectUtil;
 
 	public class AMFService
 	{
@@ -20,6 +21,7 @@ package com.academy.calder.business
 		public static function send(class_method:String, parameters:Array=null, onResult:Function=null, onFault:Function=null):void{
 			var resultHandler:Function = function(event:*):void{
 				CursorManager.removeBusyCursor();
+				Logger.info(class_method + ": " + ObjectUtil.toString(event));
 				if(onResult != null)
 					onResult(event);
 			};

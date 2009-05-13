@@ -5,29 +5,27 @@ package com.academy.calder.enum
 	[Bindable]
 	public class UserTypes
 	{
-		public static const Admin:UserTypes    = new UserTypes(0, "admin");
-        public static const Employee:UserTypes = new UserTypes(1, "employee");
-		public static const Guest:UserTypes    = new UserTypes(2, "guest");
-        public static const Student:UserTypes  = new UserTypes(3, "student");
+		public static const Admin:UserTypes    = new UserTypes("admin");
+        public static const Employee:UserTypes = new UserTypes("employee");
+        public static const Student:UserTypes  = new UserTypes("student");
+		public static const Guest:UserTypes    = new UserTypes("guest");
 
-        private var _value:int;
-		private var _stringValue:String;
+        private var _value:String;
 		
-		public function UserTypes(value:int, stringValue:String){
+		public function UserTypes(value:String){
 			_value = value;
-			_stringValue = stringValue;
 		}
         
-        public function get value():int{
+        public function get value():String{
             return _value;
         }
         
         public function get label():String{
-			return Manager.bundle.getMessage(_stringValue);
+			return Manager.bundle.getMessage(_value);
 		}
 		public function set label(value:String):void{}
                 
-        public static function valueOf(value:int):UserTypes
+        public static function valueOf(value:String):UserTypes
         {
             for(var i:uint = 0; i < list.length; i++){
             	var type:UserTypes = list[i];
@@ -38,7 +36,7 @@ package com.academy.calder.enum
         }
 
         public function toString():String{
-        	return _stringValue;
+        	return _value;
         }
         
         public static function get list():Array

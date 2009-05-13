@@ -118,7 +118,7 @@
 				<mx:ComboBox dataProvider="{PrivilegeEnum.list}" width="{FIELD_WIDTH}" selectedItem="{_user.privileges}"/>
 			</mx:FormItem>
 			<mx:FormItem label="{Manager.bundle.getMessage('userStatus')}:">
-				<mx:ComboBox dataProvider="{AccountStatus.userList}" width="{FIELD_WIDTH}" selectedItem="{_user.status}"/>
+				<mx:ComboBox dataProvider="{AccountStatus.dbEnum}" width="{FIELD_WIDTH}" selectedItem="{_user.status}"/>
 			</mx:FormItem>
 			<mx:FormItem label="{Manager.bundle.getMessage('language')}:">
 				<mx:ComboBox dataProvider="{_languages}" width="{FIELD_WIDTH}" selectedIndex="{_localeIndex}" labelField="language"/>
