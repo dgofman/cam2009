@@ -218,7 +218,7 @@ function strip_html_tags( $text )
 			$params = getMsg($messageId);
 		else
 			$params = array($message, $messageId);
-		MYSQL::getInstance()->close();
+		MYSQL::getInstance()->close(false);
 		throw new Exception($params[0], $params[1]);
 	}
 	
@@ -309,9 +309,10 @@ function strip_html_tags( $text )
 			}
 		}
 
-		function close(){
+		function close($commit=true){
 			if($this->handle){
-				mysql_query("COMMIT", $this->handle);
+				if($commit)
+					mysql_query("COMMIT", $this->handle);
 				mysql_close($this->handle);
 				$this->handle = NULL;
 			}
