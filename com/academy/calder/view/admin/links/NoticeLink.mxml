@@ -49,7 +49,9 @@
 			
 			public function onCreate():void{
 				createViewStack.selectedIndex = 1;
-				messageView.message = new MessageVO();
+				dataGrid.selectedIndex = -1;
+				_reporter = null;
+				messageView.message = _message = new MessageVO();
 			}
 			
 			public function onEdit():void{
@@ -72,20 +74,24 @@
 				if(result != null){
 					if(messageView.message.messageId != null){
 						dataGrid.dataProvider.setItemAt(result, dataGrid.selectedIndex);
-					}else if(dataGrid.dataProvider == null){
-						dataGrid.dataProvider = [result];
 					}else{
 						dataGrid.dataProvider.addItemAt(result, 0);
+						dataGrid.selectedIndex = 0;
 					}
-					messageView.message = null;
+					_message = new MessageVO(result);
 					createViewStack.selectedIndex = 0;
 				}
 			}
 			
-			private function getNoticeDetails():void{
-				var data:Object = dataGrid.selectedItem;
-				if(data != null)
-					AMFService.send('Admin.messageDetails', [data.messageId], onMessageDetailsResult, onFault);
+			private function getMessageDetails():void{
+				var result:Object = dataGrid.selectedItem;
+				if(result != null){
+					_message = new MessageVO(result);
+					if(createViewStack.selectedIndex == 0){
+						dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
+						dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
+					}
+				}
 			}
 
 			private function onMessageDeleteResult(result:Object):void{
@@ -107,30 +113,21 @@
 				}
 			}
 			
-			private function onItemClick(event:ListEvent):void{
-				if(event.columnIndex != 0) {//Checkbox
-					createViewStack.selectedIndex = 0;
-					tabNav.selectedChild.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
-				}
-			}
-			
 			private function onReporterResult(result:Object):void{
 				_reporter = new UserVO(result);
 				_cachedUsers[_reporter.userId] = _reporter; 
 			}
 			
+			private function onItemClick(event:ListEvent):void{
+				if(event.columnIndex != 0) {//Checkbox
+					createViewStack.selectedIndex = 0;
+					tabNav.selectedChild.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
+					AMFService.send('Admin.read', [dataGrid.selectedItem.messageId]);
+				}
+			}
+
 			private function onNoticeResult(result:Object):void{
 				dataGrid.dataProvider = result;
-			}
-			
-			private function onMessageDetailsResult(result:Object):void{
-				_message = new MessageVO(result);
-				if(createViewStack.selectedIndex == 0){
-					if(dataGrid.selectedIndex != -1){
-						dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
-						dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
-					}
-				}
 			}
 			
 			private function onFault(fault:Object):void{
@@ -139,6 +136,7 @@
 		]]>
 	</mx:Script>
 	
+	<!--Disable Delete and New buttons-->
 	<mx:Binding source="dataGrid.selectedIndex" destination="model.selectedIndex"/>
 	
 	<mx:DataGrid id="dataGrid" width="300" height="100%" itemClick="onItemClick(event)">
@@ -162,7 +160,7 @@
 			  height="100%"
 			  width="100%">
 			
-			<mx:VBox width="100%" height="100%" label="Message Body" show="getNoticeDetails()">
+			<mx:VBox width="100%" height="100%" label="Message Body" show="getMessageDetails()">
 				<mx:HBox width="100%">
 					<mx:Label text="Subject:" fontWeight="bold"/>
 					<mx:Label text="{_message.subject}" width="100%"/>
