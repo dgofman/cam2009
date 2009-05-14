@@ -13,7 +13,6 @@
 			import com.academy.calder.vo.MessageVO;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
-			import com.academy.calder.enum.StudentStatusEnum;
 
 			[Bindable]
 			private var _details:MessageVO;
@@ -144,8 +143,7 @@
 	<mx:DataGrid id="dataGrid" width="300" height="100%" itemClick="onItemClick(event)">
 		<mx:columns>
 			<mx:Array>
-				<mx:DataGridColumn dataField="students" headerText="Students" 
-				itemRenderer="com.academy.calder.component.renderer.StudentCellRenderer" />
+				<mx:DataGridColumn dataField="students" headerText="Students" />
 			</mx:Array>
 		 </mx:columns>
 	</mx:DataGrid>
@@ -183,9 +181,6 @@
 				</mx:FormItem>
 				<mx:FormItem label="Name ???:">
 					<mx:Label text="{_reporter.namesoundex}"/>
-				</mx:FormItem>
-				<mx:FormItem label="Language:">
-					<mx:Label text="{_reporter.language}"/>
 				</mx:FormItem>
 				<mx:FormItem label="Sex:">
 					<mx:Label text="{_reporter.sex}"/>
