@@ -56,9 +56,7 @@
 			}
 		]]>
 	</mx:Script>
-	
-	<mx:Binding source="dataGrid.selectedIndex" destination="model.selectedIndex"/>
-	
+
 	<mx:DataGrid id="dataGrid" width="100%" height="100%">
 		<mx:columns>
 			<mx:Array>
