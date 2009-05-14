@@ -2,7 +2,19 @@
 	function getMsg($id, $params=array()){
 		switch($id){
 			case "invalid_account":
-				return array("Account not found", 1000);
+				return array("Account not found", 500);
+			case "cannot_update_user":
+				return array("Cannot update an user record", 501);
+			case "cannot_update_person":
+				return array("Cannot update a person record", 502);
+			case "cannot_create_user":
+				return array("Cannot create a new user", 503);
+			case "cannot_create_person":
+				return array("Cannot create a new person", 504);
+			case "cannot_create_message":
+				return array("Cannot create a new message", 505);	
+				
+				
 			case "invalid":
 				return array("Unexpected arguments", 1001);
 			case "sys_err":

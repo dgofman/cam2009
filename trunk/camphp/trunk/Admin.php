@@ -26,8 +26,11 @@ class Admin {
 		}else{
 			$sql1 = escape($this->MESSAGE_CREATE, $_SESSION["USER_ID"], $type, $priority, $subject, $body);
 			$rs = $mysql->query($sql1);
-			if($rs)
-				$messageId = $mysql->insert();
+			if(!$rs){
+				error("cannot_create_message");
+				return;
+			}
+			$messageId = $mysql->insert();
 		}
 		if(isset($messageId)){
 			$sql2 = escape($this->MESSAGE_DETAILS, $messageId);
