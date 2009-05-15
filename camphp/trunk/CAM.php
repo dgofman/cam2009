@@ -67,17 +67,20 @@ class CAM {
 			}
 		}else{
 			$sql1 = escape($this->CREATE_PERSON, $accountId, $first, $last, $namesoundex, $localeName, $sex, $dateOfBirth);
+			$rs = $mysql->query($sql1);
 			if(!$rs){
 				error("cannot_create_user");
 				return;
 			}
 			$personId = $mysql->insert();
 			$sql2 = escape($this->CREATE_USER, $personId, $typeOf, $username, $password, $privileges, $status, $notes);
+			$rs = $mysql->query($sql2);
 			if(!$rs){
 				error("cannot_create_person");
 				return;
 			}
 		}
+		$userId = $mysql->insert();
 		$sql = escape($this->PERSON, $userId);
 		$rs = $mysql->query($sql);
 		$result = $mysql->result($rs);
