@@ -13,7 +13,7 @@ class CAM {
 		$this->LOCALE="SELECT localeName, language FROM locale";
 		
 		$this->UPDATE_PERSON="UPDATE person SET accountId='%s', first='%s', last='%s', namesoundex='%s', localeName='%s', sex='%s', dateOfBirth='%s' WHERE personId='%s'";
-		$this->UPDATE_USER="UPDATE user SET	typeOf='%s', username='%s', password=PASSWORD('%s'), privileges='%s', status='%s', notes='%s' WHERE userId='%s'";
+		$this->UPDATE_USER="UPDATE user SET	typeOf='%s', privileges='%s', status='%s', notes='%s', username='%s' %s WHERE userId='%s'";
 		$this->CREATE_PERSON="INSERT INTO person (accountId, first, last, namesoundex, localeName, sex, dateOfBirth) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')";		
 		$this->CREATE_USER="INSERT INTO user (personId, typeOf, username, password, privileges, status, notes) VALUES ('%s', '%s', '%s', PASSWORD('%s'), '%s', '%s', '%s')";
 	}
@@ -48,7 +48,11 @@ class CAM {
 								$namesoundex, $dateOfBirth, $notes, $localeName, $sex, $typeOf, $privileges, $status){
 								$mysql = MYSQL::getInstance();
 		if(isset($userId) && isset($personId)){
-			$sql1 = escape($this->UPDATE_USER, $typeOf, $username, $password, $privileges, $status, $notes, $userId);
+			if(isset($password)){
+				$sql1 = escape($this->UPDATE_USER, $typeOf, $privileges, $status, $notes, $username, ", password=PASSWORD('$password')", $userId);
+			}else{
+				$sql1 = escape($this->UPDATE_USER, $typeOf, $privileges, $status, $notes, $username, "", $userId);
+			}
 			$rs = $mysql->query($sql1);
 			if(!rs){
 				error("cannot_update_user");
