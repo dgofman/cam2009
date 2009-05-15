@@ -62,7 +62,7 @@
 				case UserTypes.Admin:
 					mainHelper.changeView(MainViewHelper.ADMIN);
 					break;
-				case UserTypes.Guest:
+				case UserTypes.Other:
 					mainHelper.changeView(MainViewHelper.GUEST);
 					break;
 				case UserTypes.Employee:

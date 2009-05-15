@@ -8,7 +8,7 @@ package com.academy.calder.enum
 		public static const Admin:UserTypes    = new UserTypes("admin");
         public static const Employee:UserTypes = new UserTypes("employee");
         public static const Student:UserTypes  = new UserTypes("student");
-		public static const Guest:UserTypes    = new UserTypes("guest");
+		public static const Other:UserTypes    = new UserTypes("other");
 
         private var _value:String;
 		
@@ -45,7 +45,7 @@ package com.academy.calder.enum
             		Admin,
 	                Employee,
 	        		Student,
-	                Guest
+	                Other
 	               			];
         }
     }
