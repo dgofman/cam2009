@@ -94,6 +94,7 @@
 				}else if(newRecord){
 					dataGrid.dataProvider.addItemAt(result, 0);
 					dataGrid.selectedIndex = 0;
+					usePassword.selected = false;
 				}
 			}
 			
@@ -132,14 +133,14 @@
             <mx:AddChild relativeTo="{dobFormItem}" position="before">
                 <mx:target>
                 	<mx:FormItem label="{Manager.bundle.getMessage('password')}:">
-						<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="password"/>
+						<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="password" text="{_user.password}"/>
 					</mx:FormItem>
 			</mx:target>
             </mx:AddChild>
             <mx:AddChild relativeTo="{dobFormItem}" position="before">
                 <mx:target>
 					<mx:FormItem label="{Manager.bundle.getMessage('confirm')}:">
-						<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="confirm"/>
+						<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="confirm" text="{_user.password}"/>
 					</mx:FormItem>
                 </mx:target>
             </mx:AddChild>

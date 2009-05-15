@@ -31,6 +31,7 @@ package com.academy.calder.vo
 		public var personId:String;
 		public var accountId:String;
 		public var username:String;
+		public var password:String;
 		public var first:String;
 		public var last:String;
 		public var namesoundex:String;
