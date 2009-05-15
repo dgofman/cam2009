@@ -33,11 +33,16 @@
 
 			private function onItemClick(event:ListEvent):void{
 				_newrecord = false;
-				AMFService.send('CAM.person', [dataGrid.selectedItem.userId], onPersonResult, onFault);
+				if(dataGrid.selectedItem.cached == true){
+					onPersonResult(dataGrid.selectedItem);
+				}else{
+					AMFService.send('CAM.person', [dataGrid.selectedItem.userId], onPersonResult, onFault);
+				}
 			}
 			
 			public function onRefresh():void{
 				onNew();
+				findLocaleIndex();
 				_newrecord = false;
 				AMFService.send('CAM.users', [accountStatus && accountStatus.selectedItem ? 
 											  accountStatus.selectedItem.value : null], onUserResult, onFault);
@@ -77,13 +82,19 @@
 			}
 			
 			private function onPersonResult(result:Object):void{
-				_user = new UserVO(result);
-				findLocaleIndex();
+				onSubmitDataResult(result, false);
 			}
 			
-			private function onSubmitDataResult(result:Object):void{
+			private function onSubmitDataResult(result:Object, newRecord:Boolean=true):void{
 				_user = new UserVO(result);
 				findLocaleIndex();
+				result.cached = true;
+				if(dataGrid.selectedIndex != -1){
+					dataGrid.dataProvider.setItemAt(result, dataGrid.selectedIndex);
+				}else if(newRecord){
+					dataGrid.dataProvider.addItemAt(result, 0);
+					dataGrid.selectedIndex = 0;
+				}
 			}
 			
 			private function onLocaleResult(result:Object):void{
@@ -193,7 +204,7 @@
 			</mx:FormItem>
 		</mx:Form>
 		<mx:HBox paddingLeft="60" paddingBottom="10">	
-			<mx:Button label="{Manager.bundle.getMessage('submit')}" enabled="{dataGrid.selectedIndex != -1}" click="onSubmit()"/>
+			<mx:Button label="{Manager.bundle.getMessage('submit')}" enabled="{dataGrid.selectedIndex != -1 || _newrecord == true}" click="onSubmit()"/>
 			<mx:Button label="New..." click="onNew()"/>
 		</mx:HBox>
 	</mx:VBox>
