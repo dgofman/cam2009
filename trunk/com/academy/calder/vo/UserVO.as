@@ -39,7 +39,7 @@ package com.academy.calder.vo
 		public var dateOfBirth:String;
 		public var notes:String;
 		public var sex:Gender = Gender.Male;
-		public var typeOf:UserTypes = UserTypes.Guest;
+		public var typeOf:UserTypes = UserTypes.Other;
 		public var privileges:PrivilegeEnum = PrivilegeEnum.R;
 		public var status:AccountStatus = AccountStatus.Pending;
 	}
