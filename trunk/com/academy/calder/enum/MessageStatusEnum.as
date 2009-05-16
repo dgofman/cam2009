@@ -1,5 +1,7 @@
 package com.academy.calder.enum
 {
+	import com.academy.calder.business.Manager;
+	
 	[Bindable]
 	public class MessageStatusEnum
 	{
@@ -16,6 +18,10 @@ package com.academy.calder.enum
         public function get value():String{
             return _value;
         }
+        
+        public function get label():String{
+			return Manager.bundle.getMessage(_value);
+		}
                 
        public static function valueOf(value:String):MessageStatusEnum
         {
@@ -28,7 +34,7 @@ package com.academy.calder.enum
         }
 
         public function toString():String{
-        	return _value;
+        	return label;
         }
         
         public static function get list():Array
