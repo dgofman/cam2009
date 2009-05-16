@@ -5,6 +5,8 @@ package com.academy.calder.vo
 	import com.academy.calder.enum.PrivilegeEnum;
 	import com.academy.calder.enum.UserTypes;
 	
+	import flash.events.Event;
+	
 	[Bindable]
 	public class UserVO
 	{
@@ -42,7 +44,14 @@ package com.academy.calder.vo
 		public var typeOf:UserTypes = UserTypes.Other;
 		public var privileges:PrivilegeEnum = PrivilegeEnum.R;
 		public var status:AccountStatus = AccountStatus.Pending;
+		private var _language:String;
 		
+		public function set language(value:String):void{
+			_language = value;
+			dispatchEvent(new Event("attributesChange"));
+		}
+		
+		[Bindable("attributesChange")]
 		public function get attributes():Array{
 			return [
 				{label:'first', value:first},
@@ -55,7 +64,7 @@ package com.academy.calder.vo
 				{label:'userType', value:typeOf},
 				{label:'privileges', value:privileges},
 				{label:'userStatus', value:status},
-				{label:'language', value:localeName},
+				{label:'language', value:_language},
 				{label:'notes', value:notes}
 					];
 		}
