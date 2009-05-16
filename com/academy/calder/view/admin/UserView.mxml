@@ -25,7 +25,7 @@
 			[Bindable]
 			private var _localeIndex:uint;
 			[Bindable]
-			private var _newrecord:Boolean;
+			private var _newrecord:Boolean = false;
 			[Bindable]
 			private var _userViewIndex:uint = 0;
 			
@@ -74,15 +74,17 @@
 			}
 			
 			private function onNew():void{
-				clean();
+				_user = new UserVO()
 				_newrecord = true;
 				_userViewIndex = 1;
+				findLocaleIndex();
+				if(dataGrid) dataGrid.selectedIndex = -1;
 			}
 			
 			private function clean():void{
-				_user = new UserVO();
+				_newrecord = false;
+				_user = null;
 				_userViewIndex = 0;
-				_newrecord = true;
 				findLocaleIndex();
 				if(dataGrid) dataGrid.selectedIndex = -1;
 			}
@@ -128,37 +130,13 @@
 				}
 			}
 			
-			private function set selectedUsePassword(value:Boolean):void{
-				currentState = value ? "passwordState" : "";
-			}
-		
 			private function onFault(fault:Object):void{
 				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_users'));
 			}
 		]]>
 	</mx:Script>
-	<mx:Binding source="usePassword.selected" destination="selectedUsePassword"/>
-	
-	 <mx:states>
-        <mx:State name="passwordState">
-            <mx:AddChild relativeTo="{dobFormItem}" position="before">
-                <mx:target>
-                	<mx:FormItem label="{Manager.bundle.getMessage('password')}:">
-						<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="password" text="{_user.password}"/>
-					</mx:FormItem>
-			</mx:target>
-            </mx:AddChild>
-            <mx:AddChild relativeTo="{dobFormItem}" position="before">
-                <mx:target>
-					<mx:FormItem label="{Manager.bundle.getMessage('confirm')}:">
-						<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="confirm" text="{_user.password}"/>
-					</mx:FormItem>
-                </mx:target>
-            </mx:AddChild>
-        </mx:State>
-    </mx:states>
 
-	<mx:VBox width="400" height="100%">
+	<mx:VBox width="400" height="100%" enabled="{!_newrecord}">
 		<mx:DataGrid id="dataGrid" width="100%" height="100%" itemClick="onItemClick(event)">
 			<mx:columns>
 				<mx:Array>
@@ -206,7 +184,13 @@
 					<mx:CheckBox id="usePassword" label="{Manager.bundle.getMessage('changePassword')}"
 						 selected="{_newrecord}" enabled="{!_newrecord}"/>
 				</mx:FormItem>
-				<mx:FormItem id="dobFormItem" label="{Manager.bundle.getMessage('dob')}:">
+				<mx:FormItem label="{Manager.bundle.getMessage('password')}:" visible="{usePassword.selected}" includeInLayout="{usePassword.selected}">
+					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="password" text="{_user.password}"/>
+				</mx:FormItem>
+				<mx:FormItem label="{Manager.bundle.getMessage('confirm')}:" visible="{usePassword.selected}" includeInLayout="{usePassword.selected}">
+					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="confirm" text="{_user.password}"/>
+				</mx:FormItem>
+				<mx:FormItem label="{Manager.bundle.getMessage('dob')}:">
 					<mx:TextInput width="{FIELD_WIDTH}" text="{_user.dateOfBirth}" id="dob"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('accountId')}:">

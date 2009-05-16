@@ -33,7 +33,7 @@ package com.academy.calder.enum
         }
 
         public function toString():String{
-        	return _value;
+        	return label;
         }
         
         public static function get list():Array
