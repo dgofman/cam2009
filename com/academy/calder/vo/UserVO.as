@@ -42,5 +42,22 @@ package com.academy.calder.vo
 		public var typeOf:UserTypes = UserTypes.Other;
 		public var privileges:PrivilegeEnum = PrivilegeEnum.R;
 		public var status:AccountStatus = AccountStatus.Pending;
+		
+		public function get attributes():Array{
+			return [
+				{label:'first', value:first},
+				{label:'last', value:last},
+				{label:'namesoundex', value:namesoundex},
+				{label:'username', value:username},
+				{label:'dob', value:dateOfBirth},
+				{label:'accountId', value:accountId},
+				{label:'sex', value:sex},
+				{label:'userType', value:typeOf},
+				{label:'privileges', value:privileges},
+				{label:'userStatus', value:status},
+				{label:'language', value:localeName},
+				{label:'notes', value:notes}
+					];
+		}
 	}
 }
