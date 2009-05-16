@@ -87,7 +87,7 @@
 	
 			<mx:FormItem width="100%" label="{Manager.bundle.getMessage('password')}:" required="true">
 				<mx:TextInput width="100%" displayAsPassword="true" id="password" maxChars="16"
-					toolTip="{Manager.bundle.getMessage('tip_password')}" text="123456"/>
+					toolTip="{Manager.bundle.getMessage('tip_password')}"/>
 			</mx:FormItem>
 			
 			<mx:FormItem>
