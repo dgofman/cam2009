@@ -11,12 +11,11 @@
 		private var _helper:AdminViewHelper = AdminViewHelper.getSelf();
 		
 		private function onComplete():void{
-			if(_helper.viewName == null)
-				changeView(AdminViewHelper.HOME);
+			_helper.onMainViewChange();
 		}
 		
 		private function changeView(name:String):void{
-			AdminViewHelper.getSelf().changeView(name);
+			_helper.changeView(name);
 		}
 	]]>
 	</mx:Script>
