@@ -10,7 +10,7 @@ class CAM {
 		$this->LOGIN="SELECT A.first, A.localeName, B.userId, B.typeOf, B.status FROM person A, user B WHERE A.personId=B.personId AND username='%s' AND password=PASSWORD('%s')";
 		$this->PERSON="SELECT A.accountId, A.personId, A.first, A.last, A.namesoundex, A.sex, A.dateOfBirth, A.localeName, B.username, B.privileges, B.status, B.typeOf, B.notes, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.userId='%s'";
 		$this->USERS="SELECT A.personId, A.last, A.first, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.status %s ORDER BY A.last";
-		$this->LOCALE="SELECT localeName, language FROM locale";
+		$this->LOCALE="SELECT localeName, language FROM locale ORDER BY language";
 		
 		$this->UPDATE_PERSON="UPDATE person SET accountId='%s', first='%s', last='%s', namesoundex='%s', localeName='%s', sex='%s', dateOfBirth='%s' WHERE personId='%s'";
 		$this->UPDATE_USER="UPDATE user SET	typeOf='%s', privileges='%s', status='%s', notes='%s', username='%s' %s WHERE userId='%s'";
