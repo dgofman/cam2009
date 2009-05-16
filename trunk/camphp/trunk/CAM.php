@@ -79,8 +79,8 @@ class CAM {
 				error("cannot_create_person");
 				return;
 			}
+			$userId = $mysql->insert();
 		}
-		$userId = $mysql->insert();
 		$sql = escape($this->PERSON, $userId);
 		$rs = $mysql->query($sql);
 		$result = $mysql->result($rs);
