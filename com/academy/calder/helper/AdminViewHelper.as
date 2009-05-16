@@ -29,14 +29,14 @@ package com.academy.calder.helper
 			MainViewHelper.getSelf().addEventListener(MainViewHelper.MAINVIEW_CHANGE, onMainViewChange);
 		}
 		
-		private function onMainViewChange(event:Event):void{
+		public function onMainViewChange(event:Event=null):void{
 			var adminViewName:String = LocalShare.getValue(VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
+			if(adminViewName == null)
+				adminViewName = HOME
 			Logger.info(VIEW_SHARE_ID + "="+adminViewName);
-			if(adminViewName != null){
-				changeView(adminViewName);
-				dispatchEvent(new Event(ADMINVIEW_CHANGE));
-				view.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
-			}
+			changeView(adminViewName);
+			dispatchEvent(new Event(ADMINVIEW_CHANGE));
+			view.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
 		}
 		
 		public function changeView(name:String):void{
