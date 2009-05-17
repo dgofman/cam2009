@@ -3,7 +3,7 @@ package com.academy.calder.helper
 	import com.academy.calder.business.LocalShare;
 	import com.academy.calder.business.Manager;
 	
-	import flash.external.ExternalInterface;
+	import flash.events.Event;
 	
 	import mx.containers.ViewStack;
 	import mx.core.Container;
@@ -23,7 +23,6 @@ package com.academy.calder.helper
 		public static const SIGNOUT:String = "signout";
 		
 		public static const VIEW_SHARE_ID:String = "mainView";
-		public static const MAINVIEW_CHANGE:String = "mainViewChange";
 		
 		public static const SESSION_ID:String = "SESSION_ID";
 		
@@ -34,8 +33,10 @@ package com.academy.calder.helper
 				Manager.application.initSession(true);
 			}else{
 				LocalShare.save(VIEW_SHARE_ID, name, LocalShare.GLOBAL_LEVEL);
-				if(mainViewStack.getChildByName(name) is Container)
+				if(mainViewStack.getChildByName(name) is Container){
 					mainViewStack.selectedChild = mainViewStack.getChildByName(name) as Container;
+					mainViewStack.selectedChild.dispatchEvent(new Event(Event.ACTIVATE));
+				}
 			}
 		}
 		

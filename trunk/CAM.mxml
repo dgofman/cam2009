@@ -40,9 +40,8 @@
 			var oldCookie:String = ExternalInterface.call("getCookie");
 			var params:URLVariables = new URLVariables(oldCookie as String && oldCookie.length ? oldCookie : null);
 			if(mainViewName != null && params != null && params[MainViewHelper.SESSION_ID] == event){
-				mainHelper.changeView(mainViewName);
 				Logger.info(MainViewHelper.VIEW_SHARE_ID + "=" + mainViewName);
-				mainHelper.dispatchEvent(new Event(MainViewHelper.MAINVIEW_CHANGE));
+				mainHelper.changeView(mainViewName);
 			}else{
 				if(Manager.getAppParam("key") == "confirm"){
 					mainHelper.changeView(MainViewHelper.CONFIRM);

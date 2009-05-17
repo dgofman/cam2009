@@ -2,7 +2,7 @@
 <mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
 	xmlns:component="com.academy.calder.component.*"
 	xmlns:links="com.academy.calder.view.admin.links.*" styleName="innerView"
-	width="100%" height="100%" horizontalGap="0" show="onShow(event)">
+	width="100%" height="100%" horizontalGap="0" activate="onActivate(event)">
 	
 	<mx:Script>
 	<![CDATA[
@@ -15,13 +15,12 @@
 		
 		private const _helper:AdminViewHelper = AdminViewHelper.getSelf();
 		
-		private function onShow(event:Event):void{
-			_helper.onMainViewChange();
+		private function onActivate(event:Event):void{
 			linkViewStack.selectedChild.dispatchEvent(event);
 	    }
-
-		private function clickHandler(event:ItemClickEvent):void{
-
+	    
+	    private function itemClickHandler(event:Event):void{
+			onActivate(new Event(Event.ACTIVATE));
 		}
 	]]>
 	</mx:Script>
@@ -35,7 +34,7 @@
 		}
 	</mx:Style>
 
-	<mx:ToggleButtonBar horizontalGap="5" itemClick="clickHandler(event)" 
+	<mx:ToggleButtonBar horizontalGap="5" itemClick="itemClickHandler(event)" 
 		dataProvider="{linkViewStack}" buttonStyleName="arrowButton" direction="vertical"/>
 
 	<mx:Panel id="panel"

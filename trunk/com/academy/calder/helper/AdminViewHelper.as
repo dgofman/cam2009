@@ -4,11 +4,8 @@ package com.academy.calder.helper
 	import com.academy.calder.view.admin.AdminScreen;
 	import com.academy.calder.view.admin.AdminView;
 	
-	import flash.events.Event;
-	
 	import mx.containers.ViewStack;
 	import mx.core.Container;
-	import mx.events.FlexEvent;
 	
 	[Bindable]
 	public class AdminViewHelper extends ViewHelper
@@ -22,22 +19,6 @@ package com.academy.calder.helper
 		public static const TEACHER:String = "adminTeacher";
 		
 		public static const VIEW_SHARE_ID:String = "adminView";
-		public static const ADMINVIEW_CHANGE:String = "adminViewChange";
-		
-		override public function initialized(document:Object, id:String):void {
-			super.initialized(document, id);
-			MainViewHelper.getSelf().addEventListener(MainViewHelper.MAINVIEW_CHANGE, onMainViewChange);
-		}
-		
-		public function onMainViewChange(event:Event=null):void{
-			var adminViewName:String = LocalShare.getValue(VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
-			if(adminViewName == null)
-				adminViewName = HOME
-			Logger.info(VIEW_SHARE_ID + "="+adminViewName);
-			changeView(adminViewName);
-			dispatchEvent(new Event(ADMINVIEW_CHANGE));
-			view.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
-		}
 		
 		public function changeView(name:String):void{
 			LocalShare.save(VIEW_SHARE_ID, name, LocalShare.GLOBAL_LEVEL);
@@ -60,8 +41,10 @@ package com.academy.calder.helper
 		}
 		public function set viewName(value:String):void{
 			_viewName = value;
-			if(adminViewStack.getChildByName(value) is Container)
+			if(adminViewStack.getChildByName(value) is Container){
 				adminViewStack.selectedChild = adminViewStack.getChildByName(value) as Container;
+				adminViewStack.selectedChild.dispatchEvent(new Event(Event.ACTIVATE));
+			}
 		}
 		
 		public function get selectedIndex():int{
