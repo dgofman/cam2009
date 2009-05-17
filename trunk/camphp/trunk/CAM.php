@@ -18,9 +18,16 @@ class CAM {
 		$this->CREATE_USER="INSERT INTO user (personId, typeOf, username, password, privileges, status, notes) VALUES ('%s', '%s', '%s', PASSWORD('%s'), '%s', '%s', '%s')";
 	}
 	
-	public function getSessionId(){
-		return $_COOKIE["PHPSESSID"];
-	} 
+	public function getSessionId($destory=false){
+		if($destory){
+			$_SESSION = array();
+			unset($_COOKIE[session_name()]);
+			@session_destroy();
+		}
+		session_cache_expire(30);
+	    @session_start();
+		return session_id();
+	}
 
 	public function login($username, $password){
 		$mysql = MYSQL::getInstance();
