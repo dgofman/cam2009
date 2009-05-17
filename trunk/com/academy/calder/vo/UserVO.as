@@ -54,18 +54,18 @@ package com.academy.calder.vo
 		[Bindable("attributesChange")]
 		public function get attributes():Array{
 			return [
-				{label:'first', value:first},
-				{label:'last', value:last},
-				{label:'namesoundex', value:namesoundex},
-				{label:'username', value:username},
-				{label:'dob', value:dateOfBirth},
-				{label:'accountId', value:accountId},
-				{label:'sex', value:sex},
-				{label:'userType', value:typeOf},
-				{label:'privileges', value:privileges},
-				{label:'userStatus', value:status},
-				{label:'language', value:_language},
-				{label:'notes', value:notes}
+				new UserItem({label:'first', value:first}),
+				new UserItem({label:'last', value:last}),
+				new UserItem({label:'namesoundex', value:namesoundex}),
+				new UserItem({label:'username', value:username}),
+				new UserItem({label:'dob', value:dateOfBirth}),
+				new UserItem({label:'accountId', value:accountId}),
+				new UserItem({label:'sex', value:sex}),
+				new UserItem({label:'userType', value:typeOf}),
+				new UserItem({label:'privileges', value:privileges}),
+				new UserItem({label:'userStatus', value:status}),
+				new UserItem({label:'language', value:_language}),
+				new UserItem({label:'notes', value:notes})
 					];
 		}
 	}

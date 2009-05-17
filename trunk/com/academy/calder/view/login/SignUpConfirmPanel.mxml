@@ -32,7 +32,7 @@
 			if(emailAddress != null && emailAddress.length > 0){
 				mainHelper.changeView(MainViewHelper.LOGIN);
 			}else{
-				mainHelper.changeView(MainViewHelper.GUEST);
+				mainHelper.changeView(MainViewHelper.OTHER);
 			}
 		}
 	]]>

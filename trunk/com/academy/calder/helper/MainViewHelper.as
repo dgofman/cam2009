@@ -17,7 +17,7 @@ package com.academy.calder.helper
 		public static const RESET:String   = "reset";
 		public static const CHANGE:String  = "change";
 		public static const ADMIN:String   = "admin";
-		public static const GUEST:String   = "guest";
+		public static const OTHER:String   = "other";
 		public static const STUDENT:String = "student";
 		public static const TEACHER:String = "teacher";
 		public static const SIGNOUT:String = "signout";
