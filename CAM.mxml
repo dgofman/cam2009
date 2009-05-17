@@ -30,20 +30,16 @@
 		private function onLanguageComplete():void{
 			currentState = "APPLICATION_READY";
 			pageTitle = Manager.bundle.getMessage('title');
-			AMFService.send('CAM.getSessionId', null, onSessionResult, onLoginFault);
+			initSession();
 		}
 		
-		private function onSessionResult(event:*):void{			
-			if(event == null){
-				AMFService.send('CAM.getSessionId', null, onSessionResult, onLoginFault);
-				return;
-			}
-			Manager.instance.cookieParams = new URLVariables('JSESSIONID=' + event);
+		private function onSessionResult(event:*):void{
+			Manager.instance.cookieParams = new URLVariables(MainViewHelper.SESSION_ID + '=' + event);
 			
 			var mainViewName:String = LocalShare.getValue(MainViewHelper.VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
 			var oldCookie:String = ExternalInterface.call("getCookie");
 			var params:URLVariables = new URLVariables(oldCookie as String && oldCookie.length ? oldCookie : null);
-			if(mainViewName != null && params != null && params['JSESSIONID'] == event){
+			if(mainViewName != null && params != null && params[MainViewHelper.SESSION_ID] == event){
 				mainHelper.changeView(mainViewName);
 				Logger.info(MainViewHelper.VIEW_SHARE_ID + "=" + mainViewName);
 				mainHelper.dispatchEvent(new Event(MainViewHelper.MAINVIEW_CHANGE));
@@ -58,6 +54,10 @@
 		
 		private function onLoginFault(fault:Object):void{
 			Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_session'));
+		}
+		
+		public function initSession(destory:Boolean=false):void{
+			AMFService.send('CAM.getSessionId', [destory], onSessionResult, onLoginFault);
 		}
 	]]>
 	</mx:Script>
@@ -80,7 +80,6 @@
 							<guest:GuestScreen name="{MainViewHelper.GUEST}"/>
 							<student:StudentScreen name="{MainViewHelper.STUDENT}"/>
 							<teacher:TeacherScreen name="{MainViewHelper.TEACHER}"/>
-							<login:SignOutScreen name="{MainViewHelper.SIGNOUT}"/>
 						</mx:ViewStack>
 						<mx:ControlBar xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="30">
 							<mx:LinkButton label="{Manager.bundle.getMessage('copyright')}" toolTip="{Manager.bundle.getMessage('company')}" 

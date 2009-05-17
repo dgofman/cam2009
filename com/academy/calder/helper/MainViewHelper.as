@@ -1,6 +1,9 @@
 package com.academy.calder.helper
 {
 	import com.academy.calder.business.LocalShare;
+	import com.academy.calder.business.Manager;
+	
+	import flash.external.ExternalInterface;
 	
 	import mx.containers.ViewStack;
 	import mx.core.Container;
@@ -22,10 +25,18 @@ package com.academy.calder.helper
 		public static const VIEW_SHARE_ID:String = "mainView";
 		public static const MAINVIEW_CHANGE:String = "mainViewChange";
 		
+		public static const SESSION_ID:String = "SESSION_ID";
+		
 		public function changeView(name:String):void{
-			LocalShare.save(VIEW_SHARE_ID, name, LocalShare.GLOBAL_LEVEL);
-			if(mainViewStack.getChildByName(name) is Container)
-				mainViewStack.selectedChild = mainViewStack.getChildByName(name) as Container;
+			if(name == SIGNOUT){
+				LocalShare.save(VIEW_SHARE_ID, null, LocalShare.GLOBAL_LEVEL);
+				Manager.instance.currentUser = null;
+				Manager.application.initSession(true);
+			}else{
+				LocalShare.save(VIEW_SHARE_ID, name, LocalShare.GLOBAL_LEVEL);
+				if(mainViewStack.getChildByName(name) is Container)
+					mainViewStack.selectedChild = mainViewStack.getChildByName(name) as Container;
+			}
 		}
 		
 		public function get mainViewStack():ViewStack{
