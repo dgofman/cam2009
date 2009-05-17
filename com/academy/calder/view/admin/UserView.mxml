@@ -2,7 +2,7 @@
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
 				xmlns:home="com.academy.calder.view.admin.home.*"
 				xmlns:links="com.academy.calder.view.admin.links.*" styleName="innerView"
-				width="100%" height="100%" horizontalGap="6" show="onRefresh()">
+				width="100%" height="100%" horizontalGap="6" activate="onRefresh()">
 	<mx:Script>
 		<![CDATA[
 			import mx.events.ListEvent;
@@ -164,7 +164,7 @@
 				</mx:Repeater>
 			</mx:Form>
 			<mx:HBox paddingLeft="60" paddingBottom="5">
-				<mx:Button label="{Manager.bundle.getMessage('edit')}" click="onEdit()"/>
+				<mx:Button label="{Manager.bundle.getMessage('edit')}" enabled="{dataGrid.selectedIndex != -1}" click="onEdit()"/>
 				<mx:Button label="New..." click="onNew()"/>
 			</mx:HBox>
 		</mx:VBox>

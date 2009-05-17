@@ -2,7 +2,7 @@
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
 				xmlns:home="com.academy.calder.view.admin.home.*"
 				xmlns:links="com.academy.calder.view.admin.links.*"
-				width="100%" height="100%" horizontalGap="6" show="onRefresh()"
+				width="100%" height="100%" horizontalGap="6" activate="onRefresh()"
 				implements="com.academy.calder.view.admin.IMessageAction">
 	<mx:Script>
 		<![CDATA[
@@ -76,13 +76,8 @@
 			
 			private function getMessageDetails():void{
 				var result:Object = dataGrid.selectedItem;
-				if(result != null){
+				if(result != null)
 					_message = new MessageVO(result);
-					if(createViewStack.selectedIndex == 0){
-						dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
-						dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
-					}
-				}
 			}
 
 			private function onMessageDeleteResult(result:Object):void{
@@ -97,9 +92,13 @@
 						
 			private function onItemClick(event:ListEvent):void{
 				if(event.columnIndex != 0) {//Checkbox
+					if(dataGrid.selectedItem.status == MessageStatusEnum.Unread.value){
+						AMFService.send('Admin.read', [dataGrid.selectedItem.messageId]);
+						dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
+						dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
+					}
 					createViewStack.selectedIndex = 0;
 					createViewStack.selectedChild.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
-					AMFService.send('Admin.read', [dataGrid.selectedItem.messageId]);
 				}
 			}
 			
