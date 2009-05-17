@@ -56,7 +56,7 @@
 			}
 			LocalShare.save("loginInfo", remember.selected ? {username:username.text, remember:true} : null, LocalShare.GLOBAL_LEVEL);
 
-			ExternalInterface.call("setCookie", "JSESSIONID", Manager.instance.cookieParams['JSESSIONID']);
+			ExternalInterface.call("setCookie", MainViewHelper.SESSION_ID, Manager.instance.cookieParams[MainViewHelper.SESSION_ID]);
 			
 			switch(Manager.instance.currentUser.typeOf){
 				case UserTypes.Admin:
