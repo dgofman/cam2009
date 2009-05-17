@@ -8,6 +8,7 @@
 			import mx.events.ListEvent;
 			import mx.events.CollectionEvent;
 			import com.academy.calder.vo.UserVO;
+			import com.academy.calder.vo.UserItem;
 			import com.academy.calder.enum.Gender;
 			import com.academy.calder.enum.UserTypes;
 			import com.academy.calder.enum.PrivilegeEnum;
@@ -157,8 +158,8 @@
 		<mx:VBox width="100%" height="100%">
 			<mx:Form width="100%" height="100%">
 				<mx:Repeater id="rep" dataProvider="{_user.attributes}">
-					<mx:FormItem label="{Manager.bundle.getMessage(rep.currentItem.label)}:">
-						<mx:Label width="{FIELD_WIDTH}" text="{rep.currentItem.value}"/>
+					<mx:FormItem label="{Manager.bundle.getMessage(UserItem(rep.currentItem).label)}:">
+						<mx:Label width="{FIELD_WIDTH}" text="{UserItem(rep.currentItem).value}"/>
 					</mx:FormItem>
 				</mx:Repeater>
 			</mx:Form>

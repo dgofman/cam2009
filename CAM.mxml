@@ -77,7 +77,7 @@
 							<login:PasswordResetScreen name="{MainViewHelper.RESET}"/>
 							<login:PasswordChangeScreen name="{MainViewHelper.CHANGE}"/>
 							<admin:AdminScreen name="{MainViewHelper.ADMIN}"/>
-							<guest:GuestScreen name="{MainViewHelper.GUEST}"/>
+							<guest:GuestScreen name="{MainViewHelper.OTHER}"/>
 							<student:StudentScreen name="{MainViewHelper.STUDENT}"/>
 							<teacher:TeacherScreen name="{MainViewHelper.TEACHER}"/>
 						</mx:ViewStack>

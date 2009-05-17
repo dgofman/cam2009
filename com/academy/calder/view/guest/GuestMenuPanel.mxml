@@ -1,26 +1,26 @@
-﻿<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
 	verticalAlign="middle" fontSize="12" backgroundColor="#FCA34C" color="#000099" fontWeight="bold" 
-	paddingLeft="10" paddingRight="10" horizontalGap="10" height="23" width="100%">
+	paddingLeft="10" paddingRight="10" horizontalGap="10" height="23" width="100%" creationComplete="onComplete()">
 
 	<mx:Script>
 	<![CDATA[
 		import com.academy.calder.business.Manager;
-		import com.academy.calder.helper.AdminViewHelper;
 		
-		[Bindable]
-		private var _helper:AdminViewHelper = AdminViewHelper.getSelf();
+		private function onComplete():void{
+			//_helper.onMainViewChange();
+		}
 		
 		private function changeView(name:String):void{
-			_helper.changeView(name);
+			//_helper.changeView(name);
 		}
 	]]>
 	</mx:Script>
 	
-	<mx:LinkButton label="Home" toolTip="Goto homepage." click="changeView(AdminViewHelper.HOME)" selected="{_helper.viewName == AdminViewHelper.HOME}"/>
+	<!--mx:LinkButton label="Home" toolTip="Goto homepage." click="changeView(AdminViewHelper.HOME)" selected="{_helper.viewName == AdminViewHelper.HOME}"/>
 	<mx:LinkButton label="Users" toolTip="Show users" click="changeView(AdminViewHelper.USER)" selected="{_helper.viewName == AdminViewHelper.USER}"/>
 	<mx:LinkButton label="Students" toolTip="Show students" click="changeView(AdminViewHelper.STUDENT)" selected="{_helper.viewName == AdminViewHelper.STUDENT}"/>
 	<mx:LinkButton label="Teachers" toolTip="Show teachers" click="changeView(AdminViewHelper.TEACHER)" selected="{_helper.viewName == AdminViewHelper.TEACHER}"/>
-
+	-->
 	<mx:Spacer width="100%"/>
 	<mx:LinkButton label="Sign Out" toolTip="Sign out of the network" click="Manager.signout()"/>
 </mx:HBox>
