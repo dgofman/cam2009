@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml"
 	xmlns:component="com.academy.calder.component.*"
+	xmlns:buttons="com.academy.calder.component.buttons.*"
 	xmlns:links="com.academy.calder.view.admin.links.*" styleName="innerView"
 	width="100%" height="100%" horizontalGap="0" activate="onActivate(event)">
 	
@@ -53,13 +54,13 @@
 		<mx:ControlBar id="controlBar" textIndent="0" width="100%" height="30" paddingTop="0" paddingBottom="0">
 			<mx:HBox width="100%">
 				<mx:Button label="Refresh" click="IMessageAction(linkViewStack.selectedChild).onRefresh()"/>
-				<mx:Button label="{linkViewStack.selectedChild == restore ? 'Restore' : 'Delete'}"
+				<buttons:DeleteButton label="{linkViewStack.selectedChild == restore ? 'Restore' : 'Delete'}"
 					click="IMessageAction(linkViewStack.selectedChild).onDelete()"
 					enabled="{_helper.selectedIndex != -1 || linkViewStack.selectedChild == restore}"/>
 				<mx:Spacer width="100%"/>
-				<mx:Button label="Edit" visible="{linkViewStack.selectedChild != restore}" enabled="{_helper.selectedIndex != -1}"
+				<buttons:ModifyButton label="Edit" visible="{linkViewStack.selectedChild != restore}" enabled="{_helper.selectedIndex != -1}"
 						click="IMessageAction(linkViewStack.selectedChild).onEdit()"/>
-				<mx:Button label="New..." visible="{linkViewStack.selectedChild != restore}"
+				<buttons:CreateButton label="New..." visible="{linkViewStack.selectedChild != restore}"
 						click="IMessageAction(linkViewStack.selectedChild).onCreate()"/>
 			</mx:HBox>
 		</mx:ControlBar>
