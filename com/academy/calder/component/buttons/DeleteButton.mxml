@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Button xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import com.academy.calder.vo.UserVO;
+			import com.academy.calder.enum.PrivilegeEnum;
+			import com.academy.calder.business.Manager;
+			
+			[Bindable]
+			private var _manager:Manager = Manager.instance;
+			
+			private var _visible:Boolean = true;
+			
+			override public function set visible(value:Boolean):void{
+				_visible = value;
+				currentUser = _manager.currentUser;
+			}
+			
+			private function set currentUser(user:UserVO):void{
+				if(user && (user.privileges == PrivilegeEnum.CRUD || user.privileges == PrivilegeEnum.CRUDO))
+					setVisible(_visible);
+				else
+					setVisible(false);
+			}	
+		]]>
+	</mx:Script>
+	<mx:Binding source="_manager.currentUser" destination="currentUser"/>
+</mx:Button>

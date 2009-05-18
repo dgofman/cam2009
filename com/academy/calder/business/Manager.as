@@ -35,8 +35,8 @@ package com.academy.calder.business
 		public function get currentUser():UserVO{
 			return _currentUser;
 		}
-		public function set currentUser(account:UserVO):void{
-			_currentUser = account;
+		public function set currentUser(value:UserVO):void{
+			_currentUser = value;
 		}
 		
 		public static function get application():CAM{

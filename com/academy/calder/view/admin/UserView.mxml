@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
 				xmlns:home="com.academy.calder.view.admin.home.*"
+				xmlns:buttons="com.academy.calder.component.buttons.*"
 				xmlns:links="com.academy.calder.view.admin.links.*" styleName="innerView"
 				width="100%" height="100%" horizontalGap="6" activate="onRefresh()">
 	<mx:Script>
@@ -102,6 +103,8 @@
 				_user = new UserVO(result);
 				findLocaleIndex();
 				result.cached = true;
+				if(_user.userId == Manager.instance.currentUser.userId)
+					Manager.instance.currentUser = _user;
 				if(dataGrid.selectedIndex != -1){
 					dataGrid.dataProvider.setItemAt(result, dataGrid.selectedIndex);
 				}else if(newRecord){
@@ -164,8 +167,8 @@
 				</mx:Repeater>
 			</mx:Form>
 			<mx:HBox paddingLeft="60" paddingBottom="5">
-				<mx:Button label="{Manager.bundle.getMessage('edit')}" enabled="{dataGrid.selectedIndex != -1}" click="onEdit()"/>
-				<mx:Button label="New..." click="onNew()"/>
+				<buttons:ModifyButton label="{Manager.bundle.getMessage('edit')}" enabled="{dataGrid.selectedIndex != -1}" click="onEdit()"/>
+				<buttons:CreateButton label="New..." click="onNew()"/>
 			</mx:HBox>
 		</mx:VBox>
 		<mx:VBox width="100%" height="100%">
@@ -184,7 +187,7 @@
 				</mx:FormItem>
 				<mx:FormItem>
 					<mx:CheckBox id="usePassword" label="{Manager.bundle.getMessage('changePassword')}"
-						 selected="{_newrecord}" enabled="{!_newrecord}"/>
+						 selected="{_newrecord}" enabled="{!_newrecord}" visible="{Manager.instance.currentUser.privileges == PrivilegeEnum.CRUDO}"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('password')}:" visible="{usePassword.selected}" includeInLayout="{usePassword.selected}">
 					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="password" text="{_user.password}"/>
@@ -218,7 +221,7 @@
 				</mx:FormItem>
 			</mx:Form>
 			<mx:HBox paddingLeft="60" paddingBottom="5">	
-				<mx:Button label="{Manager.bundle.getMessage('submit')}" enabled="{dataGrid.selectedIndex != -1 || _newrecord == true}" click="onSubmit()"/>
+				<buttons:ModifyButton label="{Manager.bundle.getMessage('submit')}" enabled="{dataGrid.selectedIndex != -1 || _newrecord == true}" click="onSubmit()"/>
 				<mx:Button label="Cancel" click="clean()"/>
 			</mx:HBox>
 		</mx:VBox>
