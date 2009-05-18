@@ -7,7 +7,7 @@ require_once($PHP_DIR."/global.php");
 class CAM {
 
 	function CAM(){
-		$this->LOGIN="SELECT A.first, A.localeName, B.userId, B.typeOf, B.status FROM person A, user B WHERE A.personId=B.personId AND username='%s' AND password=PASSWORD('%s')";
+		$this->LOGIN="SELECT A.first, A.localeName, B.userId, B.personId, B.typeOf, B.status, B.privileges FROM person A, user B WHERE A.personId=B.personId AND username='%s' AND password=PASSWORD('%s')";
 		$this->PERSON="SELECT A.accountId, A.personId, A.first, A.last, A.namesoundex, A.sex, A.dateOfBirth, A.localeName, B.username, B.privileges, B.status, B.typeOf, B.notes, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.userId='%s'";
 		$this->USERS="SELECT A.personId, A.last, A.first, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.status %s ORDER BY A.last";
 		$this->LOCALE="SELECT localeName, language FROM locale ORDER BY language";
