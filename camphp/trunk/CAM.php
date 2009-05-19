@@ -5,11 +5,15 @@ $PHP_DIR = realpath("php_scripts");
 require_once($PHP_DIR."/global.php");
 
 class CAM {
-
+	
+	var $LOGIN_TIMEOUT = 5;
+	
 	function CAM(){
-		$this->LOGIN="SELECT A.first, A.localeName, B.userId, B.personId, B.typeOf, B.status, B.privileges FROM person A, user B WHERE A.personId=B.personId AND username='%s' AND password=PASSWORD('%s')";
+		$this->VALIDATE="SELECT loginDate FROM login WHERE username='%s' AND MINUTE(TIMEDIFF(loginDate, NOW())) < %d AND success=0 LIMIT 0, 3";
+		$this->ACCESS="INSERT INTO login (username, success) VALUE ('%s', %d)";
+		$this->LOGIN="SELECT A.first, A.localeName, A.personId, A.typeOf, B.userId, B.status, B.privileges FROM person A, user B WHERE A.userId=B.userId AND username='%s' AND password=PASSWORD('%s')";
 		$this->PERSON="SELECT A.accountId, A.personId, A.first, A.last, A.namesoundex, A.sex, A.dateOfBirth, A.localeName, B.username, B.privileges, B.status, B.typeOf, B.notes, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.userId='%s'";
-		$this->USERS="SELECT A.personId, A.last, A.first, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.status %s ORDER BY A.last";
+		$this->USERS="SELECT personId, last, first FROM person A, user B WHERE A.personId=B.personId AND B.status %s ORDER BY last";
 		$this->LOCALE="SELECT localeName, language FROM locale ORDER BY language";
 		
 		$this->UPDATE_PERSON="UPDATE person SET accountId='%s', first='%s', last='%s', namesoundex='%s', localeName='%s', sex='%s', dateOfBirth='%s' WHERE personId='%s'";
@@ -31,16 +35,31 @@ class CAM {
 
 	public function login($username, $password){
 		$mysql = MYSQL::getInstance();
-		$sql = escape($this->LOGIN, $username, $password);
-		$rs = $mysql->query($sql);
+		$sql1 = escape($this->VALIDATE, $username, $this->LOGIN_TIMEOUT);
+		$rs = $mysql->query($sql1);
+		if($rs && $mysql->rowCount() >= 3){
+			error("account_locked", NULL, array($this->LOGIN_TIMEOUT));
+		}
+		$sql2 = escape($this->LOGIN, $username, $password);
+		$rs = $mysql->query($sql2, FALSE);
 		if(!$rs || !$mysql->rowCount()){
 			$errNo = $mysql->getErrorNo();
+			$error = $mysql->getError();
+			
+			$sql3 = escape($this->ACCESS, $username, FALSE);
+			$mysql->query($sql3);
+			$mysql->commit();
+		
 			if($errNo == 0){
 				error("invalid_account");
 			}else{
-				error($errNo, $mysql->getError());
+				error($errNo, $error);
 			}
 		}else{
+			$sql3 = escape($this->ACCESS, $username, TRUE);
+			$mysql->query($sql3);
+			$mysql->commit();
+				
 			$result = $mysql->result($rs);
 			if(count($result) == 0){
 				error("invalid_result");
@@ -60,28 +79,28 @@ class CAM {
 			}else{
 				$sql1 = escape($this->UPDATE_USER, $typeOf, $privileges, $status, $notes, $username, "", $userId);
 			}
-			$rs = $mysql->query($sql1);
+			$rs = $mysql->query($sql1, FALSE);
 			if(!rs){
 				error("cannot_update_user");
 				return;
 			}
 			$sql2 = escape($this->UPDATE_PERSON, $accountId, $first, $last, $namesoundex, $localeName, $sex, $dateOfBirth, $personId);
-			$rs = $mysql->query($sql2);
+			$rs = $mysql->query($sql2, FALSE);
 			if(!rs){
-				$mysql->rollback_db();
+				$mysql->rollback();
 				error("cannot_update_person");
 				return;
 			}
 		}else{
 			$sql1 = escape($this->CREATE_PERSON, $accountId, $first, $last, $namesoundex, $localeName, $sex, $dateOfBirth);
-			$rs = $mysql->query($sql1);
+			$rs = $mysql->query($sql1, FALSE);
 			if(!$rs){
 				error("cannot_create_user");
 				return;
 			}
 			$personId = $mysql->insert();
 			$sql2 = escape($this->CREATE_USER, $personId, $typeOf, $username, $password, $privileges, $status, $notes);
-			$rs = $mysql->query($sql2);
+			$rs = $mysql->query($sql2, FALSE);
 			if(!$rs){
 				error("cannot_create_person");
 				return;

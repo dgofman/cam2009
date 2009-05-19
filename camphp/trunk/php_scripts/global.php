@@ -212,14 +212,14 @@ function strip_html_tags( $text )
 		}
 	}
 	
-	function error($messageId=0, $message=NULL){
-		$params;
+	function error($messageId=0, $message=NULL, $params=array()){
+		$keys;
 		if($message == NULL)
-			$params = getMsg($messageId);
+			$keys = getMsg($messageId, $params);
 		else
-			$params = array($message, $messageId);
+			$keys = array($message, $messageId);
 		MYSQL::getInstance()->close(false);
-		throw new Exception($params[0], $params[1]);
+		throw new Exception($keys[0], $keys[1]);
 	}
 	
 	//database API
@@ -248,8 +248,10 @@ function strip_html_tags( $text )
 			return mysql_query("BEGIN", $this->handle);
 		}
 
-		function &query($sql){
+		function &query($sql, $sendError=TRUE){
 			$this->result = mysql_query($sql, $this->handle);
+			if($sendError && !$this->result)
+				error($this->getErrorNo(), $this->getError());
 			return $this->result;
 		}
 
@@ -301,18 +303,20 @@ function strip_html_tags( $text )
 			return mysql_insert_id($this->handle);
 		}
 
-		function rollback_db() {
-			if($this->handle){
+		function rollback() {
+			if($this->handle)
 				mysql_query("ROLLBACK", $this->handle);
-				mysql_close($this->handle);
-				$this->handle = NULL;
-			}
+		}
+		
+		function commit() {
+			if($this->handle)
+				mysql_query("COMMIT", $this->handle);
 		}
 
 		function close($commit=true){
 			if($this->handle){
 				if($commit)
-					mysql_query("COMMIT", $this->handle);
+					$this->commit();
 				mysql_close($this->handle);
 				$this->handle = NULL;
 			}
