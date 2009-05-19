@@ -11,6 +11,7 @@ class CAM {
 	function CAM(){
 		$this->VALIDATE="SELECT loginDate FROM login WHERE username='%s' AND MINUTE(TIMEDIFF(loginDate, NOW())) < %d AND success=0 LIMIT 0, 3";
 		$this->ACCESS="INSERT INTO login (username, success) VALUE ('%s', %d)";
+		$this->CLEAN="DELETE FROM login WHERE username='%s'";
 		$this->LOGIN="SELECT A.first, A.localeName, A.personId, A.typeOf, B.userId, B.status, B.privileges FROM person A, user B WHERE A.userId=B.userId AND username='%s' AND password=PASSWORD('%s')";
 		$this->PERSON="SELECT A.accountId, A.personId, A.first, A.last, A.namesoundex, A.sex, A.dateOfBirth, A.localeName, B.username, B.privileges, B.status, B.typeOf, B.notes, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.userId='%s'";
 		$this->USERS="SELECT personId, last, first FROM person A, user B WHERE A.personId=B.personId AND B.status %s ORDER BY last";
@@ -56,8 +57,10 @@ class CAM {
 				error($errNo, $error);
 			}
 		}else{
-			$sql3 = escape($this->ACCESS, $username, TRUE);
+			$sql3 = escape($this->CLEAN, $username);
 			$mysql->query($sql3);
+			$sql4 = escape($this->ACCESS, $username, TRUE);
+			$mysql->query($sql4);
 			$mysql->commit();
 				
 			$result = $mysql->result($rs);
