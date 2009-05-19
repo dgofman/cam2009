@@ -1,18 +1,20 @@
 <?php
 	function getMsg($id, $params=array()){
 		switch($id){
+			case "account_locked":
+				return array("Account locked for ".$params[0]." minutes.", 500);
 			case "invalid_account":
-				return array("Account not found", 500);
+				return array("Account not found", 501);
 			case "cannot_update_user":
-				return array("Cannot update an user record", 501);
+				return array("Cannot update an user record", 502);
 			case "cannot_update_person":
-				return array("Cannot update a person record", 502);
+				return array("Cannot update a person record", 503);
 			case "cannot_create_user":
-				return array("Cannot create a new user", 503);
+				return array("Cannot create a new user", 504);
 			case "cannot_create_person":
-				return array("Cannot create a new person", 504);
+				return array("Cannot create a new person", 505);
 			case "cannot_create_message":
-				return array("Cannot create a new message", 505);	
+				return array("Cannot create a new message", 506);	
 				
 				
 			case "invalid":
