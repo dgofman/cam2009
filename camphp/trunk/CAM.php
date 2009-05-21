@@ -14,7 +14,7 @@ class CAM {
 		$this->CLEAN="DELETE FROM login WHERE username='%s'";
 		$this->LOGIN="SELECT A.first, A.localeName, A.personId, A.typeOf, B.userId, B.status, B.privileges FROM person A, user B WHERE A.userId=B.userId AND username='%s' AND password=PASSWORD('%s')";
 		$this->PERSON="SELECT A.accountId, A.personId, A.first, A.last, A.namesoundex, A.sex, A.dateOfBirth, A.localeName, B.username, B.privileges, B.status, B.typeOf, B.notes, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.userId='%s'";
-		$this->USERS="SELECT personId, last, first FROM person A, user B WHERE A.personId=B.personId AND B.status %s ORDER BY last";
+		$this->USERS="SELECT personId, userId, last, first FROM person WHERE typeOf s% ORDER BY last";
 		$this->LOCALE="SELECT localeName, language FROM locale ORDER BY language";
 		
 		$this->UPDATE_PERSON="UPDATE person SET accountId='%s', first='%s', last='%s', namesoundex='%s', localeName='%s', sex='%s', dateOfBirth='%s' WHERE personId='%s'";
@@ -118,7 +118,7 @@ class CAM {
 	
 	public function users($status){
 		$mysql = MYSQL::getInstance();
-		if(!isset($status) || $status == "any"){
+		if(!isset($status) || $status == NULL){
 			$sql = escape($this->USERS, "IS NOT NULL");
 		}else{
 			$sql = escape($this->USERS, "='$status'");
