@@ -116,12 +116,12 @@ class CAM {
 		return (count($result) == 0 ? NULL : $result[0]);
 	}
 	
-	public function users($status){
+	public function users($typeOf){
 		$mysql = MYSQL::getInstance();
-		if(!isset($status) || $status == NULL){
+		if(!isset($typeOf) || $typeOf == NULL){
 			$sql = escape($this->USERS, "IS NOT NULL");
 		}else{
-			$sql = escape($this->USERS, "='$status'");
+			$sql = escape($this->USERS, "='$typeOf'");
 		}
 		$rs = $mysql->query($sql);
 		return $mysql->result($rs);
