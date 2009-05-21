@@ -5,7 +5,6 @@ package com.academy.calder.enum
 	[Bindable]
 	public class AccountStatus
 	{
-		public static const Any:AccountStatus      = new AccountStatus('any');
         public static const Active:AccountStatus   = new AccountStatus('active');
         public static const Disable:AccountStatus  = new AccountStatus('disable');
 		public static const Inactive:AccountStatus = new AccountStatus('inactive');
@@ -27,8 +26,8 @@ package com.academy.calder.enum
                 
         public static function valueOf(value:String):AccountStatus
         {
-            for(var i:uint = 0; i < listAll.length; i++){
-            	var type:AccountStatus = listAll[i];
+            for(var i:uint = 0; i < list.length; i++){
+            	var type:AccountStatus = list[i];
             	if(value == type.value)
             		return type;
             }
@@ -37,10 +36,6 @@ package com.academy.calder.enum
 
         public function toString():String{
         	return label;
-        }
-        
-        public static function get listAll():Array{
-            return new Array(Any).concat(list);
         }
         
         public static function get list():Array
