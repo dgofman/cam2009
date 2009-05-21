@@ -3,7 +3,7 @@
 				xmlns:home="com.academy.calder.view.admin.home.*"
 				xmlns:buttons="com.academy.calder.component.buttons.*"
 				xmlns:links="com.academy.calder.view.admin.links.*" styleName="innerView"
-				width="100%" height="100%" horizontalGap="6" activate="onRefresh()">
+				width="100%" height="100%" horizontalGap="6" activate="onRefresh()" creationComplete="onComplete()">
 	<mx:Script>
 		<![CDATA[
 			import mx.events.ListEvent;
@@ -33,6 +33,13 @@
 			[Bindable]
 			private var _userViewIndex:uint = 0;
 			
+			[Bindable]
+			private var _userTypes:Array;
+			
+			private function onComplete():void{
+				_userTypes = [{label:Manager.bundle.getMessage('all')}].concat(UserTypes.list);
+			}
+			
 			private function onItemClick(event:ListEvent):void{
 				_newrecord = false;
 				if(dataGrid.selectedItem.cached == true){
@@ -44,8 +51,8 @@
 			
 			public function onRefresh():void{
 				clean();
-				AMFService.send('CAM.users', [accountStatus && accountStatus.selectedItem ? 
-											  accountStatus.selectedItem.value : null], onUserResult, onFault);
+				AMFService.send('CAM.users', [userType && userType.selectedItem ? 
+											  userType.selectedItem.value : null], onUserResult, onFault);
 			}
 			
 			private function onSubmit():void{
@@ -152,7 +159,7 @@
 		</mx:DataGrid>
 		<mx:HBox width="100%" paddingBottom="5" paddingLeft="5" paddingRight="5" verticalAlign="middle">
 			<mx:Label text="{Manager.bundle.getMessage('filter')}:"/>
-			<mx:ComboBox id="accountStatus" width="150" dataProvider="{AccountStatus.listAll}" change="onRefresh()"/>
+			<mx:ComboBox id="userType" width="150" dataProvider="{_userTypes}" change="onRefresh()"/>
 			<mx:Spacer width="100%"/>
 			<mx:Button label="{Manager.bundle.getMessage('refresh')}" click="onRefresh()"/>
 		</mx:HBox>
