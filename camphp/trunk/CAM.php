@@ -14,7 +14,7 @@ class CAM {
 		$this->CLEAN="DELETE FROM login WHERE username='%s'";
 		$this->LOGIN="SELECT A.first, A.localeName, A.personId, A.typeOf, B.userId, B.status, B.privileges FROM person A, user B WHERE A.userId=B.userId AND username='%s' AND password=PASSWORD('%s')";
 		$this->PERSON="SELECT personId, userId, accountId, first, last, sex, dateOfBirth, localeName, typeOf FROM person WHERE personId='%s'";
-		$this->USERS="SELECT personId, userId, last, first FROM person WHERE typeOf %s ORDER BY last";
+		$this->PERSONS="SELECT personId, userId, last, first FROM person WHERE typeOf %s ORDER BY last";
 		$this->LOCALE="SELECT localeName, language FROM locale ORDER BY language";
 		
 		$this->UPDATE_PERSON="UPDATE person SET accountId='%s', first='%s', last='%s', namesoundex='%s', localeName='%s', sex='%s', dateOfBirth='%s' WHERE personId='%s'";
@@ -83,7 +83,33 @@ class CAM {
 		return (count($result) == 0 ? NULL : $result[0]);
 	}
 	
-	public function updateUser($userId, $personId, $accountId, $username, $password, $first, $last,
+	public function persons($typeOf){
+		$mysql = MYSQL::getInstance();
+		if(!isset($typeOf) || $typeOf == NULL){
+			$sql = escape($this->USERS, "IS NOT NULL");
+		}else{
+			$sql = escape($this->USERS, "='$typeOf'");
+		}
+		$rs = $mysql->query($sql);
+		return $mysql->result($rs);
+	}
+	
+	public function person($personId){
+		$mysql = MYSQL::getInstance();
+		$sql = escape($this->PERSON, $personId);
+		$rs = $mysql->query($sql);
+		$result = $mysql->result($rs);
+		return (count($result) == 0 ? NULL : $result[0]);
+	}
+
+	public function locale(){
+		$mysql = MYSQL::getInstance();
+		$rs = $mysql->query($this->LOCALE);
+		$result = $mysql->result($rs);
+		return $result;
+	}
+	
+	public function updatePerson($userId, $personId, $accountId, $username, $password, $first, $last,
 								$namesoundex, $dateOfBirth, $notes, $localeName, $sex, $typeOf, $privileges, $status){
 								$mysql = MYSQL::getInstance();
 		if(isset($userId) && isset($personId)){
@@ -124,32 +150,6 @@ class CAM {
 		$rs = $mysql->query($sql);
 		$result = $mysql->result($rs);
 		return (count($result) == 0 ? NULL : $result[0]);
-	}
-	
-	public function users($typeOf){
-		$mysql = MYSQL::getInstance();
-		if(!isset($typeOf) || $typeOf == NULL){
-			$sql = escape($this->USERS, "IS NOT NULL");
-		}else{
-			$sql = escape($this->USERS, "='$typeOf'");
-		}
-		$rs = $mysql->query($sql);
-		return $mysql->result($rs);
-	}
-	
-	public function person($personId){
-		$mysql = MYSQL::getInstance();
-		$sql = escape($this->PERSON, $personId);
-		$rs = $mysql->query($sql);
-		$result = $mysql->result($rs);
-		return (count($result) == 0 ? NULL : $result[0]);
-	}
-
-	public function locale(){
-		$mysql = MYSQL::getInstance();
-		$rs = $mysql->query($this->LOCALE);
-		$result = $mysql->result($rs);
-		return $result;
 	}
 }
 ?>
