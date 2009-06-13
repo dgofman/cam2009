@@ -51,12 +51,12 @@
 			
 			public function onRefresh():void{
 				clean();
-				AMFService.send('CAM.users', [userType && userType.selectedItem ? 
+				AMFService.send('CAM.persons', [userType && userType.selectedItem ? 
 											  userType.selectedItem.value : null], onUserResult, onFault);
 			}
 			
 			private function onSubmit():void{
-				/*AMFService.send('CAM.updateUser', [_person.userId,
+				/*AMFService.send('CAM.updatePerson', [_person.userId,
 												   _person.personId,
 												   accountId.text,
 												   username.text,
