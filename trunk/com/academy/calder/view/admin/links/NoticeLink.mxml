@@ -9,7 +9,7 @@
 			import mx.events.FlexEvent;
 			import mx.events.ListEvent;
 			import mx.events.CollectionEvent;
-			import com.academy.calder.vo.UserVO;
+			import com.academy.calder.vo.PersonVO;
 			import com.academy.calder.vo.MessageVO;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
@@ -19,7 +19,7 @@
 			private const model:AdminViewHelper = AdminViewHelper.getSelf();
 
 			[Bindable]
-			private var _reporter:UserVO;
+			private var _reporter:PersonVO;
 			
 			[Bindable]
 			private var _message:MessageVO;
@@ -109,7 +109,7 @@
 			}
 			
 			private function onReporterResult(result:Object):void{
-				_reporter = new UserVO(result);
+				_reporter = new PersonVO(result);
 				_cachedUsers[_reporter.userId] = _reporter; 
 			}
 			
@@ -174,9 +174,6 @@
 				<mx:FormItem label="Account ID:">
 					<mx:Label text="{_reporter.accountId}"/>
 				</mx:FormItem>
-				<mx:FormItem label="Username:">
-					<mx:Label text="{_reporter.username}"/>
-				</mx:FormItem>
 				<mx:FormItem label="User Type:">
 					<mx:Label text="{_reporter.typeOf.label}"/>
 				</mx:FormItem>
@@ -185,9 +182,6 @@
 				</mx:FormItem>
 				<mx:FormItem label="Last Name:">
 					<mx:Label text="{_reporter.last}"/>
-				</mx:FormItem>
-				<mx:FormItem label="Name ???:">
-					<mx:Label text="{_reporter.namesoundex}"/>
 				</mx:FormItem>
 				<mx:FormItem label="Sex:">
 					<mx:Label text="{_reporter.sex}"/>

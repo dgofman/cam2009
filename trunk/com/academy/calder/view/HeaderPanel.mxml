@@ -26,7 +26,7 @@
 	<mx:Canvas width="100%" height="100%">
 		<mx:Image source="{Manager.getIcon('headerIcon')}" toolTip="{Manager.bundle.getMessage('homepage')}" horizontalAlign="center" width="100%"/>
 		<mx:HBox width="100%" height="100%" verticalAlign="middle">
-			<mx:Label text="{(manager.currentUser.first ? 'Welcome ' + manager.currentUser.first : '')}"/>
+			<mx:Label text="{(manager.currentUser.personRef.first ? 'Welcome ' + manager.currentUser.personRef.first : '')}"/>
 			<mx:Label id="today_lbl" width="100%" textAlign="right" truncateToFit="false" height="40"/>
 		</mx:HBox>
 	</mx:Canvas>

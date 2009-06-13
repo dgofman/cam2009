@@ -6,6 +6,7 @@
 	<mx:Script>
 	<![CDATA[
 		import com.academy.calder.vo.UserVO;
+		import com.academy.calder.vo.PersonVO;
 		import com.academy.calder.enum.UserTypes;
 		import com.academy.calder.enum.AccountStatus;
 		import com.academy.calder.business.AMFService;
@@ -49,16 +50,18 @@
 		}
 		
 		private function onLoginResult(result:Object):void{
-			Manager.instance.currentUser = new UserVO(result);
+			var user:UserVO = new UserVO(result);
+			Manager.instance.currentUser = user;
 			if(Manager.instance.currentUser.status != AccountStatus.Active){
 				Manager.error(Manager.bundle.getMessage('error_inactive_account'), Manager.bundle.getMessage('error_authentication'));
 				return;
 			}
 			LocalShare.save("loginInfo", remember.selected ? {username:username.text, remember:true} : null, LocalShare.GLOBAL_LEVEL);
 
-			ExternalInterface.call("setCookie", MainViewHelper.SESSION_ID, Manager.instance.cookieParams[MainViewHelper.SESSION_ID]);
-			
-			switch(Manager.instance.currentUser.typeOf){
+			ExternalInterface.call("setCookie", MainViewHelper.SESSION_ID,
+												Manager.instance.cookieParams[MainViewHelper.SESSION_ID]);
+												
+			switch(Manager.instance.currentUser.personRef.typeOf){
 				case UserTypes.Admin:
 					mainHelper.changeView(MainViewHelper.ADMIN);
 					break;
