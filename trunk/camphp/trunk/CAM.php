@@ -86,9 +86,9 @@ class CAM {
 	public function persons($typeOf){
 		$mysql = MYSQL::getInstance();
 		if(!isset($typeOf) || $typeOf == NULL){
-			$sql = escape($this->USERS, "IS NOT NULL");
+			$sql = escape($this->PERSONS, "IS NOT NULL");
 		}else{
-			$sql = escape($this->USERS, "='$typeOf'");
+			$sql = escape($this->PERSONS, "='$typeOf'");
 		}
 		$rs = $mysql->query($sql);
 		return $mysql->result($rs);
