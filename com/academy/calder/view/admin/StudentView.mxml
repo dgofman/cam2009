@@ -9,7 +9,7 @@
 			import mx.events.FlexEvent;
 			import mx.events.ListEvent;
 			import mx.events.CollectionEvent;
-			import com.academy.calder.vo.UserVO;
+			import com.academy.calder.vo.PersonVO;
 			import com.academy.calder.vo.MessageVO;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
@@ -17,7 +17,7 @@
 			[Bindable]
 			private var _details:MessageVO;
 			[Bindable]
-			private var _reporter:UserVO;
+			private var _reporter:PersonVO;
 			
 			private var _cachedUsers:Object = {};
 
@@ -178,9 +178,6 @@
 				</mx:FormItem>
 				<mx:FormItem label="Last Name:">
 					<mx:Label text="{_reporter.last}"/>
-				</mx:FormItem>
-				<mx:FormItem label="Name ???:">
-					<mx:Label text="{_reporter.namesoundex}"/>
 				</mx:FormItem>
 				<mx:FormItem label="Sex:">
 					<mx:Label text="{_reporter.sex}"/>

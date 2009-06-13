@@ -17,6 +17,7 @@
 	
 	<mx:Script>
 	<![CDATA[
+		import com.academy.calder.vo.UserVO;
 		import com.academy.calder.business.LocalShare;
 		import com.academy.calder.business.Manager;
 		import com.academy.calder.business.AMFService;
@@ -38,10 +39,9 @@
 			
 			var mainViewName:String = LocalShare.getValue(MainViewHelper.VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
 			var oldCookie:String = ExternalInterface.call("getCookie");
-			var params:URLVariables = new URLVariables(oldCookie as String && oldCookie.length ? oldCookie : null);
+			var params:URLVariables = new URLVariables(oldCookie as String && oldCookie.length ? unescape(oldCookie) : null);
 			if(mainViewName != null && params != null && params[MainViewHelper.SESSION_ID] == event){
-				Logger.info(MainViewHelper.VIEW_SHARE_ID + "=" + mainViewName);
-				mainHelper.changeView(mainViewName);
+				AMFService.send('CAM.access', null, onUserSessionResult, onLoginFault);
 			}else{
 				if(Manager.getAppParam("key") == "confirm"){
 					mainHelper.changeView(MainViewHelper.CONFIRM);
@@ -53,6 +53,18 @@
 		
 		private function onLoginFault(fault:Object):void{
 			Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_session'));
+		}
+		
+		private function onUserSessionResult(result:Object):void{
+			var mainViewName:String = LocalShare.getValue(MainViewHelper.VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
+			if(result != null && mainViewName != null && mainViewName != MainViewHelper.LOGIN){
+				var user:UserVO = new UserVO(result);
+				Logger.info(MainViewHelper.VIEW_SHARE_ID + "=" + mainViewName);
+				Manager.instance.currentUser = user;
+				mainHelper.changeView(mainViewName);
+			}else{
+				mainHelper.changeView(MainViewHelper.LOGIN);
+			}
 		}
 		
 		public function initSession(destory:Boolean=false):void{
