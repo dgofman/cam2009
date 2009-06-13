@@ -13,8 +13,8 @@ class CAM {
 		$this->ACCESS="INSERT INTO login (username, success) VALUE ('%s', %d)";
 		$this->CLEAN="DELETE FROM login WHERE username='%s'";
 		$this->LOGIN="SELECT A.first, A.localeName, A.personId, A.typeOf, B.userId, B.status, B.privileges FROM person A, user B WHERE A.userId=B.userId AND username='%s' AND password=PASSWORD('%s')";
-		$this->PERSON="SELECT A.accountId, A.personId, A.first, A.last, A.namesoundex, A.sex, A.dateOfBirth, A.localeName, B.username, B.privileges, B.status, B.typeOf, B.notes, B.userId FROM person A, user B WHERE A.personId=B.personId AND B.userId='%s'";
-		$this->USERS="SELECT personId, userId, last, first FROM person WHERE typeOf s% ORDER BY last";
+		$this->PERSON="SELECT personId, userId, accountId, first, last, sex, dateOfBirth, localeName, typeOf FROM person WHERE personId='%s'";
+		$this->USERS="SELECT personId, userId, last, first FROM person WHERE typeOf %s ORDER BY last";
 		$this->LOCALE="SELECT localeName, language FROM locale ORDER BY language";
 		
 		$this->UPDATE_PERSON="UPDATE person SET accountId='%s', first='%s', last='%s', namesoundex='%s', localeName='%s', sex='%s', dateOfBirth='%s' WHERE personId='%s'";
@@ -67,10 +67,20 @@ class CAM {
 			if(count($result) == 0){
 				error("invalid_result");
 			}else{
-				$_SESSION["USER_ID"] = $result[0]["userId"];
+				$_SESSION["USERNAME"] = $username;
+				$_SESSION["PASSWORD"] = $password;
+				$_SESSION["USER_ID"]  = $result[0]["userId"];
 				return $result[0];
 			}
 		}
+	}
+	
+	public function access(){
+		$mysql = MYSQL::getInstance();
+		$sql = escape($this->LOGIN, $_SESSION["USERNAME"], $_SESSION["PASSWORD"]);
+		$rs = $mysql->query($sql);
+		$result = $mysql->result($rs);
+		return (count($result) == 0 ? NULL : $result[0]);
 	}
 	
 	public function updateUser($userId, $personId, $accountId, $username, $password, $first, $last,
@@ -127,9 +137,9 @@ class CAM {
 		return $mysql->result($rs);
 	}
 	
-	public function person($userId){
+	public function person($personId){
 		$mysql = MYSQL::getInstance();
-		$sql = escape($this->PERSON, $userId);
+		$sql = escape($this->PERSON, $personId);
 		$rs = $mysql->query($sql);
 		$result = $mysql->result($rs);
 		return (count($result) == 0 ? NULL : $result[0]);
