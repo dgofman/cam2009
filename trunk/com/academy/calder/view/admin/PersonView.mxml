@@ -58,11 +58,23 @@
 			}
 			
 			private function onSubmit():void{
-				if(username.text.length > 0){
-					if(changePassword.selected && password.text != confirm.text){
+				if(username && username.text.length > 0){
+					if(password.text.length < 6){
+						Manager.error("Password cannot be less than 6 characters", Manager.bundle.getMessage('error_password'));
+						return;
+					}
+					if(updatePwd.selected && password.text != confirm.text){
 						Manager.error("Passwords do not match", Manager.bundle.getMessage('error_password'));
 						return;
 					}
+				}
+				
+				if(username != null){
+					_user.username = username.text;
+					_user.password = password.text;
+					_user.privileges = privileges.selectedItem as PrivilegeEnum;
+					_user.status = status.selectedItem as AccountStatus;
+					_user.notes = unotes.text;
 				}
 				
 				AMFService.send('CAM.updateRecord', [_person.userId,
@@ -74,11 +86,12 @@
 												   sex.selectedItem.value,
 												   typeOf.selectedItem.value,
 												   pnotes.text,
-												   username.text,
-												   (changePassword.selected ? password.text : null),
-												   privileges.selectedItem.value,
-												   status.selectedItem.value,
-												   unotes.text], onSubmitDataResult, onFault);
+												   _user.username,
+												   _user.password,
+												   _user.privileges.value,
+												   _user.status.value,
+												   _user.notes,
+												   (updatePwd ? updatePwd.selected : false)], onSubmitDataResult, onFault);
 			}
 			
 			private function onEdit():void{
@@ -136,11 +149,7 @@
 
 			private function onSubmitDataResult(result:Object):void{
 				if(result != null){
-					_user.username = username.text;
-					_user.privileges = privileges.selectedItem as PrivilegeEnum;
-					_user.status = status.selectedItem as AccountStatus;
-					_user.notes = unotes.text;
-						
+
 					result.user = _user;
 					result.cached = true;
 					
@@ -211,7 +220,7 @@
 					<mx:TextInput width="{FIELD_WIDTH}" text="{_person.last}" id="last"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('dob')}:">
-					<mx:DateField width="{FIELD_WIDTH}" text="{_person.dateOfBirth}" id="dob" formatString="YYYY-MM-DD"/>
+					<mx:DateField width="{FIELD_WIDTH}" text="{_person.dateOfBirth == null ? '' : _person.dateOfBirth}" id="dob" formatString="YYYY-MM-DD"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('sex')}:">
 					<mx:ComboBox dataProvider="{Gender.list}" width="{FIELD_WIDTH}" selectedItem="{_person.sex}" id="sex"/>
@@ -240,13 +249,13 @@
 					<mx:TextInput width="{FIELD_WIDTH}" text="{_user.username}" id="username"/>
 				</mx:FormItem>
 				<mx:FormItem>
-					<mx:CheckBox id="changePassword" label="{Manager.bundle.getMessage('changePassword')}"
-						 selected="{_newrecord}" visible="{_newrecord == false &amp;&amp; Manager.instance.currentUser.privileges == PrivilegeEnum.CRUDO}"/>
+					<mx:CheckBox id="updatePwd" label="{Manager.bundle.getMessage('updatePwd')}"
+						 selected="{_person.userId == null}" visible="{_person.userId != null &amp;&amp; Manager.instance.currentUser.privileges == PrivilegeEnum.CRUDO}"/>
 				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('password')}:" visible="{changePassword.selected}" includeInLayout="{changePassword.selected}">
+				<mx:FormItem label="{Manager.bundle.getMessage('password')}:" visible="{updatePwd.selected}" includeInLayout="{updatePwd.selected}">
 					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="password"/>
 				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('confirm')}:" visible="{changePassword.selected}" includeInLayout="{changePassword.selected}">
+				<mx:FormItem label="{Manager.bundle.getMessage('confirm')}:" visible="{updatePwd.selected}" includeInLayout="{updatePwd.selected}">
 					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="confirm"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('privileges')}:">
