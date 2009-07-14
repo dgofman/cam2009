@@ -27,7 +27,7 @@
 		
 		<mx:ViewStack id="adminViewStack" width="100%" height="100%">
 			<admin:AdminView   name="{AdminViewHelper.HOME}"/>
-			<admin:UserView    name="{AdminViewHelper.USER}"/>
+			<admin:PersonView  name="{AdminViewHelper.PERSON}"/>
 			<admin:StudentView name="{AdminViewHelper.STUDENT}"/>
 			<admin:TeacherView name="{AdminViewHelper.TEACHER}"/>
 		</mx:ViewStack>
