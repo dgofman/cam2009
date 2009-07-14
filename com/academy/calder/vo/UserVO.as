@@ -15,8 +15,6 @@ package com.academy.calder.vo
 				privileges = PrivilegeEnum.valueOf(result.privileges);
 				status = AccountStatus.valueOf(result.status);
 				notes = result.notes;
-				
-				personRef = new PersonVO(result);
 			}
 			dispatchEvent(new PropertyChangeEvent(PropertyChangeEvent.PROPERTY_CHANGE));
 		}
@@ -27,7 +25,15 @@ package com.academy.calder.vo
 		public var privileges:PrivilegeEnum = PrivilegeEnum.R;
 		public var status:AccountStatus = AccountStatus.Pending;
 		public var notes:String;
-		public var personRef:PersonVO;
+		
+		private var _personRef:PersonVO;
+		
+		public function get personRef():PersonVO{
+			return _personRef;
+		}
+		public function set personRef(value:PersonVO):void{
+			_personRef = value;
+		}
 		
 		[Bindable("attributesChange")]
 		public function get attributes():Array{

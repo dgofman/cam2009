@@ -16,10 +16,10 @@
 	]]>
 	</mx:Script>
 	
-	<mx:LinkButton label="Home" toolTip="Goto homepage." click="changeView(AdminViewHelper.HOME)" selected="{_helper.viewName == AdminViewHelper.HOME}"/>
-	<mx:LinkButton label="Users" toolTip="Show users" click="changeView(AdminViewHelper.USER)" selected="{_helper.viewName == AdminViewHelper.USER}"/>
-	<mx:LinkButton label="Students" toolTip="Show students" click="changeView(AdminViewHelper.STUDENT)" selected="{_helper.viewName == AdminViewHelper.STUDENT}"/>
-	<mx:LinkButton label="Teachers" toolTip="Show teachers" click="changeView(AdminViewHelper.TEACHER)" selected="{_helper.viewName == AdminViewHelper.TEACHER}"/>
+	<mx:LinkButton label="{Manager.bundle.getMessage('Home')}" toolTip="Goto homepage." click="changeView(AdminViewHelper.HOME)" selected="{_helper.viewName == AdminViewHelper.HOME}"/>
+	<mx:LinkButton label="{Manager.bundle.getMessage('Person')}" toolTip="Show users" click="changeView(AdminViewHelper.PERSON)" selected="{_helper.viewName == AdminViewHelper.PERSON}"/>
+	<mx:LinkButton label="{Manager.bundle.getMessage('Students')}" toolTip="Show students" click="changeView(AdminViewHelper.STUDENT)" selected="{_helper.viewName == AdminViewHelper.STUDENT}"/>
+	<mx:LinkButton label="{Manager.bundle.getMessage('Teachers')}" toolTip="Show teachers" click="changeView(AdminViewHelper.TEACHER)" selected="{_helper.viewName == AdminViewHelper.TEACHER}"/>
 
 	<mx:Spacer width="100%"/>
 	<mx:LinkButton label="Sign Out" toolTip="Sign out of the network" click="Manager.signout()"/>

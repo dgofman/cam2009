@@ -51,6 +51,7 @@
 		
 		private function onLoginResult(result:Object):void{
 			var user:UserVO = new UserVO(result);
+			user.personRef = new PersonVO(result);
 			Manager.instance.currentUser = user;
 			if(Manager.instance.currentUser.status != AccountStatus.Active){
 				Manager.error(Manager.bundle.getMessage('error_inactive_account'), Manager.bundle.getMessage('error_authentication'));

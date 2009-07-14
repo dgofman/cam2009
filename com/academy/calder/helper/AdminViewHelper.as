@@ -14,7 +14,7 @@ package com.academy.calder.helper
 		private var _selectedIndex:int;
 		
 		public static const HOME:String    = "adminHome";
-		public static const USER:String    = "userMember";
+		public static const PERSON:String  = "adminPerson";
 		public static const STUDENT:String = "adminStudent";
 		public static const TEACHER:String = "adminTeacher";
 		
