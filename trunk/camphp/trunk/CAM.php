@@ -18,10 +18,10 @@ class CAM {
 		$this->USER="SELECT username, privileges, status, notes FROM user WHERE userId='%s'";
 		$this->LOCALE="SELECT localeName, language FROM locale ORDER BY language";
 		
-		$this->CREATE_USER="INSERT INTO user (username, password, privileges, status, notes) VALUES ('%s', %s, '%s', '%s', '%s')";
-		$this->UPDATE_USER="UPDATE user SET	username='%s', password=%s, privileges='%s', status='%s', notes='%s' WHERE userId='%s'";
-		$this->CREATE_PERSON="INSERT INTO person (userId, first, last, sex, dateOfBirth, localeName, typeOf, notes) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";		
-		$this->UPDATE_PERSON="UPDATE person SET userId='%s', first='%s', last='%s', sex='%s', dateOfBirth='%s', localeName='%s', typeOf='%s' WHERE personId='%s'";
+		$this->CREATE_USER="INSERT INTO user (username, password, privileges, status, notes) VALUES ('%s', PASSWORD('%s'), '%s', '%s', '%s')";
+		$this->UPDATE_USER="UPDATE user SET	username='%s', privileges='%s', status='%s', notes='%s' WHERE userId='%s'";
+		$this->CREATE_PERSON="INSERT INTO person (userId, first, last, sex, dateOfBirth, localeName, typeOf, notes) VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s')";		
+		$this->UPDATE_PERSON="UPDATE person SET userId=%s, first='%s', last='%s', sex='%s', dateOfBirth='%s', localeName='%s', typeOf='%s' WHERE personId='%s'";
 	}
 	
 	public function getSessionId($destory=false){
@@ -119,24 +119,19 @@ class CAM {
 	}
 	
 	public function updateRecord($userId, $personId, $first, $last, $dateOfBirth, $localeName,
-								 $sex, $typeOf, $pnotes, $username, $password, $privileges, $status, $unotes){
+								 $sex, $typeOf, $pnotes, $username, $password, $privileges, 
+								 $status, $unotes, $updatePwd){
 									
 		$mysql = MYSQL::getInstance();
 		
-		if(isset($password)){
-			$password = "PASSWORD('$password')";
-		}else{
-			$password = "NULL";
-		}
-
 		if(isset($userId)){
-			$sql = escape($this->UPDATE_USER, $username, $password, $privileges, $status, $unotes, $userId);
+			$sql = escape($this->UPDATE_USER, $username, $updatePwd == TRUE ? "password=PASSWORD('$password')," : "", $privileges, $status, $unotes, $userId);
 			$rs = $mysql->query($sql, FALSE);
 			if(!rs){
 				error("cannot_update_user");
 				return;
 			}
-		}else if(isset($username)){
+		}else if(isset($username) && !empty($username)){
 			$sql = escape($this->CREATE_USER, $username, $password, $privileges, $status, $unotes);
 			$rs = $mysql->query($sql, FALSE);
 			if(!$rs){
@@ -145,6 +140,9 @@ class CAM {
 			}
 			$userId = $mysql->insert();
 		}
+		
+		if(!isset($userId) || $userId == NULL)
+			$userId = "NULL";
 		
 		if(isset($personId)){
 			$sql = escape($this->UPDATE_PERSON, $userId, $first, $last, $sex, $dateOfBirth, $localeName, $typeOf, $pnotes, $personId);
