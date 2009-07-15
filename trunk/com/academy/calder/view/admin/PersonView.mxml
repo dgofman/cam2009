@@ -149,10 +149,10 @@
 
 			private function onSubmitDataResult(result:Object):void{
 				if(result != null){
-
+					_person = new PersonVO(result);
 					result.user = _user;
 					result.cached = true;
-					
+
 					if(dataGrid.selectedIndex != -1){
 						dataGrid.dataProvider.setItemAt(result, dataGrid.selectedIndex);
 					}else{
@@ -212,6 +212,7 @@
 	</mx:VBox>
 	<mx:TabNavigator id="tabNav" width="100%" height="100%">
 		<mx:VBox width="100%" height="100%" label="Person" id="personForm">
+			<mx:Label width="100%" textAlign="right" paddingRight="25" text="{_person.accountId}"/>
 			<mx:Form width="100%" height="100%" enabled="{_editrecord || _newrecord}">
 				<mx:FormItem label="{Manager.bundle.getMessage('first')}:">
 					<mx:TextInput width="{FIELD_WIDTH}" text="{_person.first}" id="first"/>
@@ -253,10 +254,10 @@
 						 selected="{_person.userId == null}" visible="{_person.userId != null &amp;&amp; Manager.instance.currentUser.privileges == PrivilegeEnum.CRUDO}"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('password')}:" visible="{updatePwd.selected}" includeInLayout="{updatePwd.selected}">
-					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="password"/>
+					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" text="{_user.password}" id="password"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('confirm')}:" visible="{updatePwd.selected}" includeInLayout="{updatePwd.selected}">
-					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" id="confirm"/>
+					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" text="{_user.password}" id="confirm"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('privileges')}:">
 					<mx:ComboBox dataProvider="{PrivilegeEnum.list}" width="{FIELD_WIDTH}" selectedItem="{_user.privileges}" id="privileges"/>
