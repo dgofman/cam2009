@@ -250,8 +250,13 @@ function strip_html_tags( $text )
 
 		function &query($sql, $sendError=TRUE){
 			$this->result = mysql_query($sql, $this->handle);
-			if($sendError && !$this->result)
-				error($this->getErrorNo(), $this->getError());
+			$errorNo = $this->getErrorNo();
+			$errorMsg = $this->getError();
+			if(!$this->result){
+				error_log($errorMsg, $errorNo);
+				if($sendError)
+					error($errorNo, $errorMsg);
+			}
 			return $this->result;
 		}
 
