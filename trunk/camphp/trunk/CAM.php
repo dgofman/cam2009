@@ -18,10 +18,10 @@ class CAM {
 		$this->USER="SELECT username, privileges, status, notes FROM user WHERE userId='%s'";
 		$this->LOCALE="SELECT localeName, language FROM locale ORDER BY language";
 		
-		$this->CREATE_USER="INSERT INTO user (username, password, privileges, status, notes) VALUES ('%s', PASSWORD('%s'), '%s', '%s', '%s')";
+		$this->CREATE_USER="INSERT INTO user (personId, username, password, privileges, status, notes) VALUES ('%s', '%s', PASSWORD('%s'), '%s', '%s', '%s')";
 		$this->UPDATE_USER="UPDATE user SET	username='%s', privileges='%s', status='%s', notes='%s' WHERE userId='%s'";
-		$this->CREATE_PERSON="INSERT INTO person (userId, first, last, sex, dateOfBirth, localeName, typeOf, notes) VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s')";		
-		$this->UPDATE_PERSON="UPDATE person SET userId=%s, first='%s', last='%s', sex='%s', dateOfBirth='%s', localeName='%s', typeOf='%s' WHERE personId='%s'";
+		$this->CREATE_PERSON="INSERT INTO person (userId, first, last, sex, dateOfBirth, localeName, typeOf, notes) VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
+		$this->UPDATE_PERSON="UPDATE person SET userId=%s, first='%s', last='%s', sex='%s', dateOfBirth='%s', localeName='%s', typeOf='%s', notes='%s' WHERE personId='%s'";
 	}
 	
 	public function getSessionId($destory=false){
@@ -132,7 +132,7 @@ class CAM {
 				return;
 			}
 		}else if(isset($username) && !empty($username)){
-			$sql = escape($this->CREATE_USER, $username, $password, $privileges, $status, $unotes);
+			$sql = escape($this->CREATE_USER, $personId, $username, $password, $privileges, $status, $unotes);
 			$rs = $mysql->query($sql, FALSE);
 			if(!$rs){
 				error("cannot_create_user");
