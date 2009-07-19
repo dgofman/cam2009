@@ -80,9 +80,13 @@
 				if(username != null){
 					_user.username = username.text;
 					_user.password = password.text;
+					_user.admin = admin.selected;
 					_user.privileges = privileges.selectedItem as PrivilegeEnum;
 					_user.status = status.selectedItem as AccountStatus;
 					_user.notes = unotes.text;
+					
+					password.text = "";
+					confirm.text = "";
 				}
 				
 				AMFService.send('CAM.updateRecord', [_person.userId,
@@ -95,6 +99,7 @@
 												   pnotes.text,
 												   _user.username,
 												   _user.password,
+												   _user.admin,
 												   _user.privileges.value,
 												   _user.status.value,
 												   _user.notes,
@@ -261,6 +266,9 @@
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('confirm')}:" visible="{updatePwd.selected}" includeInLayout="{updatePwd.selected}">
 					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" text="{_user.password}" id="confirm"/>
+				</mx:FormItem>
+				<mx:FormItem>
+					<mx:CheckBox width="{FIELD_WIDTH}" label="{Manager.bundle.getMessage('setAsAdmin')}" selected="{_user.admin}" id="admin"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('privileges')}:">
 					<mx:ComboBox dataProvider="{PrivilegeEnum.list}" width="{FIELD_WIDTH}" selectedItem="{_user.privileges}" id="privileges"/>
