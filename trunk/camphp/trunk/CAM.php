@@ -9,6 +9,7 @@ class CAM {
 		$this->ACCESS="INSERT INTO login (username, success) VALUE ('%s', %d)";
 		$this->CLEAN="DELETE FROM login WHERE username='%s'";
 		$this->LOGIN="SELECT A.userId, A.status, A.privileges, A.admin, B.first, B.localeName, B.personId, C.studentId, D.employeeId FROM user A, person B LEFT JOIN student C ON (B.personId=C.personId) LEFT JOIN employee D ON (B.personId=D.personId) WHERE A.personId=B.personId AND A.username='%s' AND A.password=PASSWORD('%s')";
+		$this->SEARCH="SELECT A.userId, B.personId, B.first, B.last FROM user A RIGHT JOIN person B ON (A.personId=B.personId) WHERE B.first LIKE '%s' OR B.last LIKE '%s' ORDER BY B.last";
 		$this->PERSONS="SELECT A.userId, B.personId, B.first, B.last FROM user A RIGHT JOIN person B ON (A.personId=B.personId) ORDER BY B.last";
 		$this->PERSON="SELECT A.userId, B.personId, B.first, B.last, B.sex, B.dateOfBirth, B.localeName, B.notes FROM user A RIGHT JOIN person B ON (A.personId=B.personId) WHERE B.personId=%s";
 		$this->USER="SELECT username, admin, privileges, status, notes FROM user WHERE userId=%s";
@@ -82,7 +83,13 @@ class CAM {
 	
 	public function persons(){
 		$mysql = MYSQL::getInstance();
-		$sql = escape($this->PERSONS);
+		$rs = $mysql->query($this->PERSONS);
+		return $mysql->result($rs);
+	}
+	
+	public function searchPersons($keyword){
+		$mysql = MYSQL::getInstance();
+		$sql = escape($this->SEARCH, "%$keyword%", "%$keyword%");
 		$rs = $mysql->query($sql);
 		return $mysql->result($rs);
 	}
