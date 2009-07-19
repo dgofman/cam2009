@@ -171,12 +171,6 @@
 				<mx:Text text="{_message.body}" width="100%" height="100%"/>
 			</mx:VBox>
 			<mx:Form width="100%" height="100%" label="Reporter Profile" show="getReporter()">
-				<mx:FormItem label="Account ID:">
-					<mx:Label text="{_reporter.accountId}"/>
-				</mx:FormItem>
-				<mx:FormItem label="User Type:">
-					<mx:Label text="{_reporter.typeOf.label}"/>
-				</mx:FormItem>
 				<mx:FormItem label="First Name:">
 					<mx:Label text="{_reporter.first}"/>
 				</mx:FormItem>
