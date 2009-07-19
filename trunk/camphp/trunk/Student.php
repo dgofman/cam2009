@@ -1,13 +1,9 @@
 <?php
 
-$PHP_DIR = realpath("php_scripts");
-
-require_once($PHP_DIR."/global.php");
-
 class Student {
 
 	function Student(){
-		$this->STUDENTS="SELECT studentId, accountId, personId, enrollDate, status+0 AS status, studentType+0 AS studentType, medication, allergies FROM student";
+		$this->STUDENTS="SELECT A.studentId, B.userId, C.personId, C.first, C.last FROM student A, user B RIGHT JOIN person C ON (B.personId=C.personId) WHERE A.personId=C.personId ORDER BY C.last";
 	}
 
 	public function students(){

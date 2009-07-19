@@ -1,6 +1,10 @@
 <?php
 @session_start();
 
+$PHP_DIR = realpath("php_scripts");
+
+require_once($PHP_DIR."/global.php");
+
 require_once('Zend/Amf/Server.php');
 $server = new Zend_Amf_Server();
 
@@ -14,6 +18,9 @@ $server->setClass('Admin');
 
 require_once('Student.php');
 $server->setClass('Student');
+
+require_once('Employee.php');
+$server->setClass('Employee');
 
 echo($server->handle());
 ?>

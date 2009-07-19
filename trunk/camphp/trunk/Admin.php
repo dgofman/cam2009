@@ -1,9 +1,5 @@
 <?php
 
-$PHP_DIR = realpath("php_scripts");
-
-require_once($PHP_DIR."/global.php");
-
 class Admin {
 
 	function Admin(){
