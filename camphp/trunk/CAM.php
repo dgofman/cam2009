@@ -1,9 +1,5 @@
 <?php
 
-$PHP_DIR = realpath("php_scripts");
-
-require_once($PHP_DIR."/global.php");
-
 class CAM {
 	
 	var $LOGIN_TIMEOUT = 5;
@@ -12,16 +8,16 @@ class CAM {
 		$this->VALIDATE="SELECT loginDate FROM login WHERE username='%s' AND MINUTE(TIMEDIFF(loginDate, NOW())) < %d AND success=0 LIMIT 0, 3";
 		$this->ACCESS="INSERT INTO login (username, success) VALUE ('%s', %d)";
 		$this->CLEAN="DELETE FROM login WHERE username='%s'";
-		$this->LOGIN="SELECT A.first, A.localeName, A.personId, A.typeOf, B.userId, B.status, B.privileges FROM person A, user B WHERE A.userId=B.userId AND username='%s' AND password=PASSWORD('%s')";
-		$this->PERSONS="SELECT personId, userId, last, first FROM person WHERE typeOf %s ORDER BY last";
-		$this->PERSON="SELECT personId, userId, accountId, first, last, sex, dateOfBirth, localeName, typeOf, notes FROM person WHERE personId='%s'";
-		$this->USER="SELECT username, privileges, status, notes FROM user WHERE userId='%s'";
+		$this->LOGIN="SELECT A.userId, A.status, A.privileges, A.admin, B.first, B.localeName, B.personId, C.studentId, D.employeeId FROM user A, person B LEFT JOIN student C ON (B.personId=C.personId) LEFT JOIN employee D ON (B.personId=D.personId) WHERE A.personId=B.personId AND A.username='%s' AND A.password=PASSWORD('%s')";
+		$this->PERSONS="SELECT A.userId, B.personId, B.first, B.last FROM user A RIGHT JOIN person B ON (A.personId=B.personId) ORDER BY B.last";
+		$this->PERSON="SELECT A.userId, B.personId, B.first, B.last, B.sex, B.dateOfBirth, B.localeName, B.notes FROM user A RIGHT JOIN person B ON (A.personId=B.personId) WHERE B.personId=%s";
+		$this->USER="SELECT username, admin, privileges, status, notes FROM user WHERE userId=%s";
 		$this->LOCALE="SELECT localeName, language FROM locale ORDER BY language";
 		
-		$this->CREATE_USER="INSERT INTO user (personId, username, password, privileges, status, notes) VALUES ('%s', '%s', PASSWORD('%s'), '%s', '%s', '%s')";
-		$this->UPDATE_USER="UPDATE user SET	username='%s', privileges='%s', status='%s', notes='%s' WHERE userId='%s'";
-		$this->CREATE_PERSON="INSERT INTO person (userId, first, last, sex, dateOfBirth, localeName, typeOf, notes) VALUES (%s, '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
-		$this->UPDATE_PERSON="UPDATE person SET userId=%s, first='%s', last='%s', sex='%s', dateOfBirth='%s', localeName='%s', typeOf='%s', notes='%s' WHERE personId='%s'";
+		$this->CREATE_USER="INSERT INTO user (personId, username, password, privileges, status, notes) VALUES (%s, '%s', PASSWORD('%s'), '%s', '%s', '%s')";
+		$this->UPDATE_USER="UPDATE user SET	username='%s', privileges='%s', status='%s', notes='%s' WHERE userId=%s";
+		$this->CREATE_PERSON="INSERT INTO person (first, last, sex, dateOfBirth, localeName, notes) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')";
+		$this->UPDATE_PERSON="UPDATE person SET first='%s', last='%s', sex='%s', dateOfBirth='%s', localeName='%s', notes='%s' WHERE personId=%s";
 	}
 	
 	public function getSessionId($destory=false){
@@ -84,13 +80,9 @@ class CAM {
 		return (count($result) == 0 ? NULL : $result[0]);
 	}
 	
-	public function persons($typeOf){
+	public function persons(){
 		$mysql = MYSQL::getInstance();
-		if(!isset($typeOf) || $typeOf == NULL){
-			$sql = escape($this->PERSONS, "IS NOT NULL");
-		}else{
-			$sql = escape($this->PERSONS, "='$typeOf'");
-		}
+		$sql = escape($this->PERSONS);
 		$rs = $mysql->query($sql);
 		return $mysql->result($rs);
 	}
@@ -119,13 +111,13 @@ class CAM {
 	}
 	
 	public function updateRecord($userId, $personId, $first, $last, $dateOfBirth, $localeName,
-								 $sex, $typeOf, $pnotes, $username, $password, $privileges, 
+								 $sex, $pnotes, $username, $password, $privileges, 
 								 $status, $unotes, $updatePwd){
-									
+												   
 		$mysql = MYSQL::getInstance();
 		
 		if(isset($userId)){
-			$sql = escape($this->UPDATE_USER, $username, $updatePwd == TRUE ? "password=PASSWORD('$password')," : "", $privileges, $status, $unotes, $userId);
+			$sql = escape($this->UPDATE_USER, $username + ($updatePwd == TRUE ? ", password=PASSWORD('$password')" : ""), $privileges, $status, $unotes, $userId);
 			$rs = $mysql->query($sql, FALSE);
 			if(!rs){
 				error("cannot_update_user");
@@ -145,7 +137,7 @@ class CAM {
 			$userId = "NULL";
 		
 		if(isset($personId)){
-			$sql = escape($this->UPDATE_PERSON, $userId, $first, $last, $sex, $dateOfBirth, $localeName, $typeOf, $pnotes, $personId);
+			$sql = escape($this->UPDATE_PERSON, $first, $last, $sex, $dateOfBirth, $localeName, $pnotes, $personId);
 			$rs = $mysql->query($sql, FALSE);
 			if(!rs){
 				$mysql->rollback();
@@ -153,7 +145,7 @@ class CAM {
 				return;
 			}
 		}else{
-			$sql = escape($this->CREATE_PERSON, $userId, $first, $last, $sex, $dateOfBirth, $localeName, $typeOf, $pnotes);
+			$sql = escape($this->CREATE_PERSON, $first, $last, $sex, $dateOfBirth, $localeName, $pnotes);
 			$rs = $mysql->query($sql, FALSE);
 			if(!$rs){
 				$mysql->rollback();
