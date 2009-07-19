@@ -10,9 +10,7 @@
 			import mx.events.CollectionEvent;
 			import com.academy.calder.vo.UserVO;
 			import com.academy.calder.vo.PersonVO;
-			import com.academy.calder.vo.UserItem;
 			import com.academy.calder.enum.Gender;
-			import com.academy.calder.enum.UserTypes;
 			import com.academy.calder.enum.PrivilegeEnum;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
@@ -40,7 +38,11 @@
 			private var _personTypes:Array;
 			
 			private function onComplete():void{
-				_personTypes = [{label:Manager.bundle.getMessage('all')}].concat(UserTypes.list);
+				_personTypes = [
+					{label:Manager.bundle.getMessage('all'), data:'all'},
+					{label:Manager.bundle.getMessage('student'), data:'student'},
+					{label:Manager.bundle.getMessage('employee'), data:'employee'}
+				];
 			}
 			
 			private function onItemClick(event:ListEvent):void{
@@ -53,8 +55,14 @@
 			
 			public function onRefresh():void{
 				clean();
-				AMFService.send('CAM.persons', [userType && userType.selectedItem ? 
-											  userType.selectedItem.value : null], onPersonsResult, onFault);
+				var item:String = ((userType && userType.selectedItem) ? userType.selectedItem.data : "all");
+				if(item == "student"){
+					AMFService.send('Student.students', null, onPersonsResult, onFault);
+				}else if(item == "employee"){
+					AMFService.send('Employee.employees', null, onPersonsResult, onFault);
+				}else{
+					AMFService.send('CAM.persons', null, onPersonsResult, onFault);
+				}
 			}
 			
 			private function onSubmit():void{
@@ -84,7 +92,6 @@
 												   dob.text,
 												   lang.selectedItem.localeName,
 												   sex.selectedItem.value,
-												   typeOf.selectedItem.value,
 												   pnotes.text,
 												   _user.username,
 												   _user.password,
@@ -212,7 +219,6 @@
 	</mx:VBox>
 	<mx:TabNavigator id="tabNav" width="100%" height="100%">
 		<mx:VBox width="100%" height="100%" label="Person" id="personForm">
-			<mx:Label width="100%" textAlign="right" paddingRight="25" text="{_person.accountId}"/>
 			<mx:Form width="100%" height="100%" enabled="{_editrecord || _newrecord}">
 				<mx:FormItem label="{Manager.bundle.getMessage('first')}:">
 					<mx:TextInput width="{FIELD_WIDTH}" text="{_person.first}" id="first"/>
@@ -225,9 +231,6 @@
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('sex')}:">
 					<mx:ComboBox dataProvider="{Gender.list}" width="{FIELD_WIDTH}" selectedItem="{_person.sex}" id="sex"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('userType')}:">
-					<mx:ComboBox dataProvider="{UserTypes.list}" width="{FIELD_WIDTH}" selectedItem="{_person.typeOf}" id="typeOf"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('language')}:">
 					<mx:ComboBox dataProvider="{_languages}" width="{FIELD_WIDTH}" selectedIndex="{_localeIndex}" labelField="language" id="lang"/>

@@ -11,6 +11,7 @@ package com.academy.calder.vo
 		public function UserVO(result:Object=null){
 			if(result != null){
 				userId = result.userId;
+				admin = result.admin;
 				username = result.username;
 				privileges = PrivilegeEnum.valueOf(result.privileges);
 				status = AccountStatus.valueOf(result.status);
@@ -20,6 +21,7 @@ package com.academy.calder.vo
 		}
 		
 		public var userId:String;
+		public var admin:Boolean;
 		public var username:String;
 		public var password:String;
 		public var privileges:PrivilegeEnum = PrivilegeEnum.R;
@@ -35,16 +37,16 @@ package com.academy.calder.vo
 			_personRef = value;
 		}
 		
-		[Bindable("attributesChange")]
+		/*[Bindable("attributesChange")]
 		public function get attributes():Array{
 			return [
-				new UserItem({label:'userId', value:userId}),
-				new UserItem({label:'username', value:username}),
-				new UserItem({label:'password', value:password}),
-				new UserItem({label:'privileges', value:privileges}),
-				new UserItem({label:'userStatus', value:status}),
-				new UserItem({label:'notes', value:notes})
+				new UserItem('userId', userId),
+				new UserItem('username', username),
+				new UserItem('password', password),
+				new UserItem('privileges', privileges),
+				new UserItem('userStatus', status),
+				new UserItem('notes', notes)
 					];
-		}
+		}*/
 	}
 }

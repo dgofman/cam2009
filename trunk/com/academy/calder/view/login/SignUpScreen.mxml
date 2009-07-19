@@ -5,7 +5,6 @@
 		
 	<mx:Script>
 	<![CDATA[
-		import com.academy.calder.enum.UserTypes;
 		import com.academy.calder.business.Manager;
 		import com.academy.calder.business.AMFService;	
 		

@@ -7,7 +7,6 @@
 	<![CDATA[
 		import com.academy.calder.vo.UserVO;
 		import com.academy.calder.vo.PersonVO;
-		import com.academy.calder.enum.UserTypes;
 		import com.academy.calder.enum.AccountStatus;
 		import com.academy.calder.business.AMFService;
 		import com.academy.calder.business.Manager;
@@ -51,6 +50,7 @@
 		
 		private function onLoginResult(result:Object):void{
 			var user:UserVO = new UserVO(result);
+			user.username = username.text;
 			user.personRef = new PersonVO(result);
 			Manager.instance.currentUser = user;
 			if(Manager.instance.currentUser.status != AccountStatus.Active){
@@ -61,20 +61,15 @@
 
 			ExternalInterface.call("setCookie", MainViewHelper.SESSION_ID,
 												Manager.instance.cookieParams[MainViewHelper.SESSION_ID]);
-												
-			switch(Manager.instance.currentUser.personRef.typeOf){
-				case UserTypes.Admin:
-					mainHelper.changeView(MainViewHelper.ADMIN);
-					break;
-				case UserTypes.Other:
-					mainHelper.changeView(MainViewHelper.OTHER);
-					break;
-				case UserTypes.Employee:
-					mainHelper.changeView(MainViewHelper.TEACHER);
-					break;
-				case UserTypes.Student:
-					mainHelper.changeView(MainViewHelper.STUDENT);
-					break;
+										
+			if(user.admin == true){
+				mainHelper.changeView(MainViewHelper.ADMIN);
+			}else if(result.employeeId != null){
+				mainHelper.changeView(MainViewHelper.TEACHER);
+			}else if(result.studentId != null){
+				mainHelper.changeView(MainViewHelper.STUDENT);
+			}else{
+				mainHelper.changeView(MainViewHelper.OTHER);
 			}
 		}
 	]]>
