@@ -3,7 +3,7 @@
 				xmlns:home="com.academy.calder.view.admin.home.*"
 				xmlns:links="com.academy.calder.view.admin.links.*"
 				width="100%" height="100%" horizontalGap="6" activate="onRefresh()"
-				implements="com.academy.calder.view.admin.IMessageAction">
+				implements="com.academy.calder.view.admin.links.IMessageAction">
 	<mx:Script>
 		<![CDATA[
 			import mx.events.FlexEvent;
