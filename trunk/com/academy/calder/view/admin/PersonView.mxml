@@ -65,6 +65,18 @@
 				}
 			}
 			
+			private function onSearch():void{
+				clean();
+				var item:String = ((userType && userType.selectedItem) ? userType.selectedItem.data : "all");
+				if(item == "student"){
+					AMFService.send('Student.searchStudents', [keyword.text], onPersonsResult, onFault);
+				}else if(item == "employee"){
+					AMFService.send('Employee.searchEmployees', [keyword.text], onPersonsResult, onFault);
+				}else{
+					AMFService.send('CAM.searchPersons', [keyword.text], onPersonsResult, onFault);
+				}
+			}
+			
 			private function onSubmit():void{
 				if(username && username.text.length > 0){
 					if(password.text.length < 6){
@@ -207,6 +219,11 @@
 	</mx:Script>
 
 	<mx:VBox width="400" height="100%" enabled="{_newrecord == false &amp;&amp; _editrecord == false}">
+		<mx:HBox width="100%" label="Search" backgroundColor="#cccccc"
+				paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10">
+			<mx:TextInput id="keyword" width="100%" enter="onSearch()"/>
+			<mx:Button label="{Manager.bundle.getMessage('search')}" click="onSearch()"/>
+		</mx:HBox>
 		<mx:DataGrid id="dataGrid" width="100%" height="100%" itemClick="onItemClick(event)">
 			<mx:columns>
 				<mx:Array>
