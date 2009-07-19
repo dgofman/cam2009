@@ -10,6 +10,7 @@
 		import mx.events.ItemClickEvent;
 		import com.academy.calder.business.Manager;
 		import com.academy.calder.helper.AdminViewHelper;
+		import com.academy.calder.view.admin.links.IMessageAction;
 		
 		[Embed('/resources/images/btn_arrow.png')]
 		private static const BUTTON_ARROW:Class;

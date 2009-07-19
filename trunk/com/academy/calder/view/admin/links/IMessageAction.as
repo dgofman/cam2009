@@ -1,4 +1,4 @@
-package com.academy.calder.view.admin{
+package com.academy.calder.view.admin.links{
 	
 	public interface IMessageAction{
 		function onEdit():void;
