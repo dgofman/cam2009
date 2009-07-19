@@ -1,192 +1,245 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
 				xmlns:home="com.academy.calder.view.admin.home.*"
-				xmlns:links="com.academy.calder.view.admin.links.*"
-				width="100%" height="100%" horizontalGap="6" >
-				
+				xmlns:buttons="com.academy.calder.component.buttons.*"
+				xmlns:links="com.academy.calder.view.admin.links.*" styleName="innerView"
+				width="100%" height="100%" horizontalGap="6" activate="onRefresh()">
 	<mx:Script>
 		<![CDATA[
-			import mx.events.FlexEvent;
 			import mx.events.ListEvent;
 			import mx.events.CollectionEvent;
+			import com.academy.calder.vo.UserVO;
 			import com.academy.calder.vo.PersonVO;
-			import com.academy.calder.vo.MessageVO;
+			import com.academy.calder.enum.Gender;
+			import com.academy.calder.enum.PrivilegeEnum;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
-
+			import com.academy.calder.enum.AccountStatus;
+			import com.academy.calder.enum.MessageStatusEnum;
+			
+			private static const FIELD_WIDTH:uint = 200;
+			private static const DEFAULT_LOCALE:String = "en_US";
+			
 			[Bindable]
-			private var _details:MessageVO;
+			private var _person:PersonVO;
 			[Bindable]
-			private var _reporter:PersonVO;
+			private var _user:UserVO;
+			[Bindable]
+			private var _localeIndex:uint;
+			[Bindable]
+			private var _languages:Array;
 			
-			private var _cachedUsers:Object = {};
-
-		/*	public function onRefresh():void{
-				_details = null;
-				_reporter = null;
-				AMFService.send('CAM.notice', null, onNoticeResult, onFault);
-			}*/
-
-		/*	public function onDelete():void{
-				_details = null;
-				_reporter = null;
-				if(dataGrid.dataProvider != null){
-					var ids:Array = [];
-					for(var i:uint = 0; i < dataGrid.dataProvider.length; i++){
-						var data:Object = dataGrid.dataProvider[i];
-						if(data.flag == true)
-							ids.push(data.messageId);
-					}
-					if(ids.length)
-						AMFService.send('CAM.deleteMessage', ids, onMessageDeleteResult, onFault);
-				}
-			}	*/
-			
-	/*		public function onCreate():void{
-				createViewStack.selectedIndex = 1;
-			}*/
-			
-	/*		private function onSubmit():void{
-				AMFService.send('CAM.createMessage', ['notice', create.priority.selectedItem.value, create.subject.text, create.body.text], onCreateMessageResult, onFault);
-			}*/
-			
-	/*		private function onCancel():void{
-				createViewStack.selectedIndex = 0;
-			}*/
-			
-	/*		private function onCreateMessageResult(result:Object):void{
-				if(result != null){
-					if(dataGrid.dataProvider == null){
-						dataGrid.dataProvider = [result];
-					}else{
-						dataGrid.dataProvider.addItemAt(result, 0);
-					}
-					create.record = {};
-					createViewStack.selectedIndex = 0;
-				}
-			}*/
-			
-		/*	private function getNoticeDetails():void{
-				var data:Object = dataGrid.selectedItem;
-				if(data != null)
-					AMFService.send('CAM.messageBody', [data.messageId], onMessageBodyResult, onFault);
-			}	*/
-
-		/*	private function onMessageDeleteResult(result:Object):void{
-				if(result && result is Array){
-					for(var i:Number = dataGrid.dataProvider.length - 1; i >= 0; i--){
-						var data:Object = dataGrid.dataProvider[i];
-						if(result.indexOf(data.messageId) != -1)
-							dataGrid.dataProvider.removeItemAt(i);
-					}
-				}
-			}	*/
-			
-		/*	private function getReporter():void{
-				var data:Object = dataGrid.selectedItem;
-				if(data != null){
-					_reporter = _cachedUsers[data.userId];
-					if(_reporter == null)
-						AMFService.send('CAM.reporter', [data.userId], onReporterResult, onFault);
-				}
-			}	*/
+			[Bindable]
+			private var _newrecord:Boolean = false;
+			[Bindable]
+			private var _editrecord:Boolean = false;
 			
 			private function onItemClick(event:ListEvent):void{
-				if(event.columnIndex != 0) {//Checkbox
-					createViewStack.selectedIndex = 0;
-					tabNav.selectedChild.dispatchEvent(new FlexEvent(FlexEvent.SHOW));
+				if(dataGrid.selectedItem.cached == true){
+					onPersonResult(dataGrid.selectedItem);
+				}else{
+					AMFService.send('CAM.person', [dataGrid.selectedItem.personId], onPersonResult, onFault);
 				}
 			}
 			
-	/*		private function onReporterResult(result:Object):void{
-				_reporter = new UserVO(result);
-				_cachedUsers[_reporter.userId] = _reporter; 
-			}	*/
-			
-			
-			public function onShow():void{
-				_details = null;
-				_reporter = null;
-				AMFService.send('CAM.showStudents', null, onShowResult, onFault);
+			public function onRefresh():void{
+				clean();
+				AMFService.send('Student.students', null, onPersonsResult, onFault);
 			}
 			
+			private function onSubmit():void{
+				AMFService.send('CAM.updateRecord', [_person.userId,
+												   _person.personId,
+												   first.text,
+												   last.text,
+												   dob.text,
+												   lang.selectedItem.localeName,
+												   sex.selectedItem.value,
+												   pnotes.text,
+												   _user.username,
+												   _user.password,
+												   _user.privileges.value,
+												   _user.status.value,
+												   _user.notes,
+												   (updatePwd ? updatePwd.selected : false)], onSubmitDataResult, onFault);
+			}
 			
+			private function onEdit():void{
+				_editrecord = true;
+			}
 			
-			private function onShowResult(result:Object):void{
+			private function onNew():void{
+				_person = new PersonVO()
+				_user = new UserVO();
+				_newrecord = true;
+				findLocaleIndex();
+				if(dataGrid) dataGrid.selectedIndex = -1;
+			}
+			
+			private function clean():void{
+				_newrecord = false;
+				_editrecord = false;
+				_person = null;
+				_user = null;
+				findLocaleIndex();
+				if(dataGrid) dataGrid.selectedIndex = -1;
+				if(tabNav) tabNav.selectedIndex = 0;
+			}
+
+			private function onPersonsResult(result:Object):void{
 				dataGrid.dataProvider = result;
+				tabNav.selectedIndex = 0;
 			}
 			
-	/*		private function onMessageBodyResult(result:Object):void{
-				_details = new MessageVO();
-				if(dataGrid.selectedIndex != -1){
-					_details.body = result as String;
-					_details.subject = dataGrid.selectedItem.subject;
-					_details.createdTime = dataGrid.selectedItem.createdTime;
-					dataGrid.selectedItem.status = MessageStatusEnum.Read.value;
-					dataGrid.dataProvider.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
+			private function onPersonResult(result:Object):void{
+				_person = new PersonVO(result);
+				result.cached = true;
+				dataGrid.dataProvider.setItemAt(result, dataGrid.selectedIndex);
+				tabNav.selectedIndex = 0;
+				findLocaleIndex();
+
+				if(_person.userId == Manager.instance.currentUser.userId)
+					Manager.instance.currentUser.personRef = _person;
+		
+				//update user data
+				if(_person.userId != null && _person.userId.length){
+					if(dataGrid.selectedItem.user is UserVO)
+						_user = dataGrid.selectedItem.user;
+					else
+						AMFService.send('CAM.user', [_person.userId], onUserResult, onFault);
+				}else{
+					_user = new UserVO();
 				}
-			}	*/
+			}
+			
+			private function onUserResult(result:Object):void{
+				_user = new UserVO(result);
+				dataGrid.selectedItem.user = _user;
+			}
+
+			private function onSubmitDataResult(result:Object):void{
+				if(result != null){
+					_person = new PersonVO(result);
+					result.user = _user;
+					result.cached = true;
+
+					if(dataGrid.selectedIndex != -1){
+						dataGrid.dataProvider.setItemAt(result, dataGrid.selectedIndex);
+					}else{
+						dataGrid.dataProvider.addItemAt(result, 0);
+						dataGrid.selectedIndex = 0;
+					}
+					
+					_newrecord = false;
+					_editrecord = false;
+					findLocaleIndex();
+					tabNav.selectedIndex = 0;
+				}
+			}
+			
+			private function onLocaleResult(result:Object):void{
+				_languages = result as Array;
+				findLocaleIndex();
+			}
+			
+			private function findLocaleIndex():void{
+				if(_languages == null){
+					AMFService.send('CAM.locale', null, onLocaleResult);
+				}else{
+					var name:String = (_person && _person.localeName) ? _person.localeName : DEFAULT_LOCALE;
+					for(var i:uint = 0; i < _languages.length; i++){
+						if(_languages[i].localeName == name){
+							_localeIndex = i;
+							if(_person != null)
+								_person.language = _languages[i].language;
+							break;
+						}
+					}
+				}
+			}
 			
 			private function onFault(fault:Object):void{
-				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_notice'));
+				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_persons'));
 			}
 		]]>
 	</mx:Script>
-	
-	<mx:VBox height="100%" >
-		
-	<mx:FormItem label="Search">
-		<mx:TextInput id="search" width="242" />
-		<mx:Button id="show" label="Show All" click="onShow()"/>
-	</mx:FormItem>
-	
-	<mx:DataGrid id="dataGrid" width="300" height="100%" itemClick="onItemClick(event)">
-		<mx:columns>
-			<mx:Array>
-				<mx:DataGridColumn dataField="students" headerText="Students" />
-			</mx:Array>
-		 </mx:columns>
-	</mx:DataGrid>
+
+	<mx:VBox width="400" height="100%" enabled="{_newrecord == false &amp;&amp; _editrecord == false}" verticalGap="0">
+		<mx:HBox width="100%" label="Search" backgroundColor="#cccccc"
+				paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10">
+			<mx:TextInput id="search" width="100%" />
+			<mx:Button label="Search" click="onRefresh()"/>
+		</mx:HBox>
+		<mx:DataGrid id="dataGrid" width="100%" height="100%" itemClick="onItemClick(event)">
+			<mx:columns>
+				<mx:Array>
+					<mx:DataGridColumn dataField="last" headerText="Last"/>
+					<mx:DataGridColumn dataField="first" headerText="First"/>
+				</mx:Array>
+			 </mx:columns>
+		</mx:DataGrid>
 	</mx:VBox>
-	
-	<mx:ViewStack id="createViewStack" width="100%" height="100%">
-		<mx:TabNavigator id="tabNav" borderStyle="solid"
-			  paddingTop="5"
-			  paddingBottom="5"
-			  paddingLeft="5"
-			  paddingRight="5"
-			  height="100%"
-			  width="100%">
-			
-			<mx:VBox width="100%" height="100%" label="Message Body" >
-				<mx:HBox width="100%">
-					<mx:Label text="Subject:" fontWeight="bold"/>
-					<mx:Label text="{_details.subject}" width="100%"/>
-				</mx:HBox>
-				<mx:HBox width="100%">
-					<mx:Label text="Date:" fontWeight="bold"/>
-					<mx:Label text="{_details.createdTime}" width="100%"/>
-				</mx:HBox>
-				<mx:Text text="{_details.body}" width="100%" height="100%"/>
-			</mx:VBox>
-			<mx:Form width="100%" height="100%" label="Student Profile" >
-				<mx:FormItem label="First Name:">
-					<mx:Label text="{_reporter.first}"/>
+	<mx:TabNavigator id="tabNav" width="100%" height="100%">
+		<mx:VBox width="100%" height="100%" label="Person" id="personForm">
+			<mx:Form width="100%" height="100%" enabled="{_editrecord || _newrecord}">
+				<mx:FormItem label="{Manager.bundle.getMessage('first')}:">
+					<mx:TextInput width="{FIELD_WIDTH}" text="{_person.first}" id="first"/>
 				</mx:FormItem>
-				<mx:FormItem label="Last Name:">
-					<mx:Label text="{_reporter.last}"/>
+				<mx:FormItem label="{Manager.bundle.getMessage('last')}:">
+					<mx:TextInput width="{FIELD_WIDTH}" text="{_person.last}" id="last"/>
 				</mx:FormItem>
-				<mx:FormItem label="Sex:">
-					<mx:Label text="{_reporter.sex}"/>
+				<mx:FormItem label="{Manager.bundle.getMessage('dob')}:">
+					<mx:DateField width="{FIELD_WIDTH}" text="{_person.dateOfBirth == null ? '' : _person.dateOfBirth}" id="dob" formatString="YYYY-MM-DD"/>
 				</mx:FormItem>
-				<mx:FormItem label="Date Of Birth:">
-					<mx:Label text="{_reporter.dateOfBirth}"/>
+				<mx:FormItem label="{Manager.bundle.getMessage('sex')}:">
+					<mx:ComboBox dataProvider="{Gender.list}" width="{FIELD_WIDTH}" selectedItem="{_person.sex}" id="sex"/>
 				</mx:FormItem>
-				<mx:FormItem label="Notes:" width="100%" height="100%">
-					<mx:Text text="{_reporter.notes}" width="100%" height="100%"/>
+				<mx:FormItem label="{Manager.bundle.getMessage('language')}:">
+					<mx:ComboBox dataProvider="{_languages}" width="{FIELD_WIDTH}" selectedIndex="{_localeIndex}" labelField="language" id="lang"/>
+				</mx:FormItem>
+				<mx:FormItem label="{Manager.bundle.getMessage('notes')}:">
+					<mx:TextArea text="{_person.notes}" id="pnotes" width="{FIELD_WIDTH}" height="80"/>
 				</mx:FormItem>
 			</mx:Form>
-		</mx:TabNavigator>
-	
-	</mx:ViewStack> 
+			<mx:HBox paddingLeft="60" paddingBottom="5">
+				<buttons:CreateButton label="New..." click="onNew()" enabled="{_newrecord == false}"/>
+				<buttons:ModifyButton label="{Manager.bundle.getMessage('edit')}" 
+					enabled="{dataGrid.selectedIndex != -1 &amp;&amp; _newrecord == false &amp;&amp; _editrecord == false}" click="onEdit()"/>
+				<buttons:ModifyButton label="{Manager.bundle.getMessage('submit')}" enabled="{_editrecord || _newrecord}" click="onSubmit()"/>
+				<mx:Button label="Cancel" enabled="{_editrecord || _newrecord}" click="clean()" />
+			</mx:HBox>
+		</mx:VBox>
+		<mx:VBox width="100%" height="100%" label="User Access">
+			<mx:Form width="100%" height="100%" enabled="{_editrecord || _newrecord}">
+				<mx:FormItem label="{Manager.bundle.getMessage('username')}:">
+					<mx:TextInput width="{FIELD_WIDTH}" text="{_user.username}" id="username"/>
+				</mx:FormItem>
+				<mx:FormItem>
+					<mx:CheckBox id="updatePwd" label="{Manager.bundle.getMessage('updatePwd')}"
+						 selected="{_person.userId == null}" visible="{_person.userId != null &amp;&amp; Manager.instance.currentUser.privileges == PrivilegeEnum.CRUDO}"/>
+				</mx:FormItem>
+				<mx:FormItem label="{Manager.bundle.getMessage('password')}:" visible="{updatePwd.selected}" includeInLayout="{updatePwd.selected}">
+					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" text="{_user.password}" id="password"/>
+				</mx:FormItem>
+				<mx:FormItem label="{Manager.bundle.getMessage('confirm')}:" visible="{updatePwd.selected}" includeInLayout="{updatePwd.selected}">
+					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" text="{_user.password}" id="confirm"/>
+				</mx:FormItem>
+				<mx:FormItem label="{Manager.bundle.getMessage('privileges')}:">
+					<mx:ComboBox dataProvider="{PrivilegeEnum.list}" width="{FIELD_WIDTH}" selectedItem="{_user.privileges}" id="privileges"/>
+				</mx:FormItem>
+				<mx:FormItem label="{Manager.bundle.getMessage('userStatus')}:">
+					<mx:ComboBox dataProvider="{AccountStatus.list}" width="{FIELD_WIDTH}" enabled="{username.text.length > 0}"
+						selectedItem="{username.text.length == 0 ? AccountStatus.Inactive : _user.status}"
+						change="{_user.status = event.target.selectedItem as AccountStatus}" id="status"/>
+				</mx:FormItem>
+				<mx:FormItem label="{Manager.bundle.getMessage('notes')}:">
+					<mx:TextArea text="{_user.notes}" id="unotes" width="{FIELD_WIDTH}" height="80"/>
+				</mx:FormItem>
+			</mx:Form>
+			<mx:HBox paddingLeft="60" paddingBottom="5">	
+				<buttons:ModifyButton label="{Manager.bundle.getMessage('submit')}" enabled="{_editrecord || _newrecord}" click="onSubmit()"/>
+				<mx:Button label="Cancel" enabled="{_editrecord || _newrecord}" click="clean()"/>
+			</mx:HBox>
+		</mx:VBox>
+	</mx:TabNavigator>
 </mx:HDividedBox>

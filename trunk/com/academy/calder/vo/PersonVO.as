@@ -1,8 +1,6 @@
 package com.academy.calder.vo
 {
 	import com.academy.calder.enum.Gender;
-
-	import flash.events.Event;
 	
 	import mx.events.PropertyChangeEvent;
 	
@@ -23,7 +21,7 @@ package com.academy.calder.vo
 			dispatchEvent(new PropertyChangeEvent(PropertyChangeEvent.PROPERTY_CHANGE));
 		}
 		
-		public var userId:String;
+		public var userId:String;		
 		public var personId:String;
 		public var first:String;
 		public var last:String;
