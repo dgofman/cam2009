@@ -22,5 +22,8 @@ $server->setClass('Student');
 require_once('Employee.php');
 $server->setClass('Employee');
 
+require_once('Account.php');
+$server->setClass('Account');
+
 echo($server->handle());
 ?>
