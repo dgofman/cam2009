@@ -226,7 +226,7 @@
 					<mx:TextInput width="{FIELD_WIDTH}" text="{_person.last}" id="last"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('dob')}:">
-					<mx:DateField width="{FIELD_WIDTH}" text="{_person.dateOfBirth == null ? '' : _person.dateOfBirth}" id="dob" formatString="YYYY-MM-DD"/>
+					<mx:DateField width="{FIELD_WIDTH}" editable="true" text="{_person.dateOfBirth == null ? '' : _person.dateOfBirth}" id="dob" formatString="YYYY-MM-DD"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('sex')}:">
 					<mx:ComboBox dataProvider="{Gender.list}" width="{FIELD_WIDTH}" selectedItem="{_person.sex}" id="sex"/>
