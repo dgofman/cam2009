@@ -15,6 +15,7 @@ package com.academy.calder.helper
 		
 		public static const HOME:String    = "adminHome";
 		public static const PERSON:String  = "adminPerson";
+		public static const ACCOUNT:String = "adminAccount";
 		public static const STUDENT:String = "adminStudent";
 		public static const TEACHER:String = "adminTeacher";
 		
