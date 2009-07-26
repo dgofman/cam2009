@@ -25,6 +25,4 @@ package com.academy.calder.vo
 		public var updateBy:String;
 		public var notes:String;
 	}
-
-	}
 }
