@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" activate="onRefresh()">
+	<mx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+			import mx.events.ListEvent;
+			import com.academy.calder.vo.AccountVO;
+			import com.academy.calder.vo.AddressVO;
+			import com.academy.calder.vo.ContactVO;
+			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.AMFService;
+		
+			[Bindable]
+			private var _newrecord:Boolean = false;
+			[Bindable]
+			private var _editrecord:Boolean = false;
+			
+			[Bindable]
+			private var _account:AccountVO;
+			[Bindable]
+			private var _address:AddressVO;
+			[Bindable]
+			private var _contact:ContactVO;
+			
+			public function onRefresh():void{
+				clean();
+				AMFService.send('CAM.persons', null, onPersonsResult, onFault);
+			}
+			
+			private function onSearch():void{
+				clean();
+				AMFService.send('CAM.searchPersons', [keyword.text], onPersonsResult, onFault);
+			}
+			
+			private function onPersonsResult(result:Object):void{
+				personGrid.dataProvider = result;
+				lessonsTabs.selectedIndex = 0;
+			}
+			
+			private function onItemClick(event:ListEvent):void{
+				AMFService.send('Account.links', [personGrid.selectedItem.personId], onAccountLinkResult, onFault);
+			}
+			
+			private function onAccountLinkResult(result:Object):void{
+				linkGrid.dataProvider = result;
+				_account = null;
+				_address = null;
+				_contact = null;
+				if(result is Array && result.length > 0 && result[0].accountId != null)
+					AMFService.send('Account.selectedAccount', [result[0].accountId], onAccountResult, onFault);					
+			}
+			
+			private function onAccountResult(result:Object):void{
+				_account = new AccountVO(result);
+				_address = new AddressVO(result);
+				_contact = new ContactVO(result);
+				if(result != null){
+					_address.addressId = _account.selectedBillingAddressId;
+					_contact.contactId = _account.selectedBillingEmailContactId;
+				}
+			}
+			
+			private function clean():void{
+				_account = null;
+				_address = null;
+				_contact = null;
+				if(personGrid)personGrid.selectedIndex = -1;
+				if(linkGrid)linkGrid.dataProvider = null;
+			}
+			
+			private function openMail(mail:String):void{
+                navigateToURL(new URLRequest('mailto:' + mail), "_top"); 
+			}
+			
+			private function onFault(fault:Object):void{
+				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_persons'));
+			}
+		]]>
+	</mx:Script>
+
+	<mx:VBox width="300" height="100%" enabled="{_newrecord == false &amp;&amp; _editrecord == false}">
+		<mx:HBox width="100%" label="Search" backgroundColor="#cccccc"
+				paddingTop="10" paddingLeft="10" paddingRight="10" paddingBottom="10">
+			<mx:TextInput id="keyword" width="100%" enter="onSearch()"/>
+			<mx:Button label="{Manager.bundle.getMessage('search')}" click="onSearch()"/>
+		</mx:HBox>
+		<mx:DataGrid id="personGrid" width="100%" height="100%" itemClick="onItemClick(event)">
+			<mx:columns>
+				<mx:Array>
+					<mx:DataGridColumn dataField="last" headerText="Last"/>
+					<mx:DataGridColumn dataField="first" headerText="First"/>
+				</mx:Array>
+			 </mx:columns>
+		</mx:DataGrid>
+	</mx:VBox>
+	<mx:VDividedBox width="100%" height="100%">
+		<mx:HBox width="100%" height="50%">
+			<mx:DataGrid id="linkGrid" width="400" height="100%" itemClick="onItemClick(event)">
+				<mx:columns>
+					<mx:Array>
+						<mx:DataGridColumn dataField="last" headerText="Last"/>
+						<mx:DataGridColumn dataField="first" headerText="First"/>
+						<mx:DataGridColumn dataField="relation" headerText="Relation" width="80"/>
+					</mx:Array>
+				 </mx:columns>
+			</mx:DataGrid>
+			<mx:VBox width="100%" height="100%">
+				<mx:HBox width="100%" horizontalAlign="right">		
+					<mx:Label text="{Manager.bundle.getMessage('Balance')}"/>
+					<mx:Label text="{_account.currentBalance}"/>
+				</mx:HBox>
+				<mx:HBox width="100%" horizontalAlign="right">		
+					<mx:Label text="{Manager.bundle.getMessage('Last Payment')}"/>
+					<mx:Label text="{_account.lastPaymentDate}"/>
+				</mx:HBox>
+				<mx:Form>
+					<mx:FormItem label="{Manager.bundle.getMessage('Email:')}">
+						<mx:Label click="openMail(_contact.entry)" 
+								htmlText="&lt;a href='#'&gt;{_contact.entry}&lt;a/&gt;"
+								color="blue" textDecoration="underline"/>
+					</mx:FormItem>
+					<mx:FormItem label="{Manager.bundle.getMessage('Address:')}">
+						<mx:VBox verticalGap="0">
+							<mx:Label text="{_address.address1}"/>
+							<mx:Label text="{_address.city}"/>
+							<mx:Label text="{_address.stateProvince}, {_address.postalCode}"/>
+						</mx:VBox>
+					</mx:FormItem>
+				</mx:Form>
+				<mx:List width="100%" height="50%" dataProvider="[1,2,3,4,5,6,7]"/>
+			</mx:VBox>
+		</mx:HBox>
+		<mx:HBox width="100%" height="50%">
+			<mx:TabNavigator id="lessonsTabs" width="80%" height="100%">
+				<mx:VBox label="Piano" width="100%" height="100%">
+					
+				</mx:VBox>
+			</mx:TabNavigator>
+			<mx:VBox width="20%" height="100%">
+				<mx:Label text="{Manager.bundle.getMessage('Payments')}"/>
+				<mx:List width="100%" height="100%"/>
+			</mx:VBox>
+		</mx:HBox>
+	</mx:VDividedBox>
+</mx:HDividedBox>

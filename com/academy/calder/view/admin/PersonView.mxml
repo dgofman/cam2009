@@ -18,17 +18,12 @@
 			import com.academy.calder.enum.MessageStatusEnum;
 			
 			private static const FIELD_WIDTH:uint = 200;
-			private static const DEFAULT_LOCALE:String = "en_US";
-			
+
 			[Bindable]
 			private var _person:PersonVO;
 			[Bindable]
 			private var _user:UserVO;
-			[Bindable]
-			private var _localeIndex:uint;
-			[Bindable]
-			private var _languages:Array;
-			
+
 			[Bindable]
 			private var _newrecord:Boolean = false;
 			[Bindable]
@@ -36,6 +31,9 @@
 			
 			[Bindable]
 			private var _personTypes:Array;
+			
+			[Bindable]
+			private var _manager:Manager = Manager.instance;
 			
 			private function onComplete():void{
 				_personTypes = [
@@ -126,7 +124,7 @@
 				_person = new PersonVO()
 				_user = new UserVO();
 				_newrecord = true;
-				findLocaleIndex();
+				Manager.findLocaleIndex(_person);
 				if(dataGrid) dataGrid.selectedIndex = -1;
 			}
 			
@@ -135,7 +133,7 @@
 				_editrecord = false;
 				_person = null;
 				_user = null;
-				findLocaleIndex();
+				Manager.findLocaleIndex(_person);
 				if(dataGrid) dataGrid.selectedIndex = -1;
 				if(tabNav) tabNav.selectedIndex = 0;
 			}
@@ -150,7 +148,7 @@
 				result.cached = true;
 				dataGrid.dataProvider.setItemAt(result, dataGrid.selectedIndex);
 				tabNav.selectedIndex = 0;
-				findLocaleIndex();
+				Manager.findLocaleIndex(_person);
 
 				if(_person.userId == Manager.instance.currentUser.userId)
 					Manager.instance.currentUser.personRef = _person;
@@ -186,29 +184,8 @@
 					
 					_newrecord = false;
 					_editrecord = false;
-					findLocaleIndex();
+					Manager.findLocaleIndex(_person);
 					tabNav.selectedIndex = 0;
-				}
-			}
-			
-			private function onLocaleResult(result:Object):void{
-				_languages = result as Array;
-				findLocaleIndex();
-			}
-			
-			private function findLocaleIndex():void{
-				if(_languages == null){
-					AMFService.send('CAM.locale', null, onLocaleResult);
-				}else{
-					var name:String = (_person && _person.localeName) ? _person.localeName : DEFAULT_LOCALE;
-					for(var i:uint = 0; i < _languages.length; i++){
-						if(_languages[i].localeName == name){
-							_localeIndex = i;
-							if(_person != null)
-								_person.language = _languages[i].language;
-							break;
-						}
-					}
 				}
 			}
 			
@@ -255,7 +232,7 @@
 					<mx:ComboBox dataProvider="{Gender.list}" width="{FIELD_WIDTH}" selectedItem="{_person.sex}" id="sex"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('language')}:">
-					<mx:ComboBox dataProvider="{_languages}" width="{FIELD_WIDTH}" selectedIndex="{_localeIndex}" labelField="language" id="lang"/>
+					<mx:ComboBox dataProvider="{_manager.languages}" width="{FIELD_WIDTH}" selectedIndex="{_manager.localeIndex}" labelField="language" id="lang"/>
 				</mx:FormItem>
 				<mx:FormItem label="{Manager.bundle.getMessage('notes')}:">
 					<mx:TextArea text="{_person.notes}" id="pnotes" width="{FIELD_WIDTH}" height="80"/>
