@@ -22,6 +22,18 @@
 			[Bindable]
 			private var _contact:ContactVO;
 			
+			//http://www.freeiconsweb.com/gif_icons.htm
+			[Bindable]
+            [Embed(source="/resources/images/email.gif")] private var email:Class;
+            [Bindable]
+            [Embed(source="/resources/images/cell.gif")]  private var cell:Class;
+            [Bindable]
+            [Embed(source="/resources/images/phone.gif")] private var phone:Class;
+			[Bindable]
+            [Embed(source="/resources/images/pager.gif")] private var pager:Class;
+            [Bindable]
+            [Embed(source="/resources/images/fax.gif")]   private var fax:Class;
+            
 			public function onRefresh():void{
 				clean();
 				AMFService.send('CAM.persons', null, onPersonsResult, onFault);
@@ -38,7 +50,14 @@
 			}
 			
 			private function onItemClick(event:ListEvent):void{
-				AMFService.send('Account.links', [personGrid.selectedItem.personId], onAccountLinkResult, onFault);
+				var personId:String = personGrid.selectedItem.personId;
+				AMFService.send('Account.links', [personId], onAccountLinkResult, onFault);
+			}
+			
+			private function onLinksItemClick(event:ListEvent):void{
+				var personId:String = linkGrid.selectedItem.personId;
+				AMFService.send('Account.contact', [personId], onContactResult, onFault);
+				AMFService.send('Account.address', [personId], onAddressResult, onFault);
 			}
 			
 			private function onAccountLinkResult(result:Object):void{
@@ -46,6 +65,8 @@
 				_account = null;
 				_address = null;
 				_contact = null;
+				contactGrid.dataProvider = null;
+				addressGrid.dataProvider = null;
 				if(result is Array && result.length > 0 && result[0].accountId != null)
 					AMFService.send('Account.selectedAccount', [result[0].accountId], onAccountResult, onFault);					
 			}
@@ -60,13 +81,27 @@
 				}
 			}
 			
+			private function onContactResult(result:Object):void{
+				contactGrid.dataProvider = result;
+			}
+			
+			private function onAddressResult(result:Object):void{
+				addressGrid.dataProvider = result;
+			}
+			
 			private function clean():void{
 				_account = null;
 				_address = null;
 				_contact = null;
 				if(personGrid)personGrid.selectedIndex = -1;
 				if(linkGrid)linkGrid.dataProvider = null;
+				if(contactGrid)contactGrid.dataProvider = null;
+				if(addressGrid)addressGrid.dataProvider = null;
 			}
+			
+			public function contactType(item:Object):Class{
+                return this[item];
+            }
 			
 			private function openMail(mail:String):void{
                 navigateToURL(new URLRequest('mailto:' + mail), "_top"); 
@@ -95,7 +130,7 @@
 	</mx:VBox>
 	<mx:VDividedBox width="100%" height="100%">
 		<mx:HBox width="100%" height="50%">
-			<mx:DataGrid id="linkGrid" width="400" height="100%" itemClick="onItemClick(event)">
+			<mx:DataGrid id="linkGrid" width="350" height="100%" itemClick="onLinksItemClick(event)">
 				<mx:columns>
 					<mx:Array>
 						<mx:DataGridColumn dataField="last" headerText="Last"/>
@@ -104,16 +139,16 @@
 					</mx:Array>
 				 </mx:columns>
 			</mx:DataGrid>
-			<mx:VBox width="100%" height="100%">
+			<mx:VBox width="100%" height="100%" verticalGap="0">
 				<mx:HBox width="100%" horizontalAlign="right">		
-					<mx:Label text="{Manager.bundle.getMessage('Balance')}"/>
+					<mx:Label text="{Manager.bundle.getMessage('Balance')}:" fontWeight="bold"/>
 					<mx:Label text="{_account.currentBalance}"/>
 				</mx:HBox>
 				<mx:HBox width="100%" horizontalAlign="right">		
-					<mx:Label text="{Manager.bundle.getMessage('Last Payment')}"/>
+					<mx:Label text="{Manager.bundle.getMessage('Last Payment')}:" fontWeight="bold"/>
 					<mx:Label text="{_account.lastPaymentDate}"/>
 				</mx:HBox>
-				<mx:Form>
+				<mx:Form width="100%" backgroundColor="#f0f0f0" paddingTop="0" paddingBottom="0">
 					<mx:FormItem label="{Manager.bundle.getMessage('Email:')}">
 						<mx:Label click="openMail(_contact.entry)" 
 								htmlText="&lt;a href='#'&gt;{_contact.entry}&lt;a/&gt;"
@@ -127,7 +162,31 @@
 						</mx:VBox>
 					</mx:FormItem>
 				</mx:Form>
-				<mx:List width="100%" height="50%" dataProvider="[1,2,3,4,5,6,7]"/>
+				<mx:HBox width="100%" height="100%">
+					<mx:DataGrid id="contactGrid" width="40%" height="100%" showHeaders="false">
+						<mx:columns>
+							<mx:Array>
+								<mx:DataGridColumn width="20">
+									<mx:itemRenderer>
+					                    <mx:Component>
+					                        <mx:Image source="{contactType(data)}" width="100%" horizontalAlign="center">
+					                        	<mx:Script>
+						                    		<![CDATA[
+						                    			private function contactType(item:Object):Class{
+						                    				return document.contactType(data.type)
+						                    			}
+						                    		]]>
+						                    	</mx:Script>
+					                        </mx:Image>
+					                    </mx:Component>
+					                </mx:itemRenderer>
+								</mx:DataGridColumn>
+								<mx:DataGridColumn dataField="entry" showDataTips="true" itemRenderer="mx.controls.Label"/>
+							</mx:Array>
+						 </mx:columns>
+					</mx:DataGrid>
+					<mx:List id="addressGrid" width="60%" height="100%" labelField="address" itemRenderer="mx.controls.Label"/>
+				</mx:HBox>
 			</mx:VBox>
 		</mx:HBox>
 		<mx:HBox width="100%" height="50%">
