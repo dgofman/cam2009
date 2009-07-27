@@ -2,13 +2,32 @@
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" activate="onRefresh()">
 	<mx:Script>
 		<![CDATA[
-			import flash.net.navigateToURL;
+			import com.academy.calder.enum.Relation;
+		]]>
+	</mx:Script>
+	<mx:Script>
+		<![CDATA[
+			import com.academy.calder.enum.Relation;
+		]]>
+	</mx:Script>
+	<mx:Script>
+		<![CDATA[
+			import com.academy.calder.enum.Relation;
+		]]>
+	</mx:Script>
+	<mx:Script>
+		<![CDATA[
+			import mx.core.UIComponent;
+			import mx.events.DragEvent;
 			import mx.events.ListEvent;
+			import mx.managers.DragManager;
+			import mx.collections.ArrayCollection;
 			import com.academy.calder.vo.AccountVO;
 			import com.academy.calder.vo.AddressVO;
 			import com.academy.calder.vo.ContactVO;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
+			import flash.net.navigateToURL;
 		
 			[Bindable]
 			private var _newrecord:Boolean = false;
@@ -39,8 +58,11 @@
 				AMFService.send('CAM.persons', null, onPersonsResult, onFault);
 			}
 			
+			public function contactType(item:Object):Class{
+                return this[item];
+            }
+            
 			private function onSearch():void{
-				clean();
 				AMFService.send('CAM.searchPersons', [keyword.text], onPersonsResult, onFault);
 			}
 			
@@ -55,9 +77,11 @@
 			}
 			
 			private function onLinksItemClick(event:ListEvent):void{
-				var personId:String = linkGrid.selectedItem.personId;
-				AMFService.send('Account.contact', [personId], onContactResult, onFault);
-				AMFService.send('Account.address', [personId], onAddressResult, onFault);
+				if(event.rowIndex != linkGrid.selectedIndex){
+					var personId:String = linkGrid.selectedItem.personId;
+					AMFService.send('Account.contact', [personId], onContactResult, onFault);
+					AMFService.send('Account.address', [personId], onAddressResult, onFault);
+				}
 			}
 			
 			private function onAccountLinkResult(result:Object):void{
@@ -99,10 +123,38 @@
 				if(addressGrid)addressGrid.dataProvider = null;
 			}
 			
-			public function contactType(item:Object):Class{
-                return this[item];
-            }
-			
+			private function onPersonDragEnter(event:DragEvent):void{
+				DragManager.showFeedback(DragManager.MOVE);
+				DragManager.acceptDragDrop(UIComponent(event.currentTarget));
+			}
+
+			private function onLinkDragEnter(event:DragEvent):void  {
+		        var items:Array = event.dragSource.dataForFormat("items") as Array;
+		        var isAllowed:Boolean = true;
+		        if(items is Array && items.length == 1 && event.currentTarget.dataProvider){
+		        	var personId:String = items[0].personId;
+		        	var dp:ArrayCollection = event.currentTarget.dataProvider;
+		        	for(var i:uint = 0; i < dp.length; i++){
+		        		if(dp.getItemAt(i).personId == personId){
+		        			isAllowed = false;
+		        			break;
+		        		}
+		        	}
+		        }
+
+		        if (isAllowed){
+		            DragManager.acceptDragDrop(UIComponent(event.currentTarget));
+		 		}else{
+		            DragManager.showFeedback(DragManager.NONE);
+		            event.preventDefault();	
+		        }
+		     }
+		     
+		     private function onLinkDragComplete(event:DragEvent):void {
+				contactGrid.dataProvider = null;
+				addressGrid.dataProvider = null;
+			}
+
 			private function openMail(mail:String):void{
                 navigateToURL(new URLRequest('mailto:' + mail), "_top"); 
 			}
@@ -119,7 +171,9 @@
 			<mx:TextInput id="keyword" width="100%" enter="onSearch()"/>
 			<mx:Button label="{Manager.bundle.getMessage('search')}" click="onSearch()"/>
 		</mx:HBox>
-		<mx:DataGrid id="personGrid" width="100%" height="100%" itemClick="onItemClick(event)">
+		<mx:DataGrid id="personGrid" width="100%" height="100%" 
+			dragEnter="onPersonDragEnter(event)"
+			dragEnabled="true" itemClick="onItemClick(event)">
 			<mx:columns>
 				<mx:Array>
 					<mx:DataGridColumn dataField="last" headerText="Last"/>
@@ -130,17 +184,32 @@
 	</mx:VBox>
 	<mx:VDividedBox width="100%" height="100%">
 		<mx:HBox width="100%" height="50%">
-			<mx:DataGrid id="linkGrid" width="350" height="100%" itemClick="onLinksItemClick(event)">
+			<mx:DataGrid id="linkGrid" width="350" height="100%" editable="true"
+				dragEnabled="true" dragMoveEnabled="true" dropEnabled="true"
+				dragComplete="onLinkDragComplete(event)" dragEnter="onLinkDragEnter(event)" 
+				itemClick="onLinksItemClick(event)">
 				<mx:columns>
 					<mx:Array>
-						<mx:DataGridColumn dataField="last" headerText="Last"/>
-						<mx:DataGridColumn dataField="first" headerText="First"/>
-						<mx:DataGridColumn dataField="relation" headerText="Relation" width="80"/>
+						<mx:DataGridColumn dataField="last" headerText="Last" editable="false"/>
+						<mx:DataGridColumn dataField="first" headerText="First" editable="false"/>
+						<mx:DataGridColumn dataField="relation" headerText="Relation" width="80">
+							<mx:itemEditor>
+			                    <mx:Component>
+			                        <mx:ComboBox dataProvider="{Relation.list}">
+			                        	<mx:Script>
+											import com.academy.calder.enum.Relation;
+			                    		</mx:Script>
+			                        </mx:ComboBox>
+			                    </mx:Component>
+			                </mx:itemEditor>
+						</mx:DataGridColumn>
 					</mx:Array>
 				 </mx:columns>
 			</mx:DataGrid>
 			<mx:VBox width="100%" height="100%" verticalGap="0">
-				<mx:HBox width="100%" horizontalAlign="right">		
+				<mx:HBox width="100%" paddingTop="2">
+					<mx:Image source="{Manager.getIcon('helpIcon')}"/>
+					<mx:Spacer width="100%"/>
 					<mx:Label text="{Manager.bundle.getMessage('Balance')}:" fontWeight="bold"/>
 					<mx:Label text="{_account.currentBalance}"/>
 				</mx:HBox>
@@ -148,15 +217,19 @@
 					<mx:Label text="{Manager.bundle.getMessage('Last Payment')}:" fontWeight="bold"/>
 					<mx:Label text="{_account.lastPaymentDate}"/>
 				</mx:HBox>
-				<mx:Form width="100%" backgroundColor="#f0f0f0" paddingTop="0" paddingBottom="0">
-					<mx:FormItem label="{Manager.bundle.getMessage('Email:')}">
-						<mx:Label click="openMail(_contact.entry)" 
+				<mx:Form width="100%" backgroundColor="#f0f0f0" paddingTop="2" paddingBottom="0">
+					<mx:FormItem label="{Manager.bundle.getMessage('Email:')}" width="100%" direction="horizontal">
+						<mx:Label click="openMail(_contact.entry)" width="100%" 
 								htmlText="&lt;a href='#'&gt;{_contact.entry}&lt;a/&gt;"
 								color="blue" textDecoration="underline"/>
+						<mx:Image source="{Manager.getIcon('helpIcon')}"/>
 					</mx:FormItem>
-					<mx:FormItem label="{Manager.bundle.getMessage('Address:')}">
-						<mx:VBox verticalGap="0">
-							<mx:Label text="{_address.address1}"/>
+					<mx:FormItem label="{Manager.bundle.getMessage('Address:')}" width="100%">
+						<mx:VBox verticalGap="0" width="100%">
+							<mx:HBox width="100%">						
+								<mx:Label text="{_address.address1}" width="100%"/>
+								<mx:Image source="{Manager.getIcon('helpIcon')}"/>
+							</mx:HBox>
 							<mx:Label text="{_address.city}"/>
 							<mx:Label text="{_address.stateProvince}, {_address.postalCode}"/>
 						</mx:VBox>
