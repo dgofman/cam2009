@@ -40,28 +40,12 @@
 			private var _address:AddressVO;
 			[Bindable]
 			private var _contact:ContactVO;
-			
-			//http://www.freeiconsweb.com/gif_icons.htm
-			[Bindable]
-            [Embed(source="/resources/images/email.gif")] private var email:Class;
-            [Bindable]
-            [Embed(source="/resources/images/cell.gif")]  private var cell:Class;
-            [Bindable]
-            [Embed(source="/resources/images/phone.gif")] private var phone:Class;
-			[Bindable]
-            [Embed(source="/resources/images/pager.gif")] private var pager:Class;
-            [Bindable]
-            [Embed(source="/resources/images/fax.gif")]   private var fax:Class;
-            
+		
 			public function onRefresh():void{
 				clean();
 				AMFService.send('CAM.persons', null, onPersonsResult, onFault);
 			}
-			
-			public function contactType(item:Object):Class{
-                return this[item];
-            }
-            
+
 			private function onSearch():void{
 				AMFService.send('CAM.searchPersons', [keyword.text], onPersonsResult, onFault);
 			}
@@ -77,11 +61,17 @@
 			}
 			
 			private function onLinksItemClick(event:ListEvent):void{
-				if(linkGrid.selectedItem.cached != true){
-					var personId:String = linkGrid.selectedItem.personId;
+				var personId:String = linkGrid.selectedItem.personId;
+				if(linkGrid.selectedItem.contacts == null){
 					AMFService.send('Account.contact', [personId], onContactResult, onFault);
+				}else{
+					contactGrid.dataProvider = linkGrid.selectedItem.contacts;
+				}
+				
+				if(linkGrid.selectedItem.addresses == null){
 					AMFService.send('Account.address', [personId], onAddressResult, onFault);
-					linkGrid.selectedItem.cached = true;
+				}else{
+					addressGrid.dataProvider = linkGrid.selectedItem.addresses;
 				}
 			}
 			
@@ -108,10 +98,14 @@
 			
 			private function onContactResult(result:Object):void{
 				contactGrid.dataProvider = result;
+				if(linkGrid.selectedItem != null)
+					linkGrid.selectedItem.contacts = result;
 			}
 			
 			private function onAddressResult(result:Object):void{
 				addressGrid.dataProvider = result;
+				if(linkGrid.selectedItem != null)
+					linkGrid.selectedItem.addresses = result;
 			}
 			
 			private function clean():void{
@@ -125,22 +119,31 @@
 			}
 			
 			private function onPersonDragEnter(event:DragEvent):void{
-				DragManager.showFeedback(DragManager.MOVE);
-				DragManager.acceptDragDrop(UIComponent(event.currentTarget));
+				if(event.dragInitiator == linkGrid){
+					DragManager.showFeedback(DragManager.MOVE);
+					DragManager.acceptDragDrop(UIComponent(event.currentTarget));
+				}else{
+					DragManager.showFeedback(DragManager.NONE);
+		            event.preventDefault();	
+				}
 			}
 
 			private function onLinkDragEnter(event:DragEvent):void  {
 		        var items:Array = event.dragSource.dataForFormat("items") as Array;
-		        var isAllowed:Boolean = true;
-		        if(items is Array && items.length == 1 && event.currentTarget.dataProvider){
+		        var isAllowed:Boolean = (event.dragInitiator == personGrid);
+		        if(isAllowed && items is Array && items.length == 1){
 		        	var personId:String = items[0].personId;
-		        	var dp:ArrayCollection = event.currentTarget.dataProvider;
-		        	for(var i:uint = 0; i < dp.length; i++){
-		        		if(dp.getItemAt(i).personId == personId){
-		        			isAllowed = false;
-		        			break;
-		        		}
-		        	}
+		        	items[0].relation = Relation.Self.value;
+		        	
+		        	if(event.currentTarget.dataProvider){
+			        	var dp:ArrayCollection = event.currentTarget.dataProvider;
+			        	for(var i:uint = 0; i < dp.length; i++){
+			        		if(dp.getItemAt(i).personId == personId){
+			        			isAllowed = false;
+			        			break;
+			        		}
+			        	}
+			        }
 		        }
 
 		        if (isAllowed){
@@ -149,11 +152,53 @@
 		            DragManager.showFeedback(DragManager.NONE);
 		            event.preventDefault();	
 		        }
-		     }
+		    }
 		     
-		     private function onLinkDragComplete(event:DragEvent):void {
+		    private function onLinkDragComplete(event:DragEvent):void {
 				contactGrid.dataProvider = null;
 				addressGrid.dataProvider = null;
+			}
+			
+			private function onEmailDragEnter(event:DragEvent):void{
+				if (event.dragInitiator == contactGrid){
+					var items:Array = event.dragSource.dataForFormat("items") as Array;
+					if(items[0].type == "email"){
+						DragManager.showFeedback(DragManager.COPY);
+		           		DragManager.acceptDragDrop(UIComponent(event.currentTarget));
+		           		return;
+		   			}
+		 		}
+		        DragManager.showFeedback(DragManager.NONE);
+		        event.preventDefault();
+			}
+			
+			private function validateDropEmail(event:DragEvent):void{
+				if(DragManager.getFeedback() == DragManager.COPY){
+					var items:Array = event.dragSource.dataForFormat("items") as Array;
+					_contact = new ContactVO(items[0]);
+				}
+			}
+			
+			private function onAddressDragEnter(event:DragEvent):void{
+				if(event.dragInitiator == addressGrid){
+					DragManager.showFeedback(DragManager.COPY);
+		           	DragManager.acceptDragDrop(UIComponent(event.currentTarget));
+		 		}else{
+		     	   DragManager.showFeedback(DragManager.NONE);
+		     	   event.preventDefault();
+		   		}
+			}
+			
+			private function validateDropAddress(event:DragEvent):void{
+				if(DragManager.getFeedback() == DragManager.COPY){
+					var items:Array = event.dragSource.dataForFormat("items") as Array;
+					_address = new AddressVO(items[0]);
+				}
+			}
+			
+			private function addressFormatter(item:Object):String{
+				return item.address1 + ', ' + item.city + ' ' + item.stateProvince + ' ' +
+					 item.postalCode + ' (' + item.priority + ')';
 			}
 
 			private function openMail(mail:String):void{
@@ -219,13 +264,15 @@
 					<mx:Label text="{_account.lastPaymentDate}"/>
 				</mx:HBox>
 				<mx:Form width="100%" backgroundColor="#f0f0f0" paddingTop="2" paddingBottom="0">
-					<mx:FormItem label="{Manager.bundle.getMessage('Email:')}" width="100%" direction="horizontal">
+					<mx:FormItem id="emailForm" label="{Manager.bundle.getMessage('Email:')}" 
+							dragEnter="onEmailDragEnter(event)" width="100%" direction="horizontal">
 						<mx:Label click="openMail(_contact.entry)" width="100%" 
 								htmlText="&lt;a href='#'&gt;{_contact.entry}&lt;a/&gt;"
 								color="blue" textDecoration="underline"/>
 						<mx:Image source="{Manager.getIcon('helpIcon')}"/>
 					</mx:FormItem>
-					<mx:FormItem label="{Manager.bundle.getMessage('Address:')}" width="100%">
+					<mx:FormItem id="addressForm" label="{Manager.bundle.getMessage('Address:')}"
+							dragEnter="onAddressDragEnter(event)" width="100%">
 						<mx:VBox verticalGap="0" width="100%">
 							<mx:HBox width="100%">						
 								<mx:Label text="{_address.address1}" width="100%"/>
@@ -237,7 +284,9 @@
 					</mx:FormItem>
 				</mx:Form>
 				<mx:HBox width="100%" height="100%">
-					<mx:DataGrid id="contactGrid" width="40%" height="100%" showHeaders="false">
+					<mx:DataGrid id="contactGrid" width="40%" height="100%" showHeaders="false"
+						dragEnabled="true" dragStart="emailForm.setStyle('backgroundColor',0xffff00)"
+						dragComplete="emailForm.setStyle('backgroundColor', null); validateDropEmail(event)">
 						<mx:columns>
 							<mx:Array>
 								<mx:DataGridColumn width="20">
@@ -246,8 +295,20 @@
 					                        <mx:Image source="{contactType(data)}" width="100%" horizontalAlign="center">
 					                        	<mx:Script>
 						                    		<![CDATA[
+						                    			//http://www.freeiconsweb.com/gif_icons.htm
+														[Bindable]
+											            [Embed(source="/resources/images/email.gif")] private var email:Class;
+											            [Bindable]
+											            [Embed(source="/resources/images/cell.gif")]  private var cell:Class;
+											            [Bindable]
+											            [Embed(source="/resources/images/phone.gif")] private var phone:Class;
+														[Bindable]
+											            [Embed(source="/resources/images/pager.gif")] private var pager:Class;
+											            [Bindable]
+											            [Embed(source="/resources/images/fax.gif")]   private var fax:Class;
+            
 						                    			private function contactType(item:Object):Class{
-						                    				return document.contactType(data.type)
+						                    				return this[data.type];
 						                    			}
 						                    		]]>
 						                    	</mx:Script>
@@ -259,7 +320,10 @@
 							</mx:Array>
 						 </mx:columns>
 					</mx:DataGrid>
-					<mx:List id="addressGrid" width="60%" height="100%" labelField="address" itemRenderer="mx.controls.Label"/>
+					<mx:List id="addressGrid" width="60%" height="100%"
+						labelFunction="addressFormatter" itemRenderer="mx.controls.Label" 
+						dragEnabled="true" dragStart="addressForm.setStyle('backgroundColor',0xffff00)"
+						dragComplete="addressForm.setStyle('backgroundColor', null); validateDropAddress(event)"/>
 				</mx:HBox>
 			</mx:VBox>
 		</mx:HBox>
