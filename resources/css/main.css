@@ -1,6 +1,7 @@
 .defaultIcons{
-	headerIcon:			 Embed(source="/resources/images/header.jpg");
-	loginIcon:			 Embed('/resources/images/calders.jpg');
+	headerIcon:	Embed(source="/resources/images/header.jpg");
+	loginIcon:	Embed('/resources/images/calders.jpg');
+	helpIcon:	Embed('/resources/images/helpQuestionMark.swf');
 }
 .mainPanel{
 	footerColors:#FFFFFF,#999999;
