@@ -77,10 +77,11 @@
 			}
 			
 			private function onLinksItemClick(event:ListEvent):void{
-				if(event.rowIndex != linkGrid.selectedIndex){
+				if(linkGrid.selectedItem.cached != true){
 					var personId:String = linkGrid.selectedItem.personId;
 					AMFService.send('Account.contact', [personId], onContactResult, onFault);
 					AMFService.send('Account.address', [personId], onAddressResult, onFault);
+					linkGrid.selectedItem.cached = true;
 				}
 			}
 			
