@@ -90,6 +90,7 @@
 				_contact = null;
 				contactGrid.dataProvider = null;
 				addressGrid.dataProvider = null;
+				lessonsTabs.dataProvider = null;
 				if(result is Array && result.length > 0 && result[0].accountId != null)
 					AMFService.send('Account.selectedAccount', [result[0].accountId], onAccountResult, onFault);					
 			}
@@ -130,6 +131,7 @@
 				if(linkGrid)linkGrid.dataProvider = null;
 				if(contactGrid)contactGrid.dataProvider = null;
 				if(addressGrid)addressGrid.dataProvider = null;
+				if(lessonsTabs)lessonsTabs.dataProvider = null;
 			}
 			
 			private function onPersonDragEnter(event:DragEvent):void{
