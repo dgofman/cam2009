@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" label="{_lesson.lesson}">
+	<mx:Script>
+		<![CDATA[
+			import com.academy.calder.vo.LessonVO;
+			import com.academy.calder.business.Manager;
+			
+			[Bindable]
+			private var _lesson:LessonVO;
+			
+
+			private function set lessonData(value:Object):void{
+				_lesson = new LessonVO(value);
+			}
+			
+			private function openSchedule():void{
+				Logger.alert("Forget about student schedule wait relese 3.x");
+			}
+		]]>
+	</mx:Script>
+	<mx:Binding source="data" destination="lessonData"/>
+	<mx:VBox width="100%" height="100%" verticalGap="0">
+		<mx:Form width="100%" height="100%" paddingBottom="0">
+			<mx:FormItem label="{Manager.bundle.getMessage('Teacher Information')}" fontWeight="bold"/>
+			<mx:FormItem label="{Manager.bundle.getMessage('first')}:">
+				<mx:Label text="{_lesson.first}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('last')}:">
+				<mx:Label text="{_lesson.last}"/>
+			</mx:FormItem>
+		</mx:Form>
+
+		<mx:Form width="100%" height="100%" paddingTop="0">
+			<mx:FormItem label="{Manager.bundle.getMessage('Lesson Deatils')}" fontWeight="bold"/>
+			<mx:FormItem label="{Manager.bundle.getMessage('lessonType')}:">
+				<mx:Label text="{_lesson.type}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('duration')}:">
+				<mx:Label text="{_lesson.duration}"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('rate')}:">
+				<mx:Label text="{_lesson.rate }"/>
+			</mx:FormItem>
+		</mx:Form>
+	 </mx:VBox>
+	 
+	 <mx:VBox height="100%" paddingRight="5">
+	 	<mx:Button label="{Manager.bundle.getMessage('schedule')}" click="openSchedule()"/>
+	 </mx:VBox>
+</mx:HBox>

@@ -2,8 +2,6 @@ package com.academy.calder.vo
 {
 	import com.academy.calder.enum.Gender;
 	
-	import mx.events.PropertyChangeEvent;
-	
 	[Bindable]
 	public class PersonVO
 	{
@@ -18,7 +16,6 @@ package com.academy.calder.vo
 				notes = result.notes;
 				sex = Gender.valueOf(result.sex);
 			}
-			dispatchEvent(new PropertyChangeEvent(PropertyChangeEvent.PROPERTY_CHANGE));
 		}
 		
 		public var userId:String;		
@@ -30,23 +27,6 @@ package com.academy.calder.vo
 		public var notes:String;
 		public var sex:Gender = Gender.Male;
 
-		private var _language:String;
-		
-		public function set language(value:String):void{
-			_language = value;
-			//dispatchEvent(new Event("attributesChange"));
-		}
-		
-		/*[Bindable("attributesChange")]
-		public function get attributes():Array{
-			return [
-				new UserItem('first', first),
-				new UserItem('last',last),
-				new UserItem('dob', dateOfBirth),
-				new UserItem('sex', sex),
-				new UserItem('language', _language),
-				new UserItem('notes', notes)
-					];
-		}*/
+		public var language:String;
 	}
 }

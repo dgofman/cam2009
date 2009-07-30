@@ -3,8 +3,6 @@ package com.academy.calder.vo
 	import com.academy.calder.enum.AccountStatus;
 	import com.academy.calder.enum.PrivilegeEnum;
 	
-	import mx.events.PropertyChangeEvent;
-	
 	[Bindable]
 	public class UserVO
 	{
@@ -17,7 +15,6 @@ package com.academy.calder.vo
 				status = AccountStatus.valueOf(result.status);
 				notes = result.notes;
 			}
-			dispatchEvent(new PropertyChangeEvent(PropertyChangeEvent.PROPERTY_CHANGE));
 		}
 		
 		public var userId:String;
@@ -36,17 +33,5 @@ package com.academy.calder.vo
 		public function set personRef(value:PersonVO):void{
 			_personRef = value;
 		}
-		
-		/*[Bindable("attributesChange")]
-		public function get attributes():Array{
-			return [
-				new UserItem('userId', userId),
-				new UserItem('username', username),
-				new UserItem('password', password),
-				new UserItem('privileges', privileges),
-				new UserItem('userStatus', status),
-				new UserItem('notes', notes)
-					];
-		}*/
 	}
 }
