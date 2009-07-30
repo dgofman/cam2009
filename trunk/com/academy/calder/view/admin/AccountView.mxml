@@ -4,21 +4,7 @@
 				activate="onRefresh()">
 	<mx:Script>
 		<![CDATA[
-			import com.academy.calder.enum.Relation;
-		]]>
-	</mx:Script>
-	<mx:Script>
-		<![CDATA[
-			import com.academy.calder.enum.Relation;
-		]]>
-	</mx:Script>
-	<mx:Script>
-		<![CDATA[
-			import com.academy.calder.enum.Relation;
-		]]>
-	</mx:Script>
-	<mx:Script>
-		<![CDATA[
+			import mx.controls.Button;
 			import mx.core.UIComponent;
 			import mx.events.DragEvent;
 			import mx.events.ListEvent;
@@ -27,6 +13,7 @@
 			import com.academy.calder.vo.AccountVO;
 			import com.academy.calder.vo.AddressVO;
 			import com.academy.calder.vo.ContactVO;
+			import com.academy.calder.enum.Relation;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
 			import flash.net.navigateToURL;
@@ -54,7 +41,7 @@
 			
 			private function onPersonsResult(result:Object):void{
 				personGrid.dataProvider = result;
-				lessonsTabs.dataProvider = null;
+				lessonsRep.dataProvider = null;
 			}
 			
 			private function onItemClick(event:ListEvent):void{
@@ -75,11 +62,11 @@
 				}else{
 					addressGrid.dataProvider = linkGrid.selectedItem.addresses;
 				}
-				
+
 				if(linkGrid.selectedItem.lessons == null){
 					AMFService.send('Account.lessons', [personId], onLessonsResult, onFault);
 				}else{
-					lessonsTabs.dataProvider = linkGrid.selectedItem.lessons;
+					lessonsRep.dataProvider = linkGrid.selectedItem.lessons;
 				}
 			}
 			
@@ -90,7 +77,7 @@
 				_contact = null;
 				contactGrid.dataProvider = null;
 				addressGrid.dataProvider = null;
-				lessonsTabs.dataProvider = null;
+				lessonsRep.dataProvider = null;
 				if(result is Array && result.length > 0 && result[0].accountId != null)
 					AMFService.send('Account.selectedAccount', [result[0].accountId], onAccountResult, onFault);					
 			}
@@ -118,7 +105,7 @@
 			}
 			
 			private function onLessonsResult(result:Object):void{
-				lessonsTabs.dataProvider = result;
+				lessonsRep.dataProvider = result;
 				if(linkGrid.selectedItem != null)
 					linkGrid.selectedItem.lessons = result;
 			}
@@ -131,7 +118,7 @@
 				if(linkGrid)linkGrid.dataProvider = null;
 				if(contactGrid)contactGrid.dataProvider = null;
 				if(addressGrid)addressGrid.dataProvider = null;
-				if(lessonsTabs)lessonsTabs.dataProvider = null;
+				if(lessonsRep)lessonsRep.dataProvider = null;
 			}
 			
 			private function onPersonDragEnter(event:DragEvent):void{
@@ -176,7 +163,7 @@
 		    	if(LtoR || RtoL){
 					contactGrid.dataProvider = null;
 					addressGrid.dataProvider = null;
-					lessonsTabs.dataProvider = null;
+					lessonsRep.dataProvider = null;
 		    	}
 		    	
 		    	if(LtoR == true){
@@ -236,6 +223,14 @@
 				}
 			}
 			
+			private function setFirstIndex(event:Event):void{
+				if(lessonTabs.selectedIndex > -1 && lessonTabs.selectedIndex < lessonTabs.numChildren){
+					var tab:Button = event.target.getTabAt(lessonTabs.selectedIndex);
+					if(tab.selected != true)
+						tab.selected = true;
+				}
+			}
+
 			private function addressFormatter(item:Object):String{
 				return item.address1 + ', ' + item.city + ' ' + item.stateProvince + ' ' +
 					 item.postalCode + ' (' + item.priority + ')';
@@ -368,9 +363,9 @@
 			</mx:VBox>
 		</mx:HBox>
 		<mx:HBox id="box" width="100%" height="50%" verticalScrollPolicy="off">
-			<mx:TabNavigator width="80%" height="{box.height}">
-				<mx:Repeater id="lessonsTabs">
-					<admin:LessonView data="{lessonsTabs.currentItem}"/>
+			<mx:TabNavigator id="lessonTabs" width="80%" height="{box.height}" updateComplete="setFirstIndex(event)">
+				<mx:Repeater id="lessonsRep">
+					<admin:LessonView data="{lessonsRep.currentItem}"/>
 				</mx:Repeater>
 			</mx:TabNavigator>
 			<mx:VBox width="20%" height="100%">
