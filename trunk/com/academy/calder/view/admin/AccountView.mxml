@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" activate="onRefresh()">
+<mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml"
+				xmlns:admin="com.academy.calder.view.admin.*"
+				activate="onRefresh()">
 	<mx:Script>
 		<![CDATA[
 			import com.academy.calder.enum.Relation;
@@ -40,7 +42,7 @@
 			private var _address:AddressVO;
 			[Bindable]
 			private var _contact:ContactVO;
-		
+			
 			public function onRefresh():void{
 				clean();
 				AMFService.send('CAM.persons', null, onPersonsResult, onFault);
@@ -52,7 +54,7 @@
 			
 			private function onPersonsResult(result:Object):void{
 				personGrid.dataProvider = result;
-				lessonsTabs.selectedIndex = 0;
+				lessonsTabs.dataProvider = null;
 			}
 			
 			private function onItemClick(event:ListEvent):void{
@@ -72,6 +74,12 @@
 					AMFService.send('Account.address', [personId], onAddressResult, onFault);
 				}else{
 					addressGrid.dataProvider = linkGrid.selectedItem.addresses;
+				}
+				
+				if(linkGrid.selectedItem.lessons == null){
+					AMFService.send('Account.lessons', [personId], onLessonsResult, onFault);
+				}else{
+					lessonsTabs.dataProvider = linkGrid.selectedItem.lessons;
 				}
 			}
 			
@@ -106,6 +114,12 @@
 				addressGrid.dataProvider = result;
 				if(linkGrid.selectedItem != null)
 					linkGrid.selectedItem.addresses = result;
+			}
+			
+			private function onLessonsResult(result:Object):void{
+				lessonsTabs.dataProvider = result;
+				if(linkGrid.selectedItem != null)
+					linkGrid.selectedItem.lessons = result;
 			}
 			
 			private function clean():void{
@@ -155,10 +169,34 @@
 		    }
 		     
 		    private function onLinkDragComplete(event:DragEvent):void {
-				contactGrid.dataProvider = null;
-				addressGrid.dataProvider = null;
+		    	var LtoR:Boolean = (event.currentTarget == personGrid && event.relatedObject == linkGrid);
+		    	var RtoL:Boolean = (event.currentTarget == linkGrid && event.relatedObject == personGrid);	
+		    	if(LtoR || RtoL){
+					contactGrid.dataProvider = null;
+					addressGrid.dataProvider = null;
+					lessonsTabs.dataProvider = null;
+		    	}
+		    	
+		    	if(LtoR == true){
+		    		var items:Array = event.dragSource.dataForFormat("items") as Array;
+		    		var personId:String = items[0].personId;
+		    		function onValidateAccountResult(result:Object):void{
+						if(result is Array && result.length > 0){
+							Manager.error( Manager.bundle.getMessage("Selected person already has exisitng account"),
+											Manager.bundle.getMessage("Account Exists"));
+							var dp:ArrayCollection = linkGrid.dataProvider as ArrayCollection;
+				        	for(var i:uint = 0; i < dp.length; i++){
+				        		if(dp.getItemAt(i).personId == personId){
+				        			dp.removeItemAt(i);
+				        			break;
+				        		}
+				        	}
+						}
+		    		};
+		    		AMFService.send('Account.valid', [personId], onValidateAccountResult, onFault);
+		    	}
 			}
-			
+
 			private function onEmailDragEnter(event:DragEvent):void{
 				if (event.dragInitiator == contactGrid){
 					var items:Array = event.dragSource.dataForFormat("items") as Array;
@@ -218,7 +256,7 @@
 			<mx:Button label="{Manager.bundle.getMessage('search')}" click="onSearch()"/>
 		</mx:HBox>
 		<mx:DataGrid id="personGrid" width="100%" height="100%" 
-			dragEnter="onPersonDragEnter(event)"
+			dragEnter="onPersonDragEnter(event)" dragComplete="onLinkDragComplete(event)"
 			dragEnabled="true" itemClick="onItemClick(event)">
 			<mx:columns>
 				<mx:Array>
@@ -327,11 +365,11 @@
 				</mx:HBox>
 			</mx:VBox>
 		</mx:HBox>
-		<mx:HBox width="100%" height="50%">
-			<mx:TabNavigator id="lessonsTabs" width="80%" height="100%">
-				<mx:VBox label="Piano" width="100%" height="100%">
-					
-				</mx:VBox>
+		<mx:HBox id="box" width="100%" height="50%" verticalScrollPolicy="off">
+			<mx:TabNavigator width="80%" height="{box.height}">
+				<mx:Repeater id="lessonsTabs">
+					<admin:LessonView data="{lessonsTabs.currentItem}"/>
+				</mx:Repeater>
 			</mx:TabNavigator>
 			<mx:VBox width="20%" height="100%">
 				<mx:Label text="{Manager.bundle.getMessage('Payments')}"/>
