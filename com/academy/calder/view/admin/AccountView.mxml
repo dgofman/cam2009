@@ -62,7 +62,7 @@
 				}else{
 					addressGrid.dataProvider = linkGrid.selectedItem.addresses;
 				}
-
+				
 				if(linkGrid.selectedItem.lessons == null){
 					AMFService.send('Account.lessons', [personId], onLessonsResult, onFault);
 				}else{
@@ -223,14 +223,6 @@
 				}
 			}
 			
-			private function setFirstIndex(event:Event):void{
-				if(lessonTabs.selectedIndex > -1 && lessonTabs.selectedIndex < lessonTabs.numChildren){
-					var tab:Button = event.target.getTabAt(lessonTabs.selectedIndex);
-					if(tab.selected != true)
-						tab.selected = true;
-				}
-			}
-
 			private function addressFormatter(item:Object):String{
 				return item.address1 + ', ' + item.city + ' ' + item.stateProvince + ' ' +
 					 item.postalCode + ' (' + item.priority + ')';
@@ -363,7 +355,7 @@
 			</mx:VBox>
 		</mx:HBox>
 		<mx:HBox id="box" width="100%" height="50%" verticalScrollPolicy="off">
-			<mx:TabNavigator id="lessonTabs" width="80%" height="{box.height}" updateComplete="setFirstIndex(event)">
+			<mx:TabNavigator id="lessonTabs" width="80%" height="{box.height}">
 				<mx:Repeater id="lessonsRep">
 					<admin:LessonView data="{lessonsRep.currentItem}"/>
 				</mx:Repeater>

@@ -2,6 +2,7 @@
 <mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" label="{_lesson.lesson}">
 	<mx:Script>
 		<![CDATA[
+			import mx.containers.TabNavigator;
 			import com.academy.calder.vo.LessonVO;
 			import com.academy.calder.business.Manager;
 			
@@ -11,6 +12,12 @@
 
 			private function set lessonData(value:Object):void{
 				_lesson = new LessonVO(value);
+				
+				var tabNav:TabNavigator = parent as TabNavigator;
+				if(tabNav && tabNav.getChildIndex(this) == 0){
+					tabNav.selectedChild = this;
+					tabNav.getTabAt(0).dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+				}
 			}
 			
 			private function openSchedule():void{
