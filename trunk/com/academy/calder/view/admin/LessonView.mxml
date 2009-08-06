@@ -27,6 +27,7 @@
 			
 			private function onScheduleResult(result:Object):void{
 				trace(result);
+				ScheduleView.openWindow();
 			}
 			
 			private function onFault(fault:Object):void{

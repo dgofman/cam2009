@@ -1,66 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" label="{_lesson.lesson}">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="1125" height="554" layout="horizontal"
+	horizontalScrollPolicy="off" verticalScrollPolicy="off" showCloseButton="true" close="closeWindow()"
+	paddingBottom="2" paddingTop="2" paddingLeft="2" paddingRight="2"
+	title="{Manager.bundle.getMessage('title')}">
+	<mx:Style>
+        .border{
+            borderColor:#999999;
+            borderStyle:solid;
+        }
+        
+        .header{
+        	horizontalAlign:right;
+        	paddingRight:2;
+        	fontWeight:bold;
+        	backgroundColor:#CDEDFE;
+        	borderColor:#999999;
+            borderStyle:solid;
+            borderSides:bottom;
+        }
+    </mx:Style>
 	<mx:Script>
 		<![CDATA[
-			import mx.containers.TabNavigator;
-			import com.academy.calder.vo.LessonVO;
+			import mx.managers.PopUpManager;
+			import mx.collections.ArrayCollection;
 			import com.academy.calder.business.Manager;
-			import com.academy.calder.business.AMFService;
 			
 			[Bindable]
-			private var _lesson:LessonVO;
+			private var calendarData:ArrayCollection;
 			
-
-			private function set lessonData(value:Object):void{
-				_lesson = new LessonVO(value);
-				
-				var tabNav:TabNavigator = parent as TabNavigator;
-				if(tabNav && tabNav.getChildIndex(this) == 0){
-					tabNav.selectedChild = this;
-					tabNav.getTabAt(0).dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+			private static var _window:ScheduleView;
+			
+			public static function openWindow():ScheduleView{
+				if(_window == null)
+               		_window = ScheduleView(PopUpManager.createPopUp(Manager.application, ScheduleView));
+               	_window.init();
+    			PopUpManager.centerPopUp(_window);
+			    return _window;
+			}
+			
+			public static function closeWindow():void{
+				if(_window)
+					PopUpManager.removePopUp(_window);
+				_window = null;
+			}
+			
+			private function init():void{
+				var day:Number = NaN;
+				var firstPosition:uint = 3;
+				var maxDays:uint = 31;
+				var rows:ArrayCollection = new ArrayCollection();
+				for(var r:uint = 0; r < 6; r++){
+					var cols:ArrayCollection = new ArrayCollection();
+					for(var c:uint = 0; c < 7; c++){
+						if(isNaN(day)){
+							if(c == firstPosition)
+								day = 1;
+						}else{
+							day++;
+						}
+						cols.addItem(day);
+						if(day >= maxDays){
+							r = 6;
+							break;
+						}
+					}
+					rows.addItem(cols);
 				}
-			}
-			
-			private function openSchedule():void{
-				AMFService.send('Account.schedule', [_lesson.lessonControlId], onScheduleResult, onFault);
-			}
-			
-			private function onScheduleResult(result:Object):void{
-				trace(result);
-			}
-			
-			private function onFault(fault:Object):void{
-				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_schedule'));
+				calendarData = rows;
 			}
 		]]>
 	</mx:Script>
-	<mx:Binding source="data" destination="lessonData"/>
-	<mx:VBox width="100%" height="100%" verticalGap="0">
-		<mx:Form width="100%" height="100%" paddingBottom="0">
-			<mx:FormItem label="{Manager.bundle.getMessage('Teacher Information')}" fontWeight="bold"/>
-			<mx:FormItem label="{Manager.bundle.getMessage('first')}:">
-				<mx:Label text="{_lesson.first}"/>
-			</mx:FormItem>
-			<mx:FormItem label="{Manager.bundle.getMessage('last')}:">
-				<mx:Label text="{_lesson.last}"/>
-			</mx:FormItem>
-		</mx:Form>
-
-		<mx:Form width="100%" height="100%" paddingTop="0">
-			<mx:FormItem label="{Manager.bundle.getMessage('Lesson Deatils')}" fontWeight="bold"/>
-			<mx:FormItem label="{Manager.bundle.getMessage('lessonType')}:">
-				<mx:Label text="{_lesson.type}"/>
-			</mx:FormItem>
-			<mx:FormItem label="{Manager.bundle.getMessage('duration')}:">
-				<mx:Label text="{_lesson.duration}"/>
-			</mx:FormItem>
-			<mx:FormItem label="{Manager.bundle.getMessage('rate')}:">
-				<mx:Label text="{_lesson.rate }"/>
-			</mx:FormItem>
-		</mx:Form>
-	 </mx:VBox>
-	 
-	 <mx:VBox height="100%" paddingRight="5">
-	 	<mx:Button label="{Manager.bundle.getMessage('schedule')}" click="openSchedule()"/>
-	 </mx:VBox>
-</mx:HBox>
+	<mx:Grid width="100%" borderSides="left top right" styleName="border" verticalGap="1" horizontalGap="1" backgroundColor="#F2F2F2">
+		<mx:Repeater id="rows" dataProvider="{calendarData}">
+			<mx:GridRow width="100%" borderSides="bottom" styleName="border">
+				<mx:Repeater id="cols" dataProvider="{rows.currentItem}">
+					<mx:GridItem width="14.26%" borderSides="right" styleName="{cols.currentIndex == 6 ? null : 'border'}">
+						<mx:VBox width="100%" height="100" backgroundColor="#ffffff" visible="{!isNaN(cols.currentItem)}">
+							<mx:HBox width="100%" styleName="header">
+								<mx:Label text="{isNaN(cols.currentItem) ? null : cols.currentItem}"/>						
+							</mx:HBox>
+						</mx:VBox>
+					</mx:GridItem>
+				</mx:Repeater>
+			</mx:GridRow>
+		</mx:Repeater>
+	</mx:Grid>
+	<mx:VBox height="100%" horizontalAlign="right">
+		<mx:DateChooser id="dateChooser"/>
+		<mx:Spacer height="100%"/>
+		<mx:Button label="{Manager.bundle.getMessage('close')}" click="closeWindow()"/>
+	</mx:VBox>
+</mx:TitleWindow>
