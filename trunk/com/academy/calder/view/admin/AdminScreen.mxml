@@ -11,8 +11,7 @@
 			private function onActivate(event:Event):void{
 				var adminViewName:String = LocalShare.getValue(AdminViewHelper.VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
 				if(adminViewName == null)
-					adminViewName = AdminViewHelper.HOME
-				Logger.info(AdminViewHelper.VIEW_SHARE_ID + "="+adminViewName);
+					adminViewName = AdminViewHelper.HOME;
 				adminHelper.changeView(adminViewName);
 			}			
 		]]>

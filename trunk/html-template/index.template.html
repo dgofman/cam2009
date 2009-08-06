@@ -17,15 +17,16 @@ body { margin: 0px; overflow:hidden; scroll:no }
 <!--
 	var id = "CAM";
 	var language = "en_US";
-	var version = null;
 	var gateway = "http://localhost/camphp/gateway.php";
+	var flashvars = "debug=true";
+	var version = null;
 	if(document.location.host)
 		gateway = "http://" + document.location.host + "/camphp/gateway.php";
 
 	if(new String("${swf}").indexOf("debug") != -1){
 		src = "${swf}";
 	}
-	createSWF(id, gateway, language, version);
+	createSWF(id, gateway, language, flashvars, version);
 
 	function setCookie(name, value){
 	    document.cookie = name + "=" + escape(value);

@@ -17,11 +17,16 @@ package com.academy.calder.business
 		
 		private static var logTarget:TraceTarget;
 		private static var faultHandlerRef:Function;
+		
+		public static var DEBUG:Boolean;
 
 		public static function send(class_method:String, parameters:Array=null, onResult:Function=null, onFault:Function=null):void{
+			if(DEBUG == true)
+				Logger.debug(class_method + ": " + ObjectUtil.toString(parameters));
 			var resultHandler:Function = function(event:*):void{
 				CursorManager.removeBusyCursor();
-				Logger.info(class_method + ": " + ObjectUtil.toString(event));
+				if(DEBUG == true)
+					Logger.info(class_method + ": " + ObjectUtil.toString(event));
 				if(onResult != null)
 					onResult(event);
 			};

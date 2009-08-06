@@ -24,6 +24,8 @@
 		import com.academy.calder.business.LanguageService;
 		
 		private function onComplete():void {
+			AMFService.DEBUG = (Manager.getAppParam("debug", "false") == "true");
+			
 			LanguageService.switchLanguage(
 				Manager.getAppParam("locale", LanguageService.DEFAULT_LANGUAGE), onLanguageComplete);			
 		}
@@ -59,7 +61,6 @@
 			var mainViewName:String = LocalShare.getValue(MainViewHelper.VIEW_SHARE_ID, LocalShare.GLOBAL_LEVEL) as String;
 			if(result != null && mainViewName != null && mainViewName != MainViewHelper.LOGIN){
 				var user:UserVO = new UserVO(result);
-				Logger.info(MainViewHelper.VIEW_SHARE_ID + "=" + mainViewName);
 				Manager.instance.currentUser = user;
 				mainHelper.changeView(mainViewName);
 			}else{

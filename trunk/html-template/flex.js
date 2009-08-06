@@ -116,7 +116,7 @@ function DetectFlashVer(reqMajorVer, reqMinorVer, reqRevision)
 		return false;
 	}
 }
-function createSWF(id, gateway, language, version)
+function createSWF(id, gateway, language, flashvars, version)
 {
 	// Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
 	var hasProductInstall = DetectFlashVer(6, 0, 65);
@@ -132,7 +132,7 @@ function createSWF(id, gateway, language, version)
 		allowScriptAccess:"always",
 		type:"application/x-shockwave-flash"
 	};
-	
+
 	if(version != null)
 		version = new Date().getTime();
 	
@@ -149,8 +149,10 @@ function createSWF(id, gateway, language, version)
 	} else if (hasRequestedVersion) {
 		// if we've detected an acceptable version
 		// embed the Flash Content SWF when all tests are passed
-		flashParams.src = id + '.swf?=' + version;
+		flashParams.src = id + ".swf?=" + version;
 		flashParams.flashvars = "locale=" + language + "&gateway=" + gateway;
+		if(flashvars)
+			flashParams.flashvars += "&" + flashvars;
 		output = flashParamsToString(id, flashParams);
 	} else {  // flash is too old or we can't detect the plugin
 		output = 'Alternate HTML content should be placed here. '
