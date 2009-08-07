@@ -133,7 +133,7 @@
 										
 										private function change(event:Event):void{
 											dateChooser.selectedDate = 
-												new Date(dateChooser.displayedYear, dateChooser.displayedMonth, event.target.data);
+												new Date(dateChooser.displayedYear, dateChooser.displayedMonth, event.currentTarget.data);
 											dateChooser.dispatchEvent(new Event(Event.CHANGE));
 										}
 									]]>
