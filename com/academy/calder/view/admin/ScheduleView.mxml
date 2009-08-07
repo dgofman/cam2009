@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="1125" height="554" layout="horizontal"
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="1125" height="656" layout="horizontal"
 	horizontalScrollPolicy="off" verticalScrollPolicy="off" showCloseButton="true" close="closeWindow()"
-	paddingBottom="2" paddingTop="2" paddingLeft="2" paddingRight="2"
-	title="{Manager.bundle.getMessage('title')}" styleName="schedulePanel">
+	paddingBottom="2" paddingTop="2" paddingLeft="2" paddingRight="2" preinitialize="init()" styleName="schedulePanel">
 	<mx:Style>
 		.schedulePanel {
 		   borderColor: #000099;
@@ -24,7 +23,7 @@
         	horizontalAlign:right;
         	paddingRight:2;
         	fontWeight:bold;
-        	backgroundColor:#CDEDFE;
+        	backgroundColor:#FF6699;
         	borderColor:#999999;
             borderStyle:solid;
             borderSides:bottom;
@@ -34,6 +33,7 @@
 		<![CDATA[
 			import mx.managers.PopUpManager;
 			import mx.collections.ArrayCollection;
+			import flash.utils.getDefinitionByName;
 			import com.academy.calder.business.Manager;
 			
 			[Bindable]
@@ -41,10 +41,13 @@
 			
 			private static var _window:ScheduleView;
 			
+			private var dateGrid:*;
+			private var lastCreateDate:Date;
+			private var createDateInterval:Number;
+			
 			public static function openWindow():ScheduleView{
 				if(_window == null)
                		_window = PopUpManager.createPopUp(Manager.application as DisplayObject, ScheduleView, true) as ScheduleView;
-               	_window.init();
     			PopUpManager.centerPopUp(_window);
 			    return _window;
 			}
@@ -56,49 +59,98 @@
 			}
 			
 			private function init():void{
-				var day:Number = NaN;
-				var firstPosition:uint = 3;
-				var maxDays:uint = 31;
-				var rows:ArrayCollection = new ArrayCollection();
-				for(var r:uint = 0; r < 6; r++){
-					var cols:ArrayCollection = new ArrayCollection();
-					for(var c:uint = 0; c < 7; c++){
-						if(isNaN(day)){
-							if(c == firstPosition)
-								day = 1;
-						}else{
-							day++;
-						}
-						cols.addItem(day);
-						if(day >= maxDays){
-							r = 6;
-							break;
-						}
-					}
-					rows.addItem(cols);
-				}
-				calendarData = rows;
+				var calendarLayout:Class = getDefinitionByName("mx.controls::CalendarLayout") as Class;
+				dateGrid = new calendarLayout();
 			}
+			
+			private function set displayedMonthAndYear(value:int):void{
+				var day:Number = NaN;
+				var displayedMonth:int = dateChooser.displayedMonth;
+				var displayedYear:int = dateChooser.displayedYear;				
+				var monthName:String = dateChooser.monthNames[displayedMonth];
+				var offset:int = dateGrid.mx_internal::getOffsetOfMonth(displayedYear, displayedMonth);
+        		var daysInMonth:int = dateGrid.mx_internal::getNumberOfDaysInMonth(displayedYear, displayedMonth);
+        		var date:Date = new Date(displayedYear, displayedMonth);
+				calendarData = null;
+				
+				if(lastCreateDate == null || lastCreateDate.time != date.time){
+					function createGrid():void{
+						clearInterval(createDateInterval);
+						var rows:ArrayCollection = new ArrayCollection();
+						for(var r:uint = 0; r < 6; r++){
+							var cols:ArrayCollection = new ArrayCollection();
+							for(var c:uint = 0; c < 7; c++){
+								if(isNaN(day)){
+									if(c == offset)
+										day = 1;
+								}else{
+									day++;
+								}
+								cols.addItem(day);
+								if(day >= daysInMonth){
+									r = 6;
+									break;
+								}
+							}
+							rows.addItem(cols);
+						}
+						calendarData = rows;
+					};				
+					title = monthName + dateChooser.monthSymbol + " - " + displayedYear + dateChooser.yearSymbol;
+					lastCreateDate = date;
+					
+					clearInterval(createDateInterval);
+					createDateInterval = setInterval(createGrid, 500);
+				}
+			} 
 		]]>
 	</mx:Script>
-	<mx:Grid width="100%" borderSides="left top right" styleName="scheduleBorder" verticalGap="1" horizontalGap="1" backgroundColor="#F2F2F2">
-		<mx:Repeater id="rows" dataProvider="{calendarData}">
-			<mx:GridRow width="100%" borderSides="bottom" styleName="scheduleBorder">
-				<mx:Repeater id="cols" dataProvider="{rows.currentItem}">
-					<mx:GridItem width="14.26%" borderSides="right" styleName="{cols.currentIndex == 6 ? null : 'scheduleBorder'}">
-						<mx:VBox width="100%" height="100" backgroundColor="#ffffff" visible="{!isNaN(cols.currentItem)}">
-							<mx:HBox width="100%" styleName="scheduleBoxHeader">
-								<mx:Label text="{isNaN(cols.currentItem) ? null : cols.currentItem}"/>						
-							</mx:HBox>
-						</mx:VBox>
-					</mx:GridItem>
-				</mx:Repeater>
-			</mx:GridRow>
-		</mx:Repeater>
-	</mx:Grid>
+	<mx:Binding source="dateChooser.displayedMonth" destination="displayedMonthAndYear"/>
+	<mx:Binding source="dateChooser.displayedYear" destination="displayedMonthAndYear"/>
+	
+	<mx:Canvas width="100%" id="canvas">
+		<mx:VBox width="{canvas.width}" height="{canvas.height}" verticalAlign="middle" horizontalAlign="center">
+			<mx:Label text="{Manager.bundle.getMessage('pleaseWait')}" fontWeight="bold"/>
+		</mx:VBox>
+		
+		<mx:Grid width="100%" borderSides="left top right" styleName="scheduleBorder" verticalGap="1" horizontalGap="1" backgroundColor="#F2F2F2">
+			<mx:Repeater id="rows" dataProvider="{calendarData}">
+				<mx:GridRow width="100%" borderSides="bottom" styleName="scheduleBorder">
+					<mx:Repeater id="cols" dataProvider="{rows.currentItem}">
+						<mx:GridItem width="14.26%" borderSides="right" styleName="{cols.currentIndex == 6 ? null : 'scheduleBorder'}">
+							<mx:VBox width="100%" height="100" backgroundColor="#ffffff" visible="{!isNaN(cols.currentItem)}" data="{cols.currentItem}"
+								 creationComplete="complete(event)" click="change(event)">
+								<mx:Script>
+									<![CDATA[
+										private function complete(event:Event):void{
+											var selectionColor:Number = dateChooser.getStyle('selectionColor');
+											function selectedDateChanged(e:Event):void{
+												event.target.setStyle("backgroundColor", 
+													event.target.data == dateChooser.selectedDate.date ? selectionColor : 0xffffff);
+											};
+											dateChooser.addEventListener(Event.CHANGE, selectedDateChanged);
+										}
+										
+										private function change(event:Event):void{
+											dateChooser.selectedDate = 
+												new Date(dateChooser.displayedYear, dateChooser.displayedMonth, event.target.data);
+											dateChooser.dispatchEvent(new Event(Event.CHANGE));
+										}
+									]]>
+								</mx:Script>
+								<mx:HBox width="100%" styleName="scheduleBoxHeader">
+									<mx:Label text="{isNaN(cols.currentItem) ? null : cols.currentItem}"/>						
+								</mx:HBox>
+							</mx:VBox>
+						</mx:GridItem>
+					</mx:Repeater>
+				</mx:GridRow>
+			</mx:Repeater>
+		</mx:Grid>
+	</mx:Canvas>
 	<mx:VBox height="100%" horizontalAlign="right">
 		<mx:DateChooser id="dateChooser"/>
-		<mx:Spacer height="100%"/>
+		<mx:VBox id="details" width="{dateChooser.width}" height="100%" borderStyle="solid"/>
 		<mx:Button label="{Manager.bundle.getMessage('close')}" click="closeWindow()"/>
 	</mx:VBox>
 </mx:TitleWindow>

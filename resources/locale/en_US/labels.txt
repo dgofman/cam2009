@@ -4,6 +4,7 @@ languageCode=en_US
 &copyright=Copyright 2009 Calder Academy Inc. All rights reserved.
 &company=Calder Academy Inc.
 &homepage=http://www.calderacademy.com
+&pleaseWait=Please wait...
 
 &login=Login
 &signup=Sign Up
