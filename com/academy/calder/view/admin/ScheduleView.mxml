@@ -35,8 +35,8 @@
 			import mx.collections.SortField;
 			import mx.collections.ArrayCollection;
 			import mx.managers.PopUpManager;
-			import flash.utils.getDefinitionByName;
 			import com.academy.calder.business.Manager;
+			import flash.utils.getDefinitionByName;
 			
 			[Bindable]
 			private var calendarData:ArrayCollection;
@@ -80,7 +80,9 @@
         		var date:Date = new Date(displayedYear, displayedMonth);
 				calendarData = null;
 				
-				if(lastCreateDate == null || lastCreateDate.time != date.time){
+				if(details) details.dataProvider = null;
+						
+				if(lastCreateDate == null || lastCreateDate.time != date.time){	
 					function createGrid():void{
 						clearInterval(createDateInterval);						
 						scheduleData = {};
@@ -237,20 +239,31 @@
 		<mx:Canvas id="cvs" width="{dateChooser.width}" height="100%" horizontalScrollPolicy="off" borderStyle="solid">
 			<mx:Form width="100%" height="100%" verticalGap="0" paddingLeft="0" paddingRight="0">
 				<mx:Repeater id="details">
+					<mx:Script>
+						<![CDATA[
+							private function getValue(schedule:Object, prop:String):String{
+								return schedule[prop];
+							}
+						]]>
+					</mx:Script>
 					<mx:FormItem label="{Manager.bundle.getMessage('startTime')}:" fontWeight="bold">
-						<mx:Label text="{details.currentItem.startTime}" width="85"/>
+						<mx:Label text="{getValue(details.currentItem, 'startTime')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('disposition')}:">
-						<mx:Label text="{details.currentItem.disposition}" toolTip="{details.currentItem.disposition}" width="85"/>
+						<mx:Label  text="{getValue(details.currentItem, 'disposition')}" 
+								toolTip="{getValue(details.currentItem, 'disposition')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('startDate')}:">
-						<mx:Label text="{details.currentItem.startDate}" width="85"/>
+						<mx:Label text="{getValue(details.currentItem, 'startDate')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('endDate')}:">
-						<mx:Label text="{details.currentItem.endDate}" width="85"/>
+						<mx:Label text="{getValue(details.currentItem, 'endDate')}" width="85"/>
+					</mx:FormItem>
+					<mx:FormItem label="{Manager.bundle.getMessage('options')}:">
+						<mx:Label text="{getValue(details.currentItem, 'options')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('note')}:">
-						<mx:Text text="{details.currentItem.note}" width="85"/>
+						<mx:Text text="{getValue(details.currentItem, 'notes')}" width="85"/>
 						<mx:Spacer height="25"/>
 					</mx:FormItem>
 				</mx:Repeater>
