@@ -8,7 +8,7 @@ class Account {
 		$this->CONTACT="SELECT A.contactId, A.type, CONCAT(A.entry, ' (', A.category, ')') AS entry FROM contact A, addresscontact B WHERE A.contactId=B.contactId AND B.personId=%s";
 		$this->ADDRESS="SELECT A.addressId, A.address1, A.city, A.stateProvince, A.postalCode, A.priority FROM address A, addresscontact B WHERE A.addressId=B.addressId AND B.personId=%s";
 		$this->LESSONS="SELECT A.lessonControlId, C.lesson, C.type, D.duration, D.rate, F.first, F.last FROM lessoncontrol A, student B, lessontype C, tuitiontype D, employee E, person F WHERE A.studentId=B.studentId AND B.personId=%s AND A.lessonTypeId=C.lessonTypeId AND A.tuitionTypeId=D.tuitionTypeId AND A.employeeId=E.employeeId AND E.personId=F.personId";
-		$this->SCHEDULE="SELECT scheduleId, refScheduleId, startDate, endDate, smtwtfs, startTime, options, disposition, note FROM lessonschedule WHERE lessoncontrolId=%s ORDER BY startDate, refScheduleId, startTime";
+		$this->SCHEDULE="SELECT scheduleId, refScheduleId, startDate, endDate, smtwtfs, startTime, options, disposition, notes FROM lessonschedule WHERE lessoncontrolId=%s ORDER BY startDate, refScheduleId, startTime";
 		$this->VALIDATE="SELECT accountId FROM accountlinks WHERE personId=%s";
 	}
 	
