@@ -31,8 +31,10 @@
     </mx:Style>
 	<mx:Script>
 		<![CDATA[
-			import mx.managers.PopUpManager;
+			import mx.collections.Sort;
+			import mx.collections.SortField;
 			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
 			import flash.utils.getDefinitionByName;
 			import com.academy.calder.business.Manager;
 			
@@ -40,17 +42,19 @@
 			private var calendarData:ArrayCollection;
 			
 			[Bindable]
-			private var scheduleDateData:Object = {};
-
-			private var dateGrid:*;
+			private var scheduleData:Object = {};
+			
+			private var resultData:Object;
 			private var lastCreateDate:Date;
 			private var createDateInterval:Number;
+			private var dateGrid:*;
 			
 			private static var _window:ScheduleView;
 			
-			public static function openWindow():ScheduleView{
+			public static function openWindow(result:Object):ScheduleView{
 				if(_window == null)
                		_window = PopUpManager.createPopUp(Manager.application as DisplayObject, ScheduleView, true) as ScheduleView;
+    			_window.resultData = result;
     			PopUpManager.centerPopUp(_window);
 			    return _window;
 			}
@@ -60,7 +64,7 @@
 					PopUpManager.removePopUp(_window);
 				_window = null;
 			}
-			
+
 			private function init():void{
 				var calendarLayout:Class = getDefinitionByName("mx.controls::CalendarLayout") as Class;
 				dateGrid = new calendarLayout();
@@ -68,8 +72,8 @@
 			
 			private function set displayedMonthAndYear(value:int):void{
 				var day:Number = NaN;
-				var displayedMonth:int = dateChooser.displayedMonth;
 				var displayedYear:int = dateChooser.displayedYear;				
+				var displayedMonth:int = dateChooser.displayedMonth;
 				var monthName:String = dateChooser.monthNames[displayedMonth];
 				var offset:int = dateGrid.mx_internal::getOffsetOfMonth(displayedYear, displayedMonth);
         		var daysInMonth:int = dateGrid.mx_internal::getNumberOfDaysInMonth(displayedYear, displayedMonth);
@@ -78,7 +82,35 @@
 				
 				if(lastCreateDate == null || lastCreateDate.time != date.time){
 					function createGrid():void{
-						clearInterval(createDateInterval);
+						clearInterval(createDateInterval);						
+						scheduleData = {};
+						
+						var recursive:Object = {};
+						var exception:Object = {};
+						 
+						if(resultData is Array){
+							for(var i:uint = 0; i < resultData.length; i++){
+								var record:Object = resultData[i];
+								if(record.endDate == null){
+									for(var w:uint = 0; w < record.smtwtfs.length; w++){
+										if(record.smtwtfs.charAt(w) == "1"){
+											if(recursive[w] == null)
+												recursive[w] = [];
+											recursive[w].push(record);
+										}
+									}
+								}else{
+									var ymd:Array = record.startDate.split('-');
+									if(ymd[0] == displayedYear && ymd[1] == displayedMonth + 1){
+										var d:String = ymd[2];
+										if(exception[d] == null)
+											exception[d] = [];
+										exception[d].push(record);
+									}	
+								}
+							}
+						}
+						
 						var rows:ArrayCollection = new ArrayCollection();
 						for(var r:uint = 0; r < 6; r++){
 							var cols:ArrayCollection = new ArrayCollection();
@@ -88,6 +120,39 @@
 										day = 1;
 								}else{
 									day++;
+									var $exception:Array = exception[day];
+									var $recursive:Array = recursive[c];
+									if($recursive != null){
+										if($exception == null){
+											scheduleData[day] = $recursive;
+										}else{
+											var $newRecursive:Array = [];
+											for(var i1:uint = 0; i1 < $recursive.length; i1++){
+												var $r:Object = $recursive[i1];
+												var add:Boolean = true;
+												for(var i2:uint = 0; i2 < $exception.length; i2++){
+													var $e:Object = $exception[i2];
+													if($r.startTime == $e.startTime && $e.disposition == "canceled"){
+														add = false;
+														break;
+													}
+												}
+												if(add == true)
+													$newRecursive.push($r);
+											}
+											for(var i3:uint = 0; i3 < $exception.length; i3++){
+												$e = $exception[i3];
+												if($e.disposition != "canceled")
+													$newRecursive.push($e);
+											}
+											var listData:ArrayCollection = new ArrayCollection($newRecursive);
+											var sort:Sort = new Sort();
+					                        sort.fields = [new SortField("startTime")]; 
+					                        listData.sort = sort;
+					                        listData.refresh();
+											scheduleData[day] = listData.toArray();
+										}
+									}
 								}
 								cols.addItem(day);
 								if(day >= daysInMonth){
@@ -129,7 +194,7 @@
 										private function onComplete(event:Event):void{
 											var selectionColor:Number = dateChooser.getStyle('selectionColor');
 											var vbox:VBox = event.currentTarget.parent as VBox;
-											event.target.dataProvider = scheduleDateData[event.target.data];
+											event.target.dataProvider = scheduleData[event.target.data];
 
 											function selectedDateChanged(e:Event):void{
 												vbox.setStyle("backgroundColor", 
