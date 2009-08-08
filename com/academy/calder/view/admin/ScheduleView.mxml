@@ -215,7 +215,7 @@
 										}
 										
 										private function labelFunctionHandler(item:Object):String{
-											return item.startTime + "  " +  item.disposition;
+											return item.startTime + " " + (item.disposition != "lesson taken" ? item.disposition : "");
 										}
 									]]>
 								</mx:Script>
