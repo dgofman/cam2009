@@ -41,8 +41,10 @@
 			[Bindable]
 			private var calendarData:ArrayCollection;
 			
-			[Bindable]
-			private var scheduleData:Object = {};
+			private var scheduleData:Object  = {};
+			private var recursiveData:Object = {};
+			private var exceptionData:Object = {};
+			private var scheduleRefData:Object = {};
 			
 			private var resultData:Object;
 			private var lastCreateDate:Date;
@@ -81,33 +83,35 @@
 				calendarData = null;
 				
 				if(details) details.dataProvider = null;
-						
+				if(cancel_txt) cancel_txt.text = "";
+					
 				if(lastCreateDate == null || lastCreateDate.time != date.time){	
 					function createGrid():void{
 						clearInterval(createDateInterval);						
 						scheduleData = {};
+						recursiveData = {};
+						exceptionData = {};
+						scheduleRefData = {};
 						
-						var recursive:Object = {};
-						var exception:Object = {};
-						 
 						if(resultData is Array){
 							for(var i:uint = 0; i < resultData.length; i++){
 								var record:Object = resultData[i];
+								scheduleRefData[record.scheduleId] = record;
 								if(record.endDate == null){
 									for(var w:uint = 0; w < record.smtwtfs.length; w++){
 										if(record.smtwtfs.charAt(w) == "1"){
-											if(recursive[w] == null)
-												recursive[w] = [];
-											recursive[w].push(record);
+											if(recursiveData[w] == null)
+												recursiveData[w] = [];
+											recursiveData[w].push(record);
 										}
 									}
 								}else{
 									var ymd:Array = record.startDate.split('-');
 									if(ymd[0] == displayedYear && ymd[1] == displayedMonth + 1){
 										var d:String = ymd[2];
-										if(exception[d] == null)
-											exception[d] = [];
-										exception[d].push(record);
+										if(exceptionData[d] == null)
+											exceptionData[d] = [];
+										exceptionData[d].push(record);
 									}	
 								}
 							}
@@ -122,32 +126,35 @@
 										day = 1;
 								}else{
 									day++;
-									var $exception:Array = exception[day];
-									var $recursive:Array = recursive[c];
-									if($recursive != null){
-										if($exception == null){
-											scheduleData[day] = $recursive;
+									var $exceptionData:Array = exceptionData[day];
+									var $recursiveData:Array = recursiveData[c];
+									if($recursiveData != null){
+										if($exceptionData == null){
+											scheduleData[day] = $recursiveData;
 										}else{
-											var $newRecursive:Array = [];
-											for(var i1:uint = 0; i1 < $recursive.length; i1++){
-												var $r:Object = $recursive[i1];
+											var $newrecursiveData:Array = [];
+											
+											for(var i1:uint = 0; i1 < $recursiveData.length; i1++){
+												var $r:Object = $recursiveData[i1];
 												var add:Boolean = true;
-												for(var i2:uint = 0; i2 < $exception.length; i2++){
-													var $e:Object = $exception[i2];
+												for(var i2:uint = 0; i2 < $exceptionData.length; i2++){
+													var $e:Object = $exceptionData[i2];
 													if($r.startTime == $e.startTime && $e.disposition == "canceled"){
 														add = false;
 														break;
 													}
 												}
 												if(add == true)
-													$newRecursive.push($r);
+													$newrecursiveData.push($r);
 											}
-											for(var i3:uint = 0; i3 < $exception.length; i3++){
-												$e = $exception[i3];
+											for(var i3:uint = 0; i3 < $exceptionData.length; i3++){
+												$e = $exceptionData[i3];
+												if($e.refScheduleId != null)
+													$e.refSchedule = scheduleRefData[$e.refScheduleId];
 												if($e.disposition != "canceled")
-													$newRecursive.push($e);
+													$newrecursiveData.push($e);
 											}
-											var listData:ArrayCollection = new ArrayCollection($newRecursive);
+											var listData:ArrayCollection = new ArrayCollection($newrecursiveData);
 											var sort:Sort = new Sort();
 					                        sort.fields = [new SortField("startTime")]; 
 					                        listData.sort = sort;
@@ -202,13 +209,30 @@
 												vbox.setStyle("backgroundColor", 
 													event.currentTarget.data == dateChooser.selectedDate.date ? selectionColor : 0xffffff);
 												
-												if(event.currentTarget.data == dateChooser.selectedDate.date)
+												if(event.currentTarget.data == dateChooser.selectedDate.date){
 													details.dataProvider = event.currentTarget.dataProvider;
+													
+													var $exceptions:Array = exceptionData[event.currentTarget.data];
+													if($exceptions != null){
+														for(var i:uint = 0; i < $exceptions.length; i++){
+															var $e1:Object = $exceptions[i];
+															if($e1.disposition == "canceled"){
+																for each(var $e2:Object in scheduleRefData){
+																	if($e2.refScheduleId == $e1.scheduleId){
+																		cancel_txt.text += $e1.startTime + " -> " + $e2.startDate + " " + $e2.startTime + "\n";
+																		break;
+																	}
+																}
+															}
+														}
+													}
+												}
 											};
 											dateChooser.addEventListener(Event.CHANGE, selectedDateChanged);
 										}
 										
 										private function onClick(event:Event):void{
+											cancel_txt.text = "";
 											dateChooser.selectedDate = 
 												new Date(dateChooser.displayedYear, dateChooser.displayedMonth, event.currentTarget.data);
 											dateChooser.dispatchEvent(new Event(Event.CHANGE));
@@ -241,34 +265,40 @@
 				<mx:Repeater id="details">
 					<mx:Script>
 						<![CDATA[
-							private function getValue(schedule:Object, prop:String):String{
-								return schedule[prop];
+							private function $v(item:Object, prop:String):*{
+								return item[prop];
 							}
 						]]>
 					</mx:Script>
 					<mx:FormItem label="{Manager.bundle.getMessage('startTime')}:" fontWeight="bold">
-						<mx:Label text="{getValue(details.currentItem, 'startTime')}" width="85"/>
+						<mx:Label text="{$v(details.currentItem, 'startTime')}" width="85"/>
+					</mx:FormItem>
+					<mx:FormItem toolTip="{$v($v(details.currentItem, 'refSchedule'), 'disposition')}" fontStyle="italic" textDecoration="underline"
+							visible="{$v(details.currentItem, 'refSchedule') != null}" includeInLayout="{$v(details.currentItem, 'refSchedule') != null}"
+							label="{$v($v(details.currentItem, 'refSchedule'), 'startDate')}">
+						<mx:Label text="{$v($v(details.currentItem, 'refSchedule'), 'startTime')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('disposition')}:">
-						<mx:Label  text="{getValue(details.currentItem, 'disposition')}" 
-								toolTip="{getValue(details.currentItem, 'disposition')}" width="85"/>
+						<mx:Label  text="{$v(details.currentItem, 'disposition')}" 
+								toolTip="{$v(details.currentItem, 'disposition')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('startDate')}:">
-						<mx:Label text="{getValue(details.currentItem, 'startDate')}" width="85"/>
+						<mx:Label text="{$v(details.currentItem, 'startDate')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('endDate')}:">
-						<mx:Label text="{getValue(details.currentItem, 'endDate')}" width="85"/>
+						<mx:Label text="{$v(details.currentItem, 'endDate')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('options')}:">
-						<mx:Label text="{getValue(details.currentItem, 'options')}" width="85"/>
+						<mx:Label text="{$v(details.currentItem, 'options')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('note')}:">
-						<mx:Text text="{getValue(details.currentItem, 'notes')}" width="85"/>
+						<mx:Text text="{$v(details.currentItem, 'notes')}" width="85"/>
 						<mx:Spacer height="25"/>
 					</mx:FormItem>
 				</mx:Repeater>
 			</mx:Form>
 		</mx:Canvas>
+		<mx:Text id="cancel_txt" width="{dateChooser.width}" color="red"/>
 		<mx:Button label="{Manager.bundle.getMessage('close')}" click="closeWindow()"/>
 	</mx:VBox>
 </mx:TitleWindow>
