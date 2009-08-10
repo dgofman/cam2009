@@ -83,7 +83,7 @@
 				calendarData = null;
 				
 				if(details) details.dataProvider = null;
-				if(cancel_txt) cancel_txt.text = "";
+				if(cancel_lst) cancel_lst.dataProvider = null;
 					
 				if(lastCreateDate == null || lastCreateDate.time != date.time){	
 					function createGrid():void{
@@ -187,7 +187,7 @@
 				return item[prop];
 			}
 			
-			private function selectDate(startDate:String):void{
+			public function selectDate(startDate:String):void{
 				var d:Array = startDate.split('-');
 				dateChooser.selectedDate = new Date(d[0], d[1] - 1, d[2]);
 				if( dateChooser.displayedYear == dateChooser.selectedDate.fullYear &&
@@ -213,17 +213,14 @@
 				<mx:GridRow width="100%" borderSides="bottom" styleName="scheduleBorder">
 					<mx:Repeater id="cols" dataProvider="{rows.currentItem}">
 						<mx:GridItem width="14.26%" borderSides="right" styleName="{cols.currentIndex == 6 ? null : 'scheduleBorder'}">
-							<mx:VBox width="100%" height="100" verticalGap="0" visible="{!isNaN(cols.currentItem)}">
+							<mx:VBox width="100%" height="100" verticalGap="0" visible="{!isNaN(cols.currentItem)}" backgroundColor="#ffffff">
 								<mx:Script>
 									<![CDATA[
 										import mx.containers.VBox;
 										
 										private function onComplete(event:Event):void{
 											var selectionColor:Number = dateChooser.getStyle('selectionColor');
-											var vbox:VBox = event.currentTarget.parent as VBox;
-											vbox.setStyle("backgroundColor", 
-													(dateChooser.selectedDate && event.currentTarget.data == dateChooser.selectedDate.date) ? selectionColor : 0xffffff);
-													
+											var vbox:VBox = event.currentTarget.parent as VBox;	
 											event.target.dataProvider = scheduleData[event.target.data];
 
 											function selectedDateChanged(e:Event):void{
@@ -231,7 +228,7 @@
 													event.currentTarget.data == dateChooser.selectedDate.date ? selectionColor : 0xffffff);
 												
 												if(event.currentTarget.data == dateChooser.selectedDate.date){
-													cancel_txt.text = "";
+													cancel_lst.dataProvider = [];
 													details.dataProvider = event.currentTarget.dataProvider;
 													
 													var $exceptions:Array = exceptionData[event.currentTarget.data];
@@ -241,7 +238,8 @@
 															if($e1.disposition == "canceled"){
 																for each(var $e2:Object in scheduleRefData){
 																	if($e2.refScheduleId == $e1.scheduleId){
-																		cancel_txt.text += $e1.startTime + " -> " + $e2.startDate + " " + $e2.startTime + "\n";
+																		cancel_lst.dataProvider.addItem(
+																			{label:$e1.startTime + " -> " + $e2.startDate + " " + $e2.startTime, startDate:$e2.startDate});
 																		break;
 																	}
 																}
@@ -251,6 +249,8 @@
 												}
 											};
 											dateChooser.addEventListener(Event.CHANGE, selectedDateChanged);
+											if(dateChooser.selectedDate != null)
+												dateChooser.dispatchEvent(new Event(Event.CHANGE));
 										}
 										
 										private function onClick(event:Event):void{
@@ -280,7 +280,7 @@
 		</mx:Grid>
 	</mx:Canvas>
 	<mx:VBox height="100%" horizontalAlign="right">
-		<mx:DateChooser id="dateChooser"/>
+		<mx:DateChooser id="dateChooser" scroll="dateChooser.selectedDate=null"/>
 		<mx:Canvas id="cvs" width="{dateChooser.width}" height="100%" horizontalScrollPolicy="off" borderStyle="solid">
 			<mx:Form width="100%" height="100%" verticalGap="0" paddingLeft="0" paddingRight="0">
 				<mx:Repeater id="details">
@@ -313,7 +313,14 @@
 				</mx:Repeater>
 			</mx:Form>
 		</mx:Canvas>
-		<mx:Text id="cancel_txt" width="{dateChooser.width}" color="red"/>
+		<mx:List id="cancel_lst" width="{dateChooser.width}" color="red" textDecoration="underline" height="30">
+			<mx:itemRenderer>
+				<mx:Component>
+					<mx:Label useHandCursor="true" buttonMode="true" mouseChildren="false" 
+						click="ScheduleView(document).selectDate(data.startDate)"/>
+				</mx:Component>
+			</mx:itemRenderer>
+		</mx:List>
 		<mx:Button label="{Manager.bundle.getMessage('close')}" click="closeWindow()"/>
 	</mx:VBox>
 </mx:TitleWindow>
