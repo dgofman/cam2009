@@ -66,7 +66,7 @@
 					PopUpManager.removePopUp(_window);
 				_window = null;
 			}
-
+			
 			private function init():void{
 				var calendarLayout:Class = getDefinitionByName("mx.controls::CalendarLayout") as Class;
 				dateGrid = new calendarLayout();
@@ -126,41 +126,42 @@
 										day = 1;
 								}else{
 									day++;
-									var $exceptionData:Array = exceptionData[day];
-									var $recursiveData:Array = recursiveData[c];
-									if($recursiveData != null){
-										if($exceptionData == null){
-											scheduleData[day] = $recursiveData;
-										}else{
-											var $newrecursiveData:Array = [];
-											
-											for(var i1:uint = 0; i1 < $recursiveData.length; i1++){
-												var $r:Object = $recursiveData[i1];
+									var $exceptions:Array = exceptionData[day];
+									var $recursives:Array = recursiveData[c];
+									if($recursives != null && $exceptions == null){
+										scheduleData[day] = $recursives;
+									}else if($exceptions != null){
+										var $data:Array = [];
+										
+										if($recursives != null){
+											for(var i1:uint = 0; i1 < $recursives.length; i1++){
+												var $r:Object = $recursives[i1];
 												var add:Boolean = true;
-												for(var i2:uint = 0; i2 < $exceptionData.length; i2++){
-													var $e:Object = $exceptionData[i2];
+												for(var i2:uint = 0; i2 < $exceptions.length; i2++){
+													var $e:Object = $exceptions[i2];
 													if($r.startTime == $e.startTime && $e.disposition == "canceled"){
 														add = false;
 														break;
 													}
 												}
 												if(add == true)
-													$newrecursiveData.push($r);
+													$data.push($r);
 											}
-											for(var i3:uint = 0; i3 < $exceptionData.length; i3++){
-												$e = $exceptionData[i3];
-												if($e.refScheduleId != null)
-													$e.refSchedule = scheduleRefData[$e.refScheduleId];
-												if($e.disposition != "canceled")
-													$newrecursiveData.push($e);
-											}
-											var listData:ArrayCollection = new ArrayCollection($newrecursiveData);
-											var sort:Sort = new Sort();
-					                        sort.fields = [new SortField("startTime")]; 
-					                        listData.sort = sort;
-					                        listData.refresh();
-											scheduleData[day] = listData.toArray();
 										}
+										
+										for(var i3:uint = 0; i3 < $exceptions.length; i3++){
+											$e = $exceptions[i3];
+											if($e.refScheduleId != null)
+												$e.refSchedule = scheduleRefData[$e.refScheduleId];
+											if($e.disposition != "canceled")
+												$data.push($e);
+										}
+										var listData:ArrayCollection = new ArrayCollection($data);
+										var sort:Sort = new Sort();
+				                        sort.fields = [new SortField("startTime")]; 
+				                        listData.sort = sort;
+				                        listData.refresh();
+										scheduleData[day] = listData.toArray();
 									}
 								}
 								cols.addItem(day);
@@ -177,9 +178,26 @@
 					lastCreateDate = date;
 					
 					clearInterval(createDateInterval);
-					createDateInterval = setInterval(createGrid, 500);
+					createDateInterval = setInterval(createGrid, 300);
 				}
-			} 
+			}
+			
+			//Repeater functions
+			private function $v(item:Object, prop:String):*{
+				return item[prop];
+			}
+			
+			private function selectDate(startDate:String):void{
+				var d:Array = startDate.split('-');
+				dateChooser.selectedDate = new Date(d[0], d[1] - 1, d[2]);
+				if( dateChooser.displayedYear == dateChooser.selectedDate.fullYear &&
+					dateChooser.displayedMonth == dateChooser.selectedDate.month){
+					dateChooser.dispatchEvent(new Event(Event.CHANGE));
+				}else{
+					dateChooser.displayedYear = dateChooser.selectedDate.fullYear;
+					dateChooser.displayedMonth = dateChooser.selectedDate.month;
+				}
+			}
 		]]>
 	</mx:Script>
 	<mx:Binding source="dateChooser.displayedMonth" destination="displayedMonthAndYear"/>
@@ -195,7 +213,7 @@
 				<mx:GridRow width="100%" borderSides="bottom" styleName="scheduleBorder">
 					<mx:Repeater id="cols" dataProvider="{rows.currentItem}">
 						<mx:GridItem width="14.26%" borderSides="right" styleName="{cols.currentIndex == 6 ? null : 'scheduleBorder'}">
-							<mx:VBox width="100%" height="100" backgroundColor="#ffffff" verticalGap="0" visible="{!isNaN(cols.currentItem)}">
+							<mx:VBox width="100%" height="100" verticalGap="0" visible="{!isNaN(cols.currentItem)}">
 								<mx:Script>
 									<![CDATA[
 										import mx.containers.VBox;
@@ -203,6 +221,9 @@
 										private function onComplete(event:Event):void{
 											var selectionColor:Number = dateChooser.getStyle('selectionColor');
 											var vbox:VBox = event.currentTarget.parent as VBox;
+											vbox.setStyle("backgroundColor", 
+													(dateChooser.selectedDate && event.currentTarget.data == dateChooser.selectedDate.date) ? selectionColor : 0xffffff);
+													
 											event.target.dataProvider = scheduleData[event.target.data];
 
 											function selectedDateChanged(e:Event):void{
@@ -210,6 +231,7 @@
 													event.currentTarget.data == dateChooser.selectedDate.date ? selectionColor : 0xffffff);
 												
 												if(event.currentTarget.data == dateChooser.selectedDate.date){
+													cancel_txt.text = "";
 													details.dataProvider = event.currentTarget.dataProvider;
 													
 													var $exceptions:Array = exceptionData[event.currentTarget.data];
@@ -232,7 +254,6 @@
 										}
 										
 										private function onClick(event:Event):void{
-											cancel_txt.text = "";
 											dateChooser.selectedDate = 
 												new Date(dateChooser.displayedYear, dateChooser.displayedMonth, event.currentTarget.data);
 											dateChooser.dispatchEvent(new Event(Event.CHANGE));
@@ -263,19 +284,13 @@
 		<mx:Canvas id="cvs" width="{dateChooser.width}" height="100%" horizontalScrollPolicy="off" borderStyle="solid">
 			<mx:Form width="100%" height="100%" verticalGap="0" paddingLeft="0" paddingRight="0">
 				<mx:Repeater id="details">
-					<mx:Script>
-						<![CDATA[
-							private function $v(item:Object, prop:String):*{
-								return item[prop];
-							}
-						]]>
-					</mx:Script>
 					<mx:FormItem label="{Manager.bundle.getMessage('startTime')}:" fontWeight="bold">
 						<mx:Label text="{$v(details.currentItem, 'startTime')}" width="85"/>
 					</mx:FormItem>
-					<mx:FormItem toolTip="{$v($v(details.currentItem, 'refSchedule'), 'disposition')}" fontStyle="italic" textDecoration="underline"
+					<mx:FormItem toolTip="{$v($v(details.currentItem, 'refSchedule'), 'disposition')}" 
+							textDecoration="underline" color="blue" useHandCursor="true" buttonMode="true" mouseChildren="false"
 							visible="{$v(details.currentItem, 'refSchedule') != null}" includeInLayout="{$v(details.currentItem, 'refSchedule') != null}"
-							label="{$v($v(details.currentItem, 'refSchedule'), 'startDate')}">
+							label="{$v($v(details.currentItem, 'refSchedule'), 'startDate')}" click="selectDate(event.target.label)">
 						<mx:Label text="{$v($v(details.currentItem, 'refSchedule'), 'startTime')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('disposition')}:">
