@@ -126,6 +126,9 @@
 										day = 1;
 								}else{
 									day++;
+								}
+								
+								if(!isNaN(day)){
 									var $exceptions:Array = exceptionData[day];
 									var $recursives:Array = recursiveData[c];
 									if($recursives != null && $exceptions == null){
