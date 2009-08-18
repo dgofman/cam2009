@@ -30,7 +30,7 @@
 			}
 			
 			private function onFault(fault:Object):void{
-				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_schedule'));
+				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_lesson'));
 			}
 		]]>
 	</mx:Script>

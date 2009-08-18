@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="1125" height="656" layout="horizontal"
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="1125" height="676" layout="horizontal"
 	horizontalScrollPolicy="off" verticalScrollPolicy="off" showCloseButton="true" close="closeWindow()"
 	paddingBottom="2" paddingTop="2" paddingLeft="2" paddingRight="2" preinitialize="init()" styleName="schedulePanel">
 	<mx:Style>
@@ -31,11 +31,16 @@
     </mx:Style>
 	<mx:Script>
 		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.DragEvent;
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
 			import mx.collections.Sort;
 			import mx.collections.SortField;
 			import mx.collections.ArrayCollection;
-			import mx.managers.PopUpManager;
 			import com.academy.calder.business.Manager;
+			import com.academy.calder.business.AMFService;
+			
 			import flash.utils.getDefinitionByName;
 			
 			[Bindable]
@@ -52,6 +57,8 @@
 			private var dateGrid:*;
 			
 			private static var _window:ScheduleView;
+			
+			private static const _smtwtfs:Array = [0, 0, 0, 0, 0, 0, 0]; 
 			
 			public static function openWindow(result:Object):ScheduleView{
 				if(_window == null)
@@ -201,10 +208,58 @@
 					dateChooser.displayedMonth = dateChooser.selectedDate.month;
 				}
 			}
+			
+			private function onDragComplete(event:DragEvent):void{
+				var items:Array = event.dragSource.dataForFormat("items") as Array;
+				if(items && items.length == 1){
+					
+					function alertClickHandler(closeEvent:CloseEvent):void{
+						var item:Object = items[0];
+						var date:Date = new Date(dateChooser.displayedYear, dateChooser.displayedMonth, List(event.relatedObject).data);
+						var smtwtfs:Array = _smtwtfs.concat(); //clone
+						smtwtfs[date.day] = 1;
+						
+						var params:Array = [
+							item.scheduleId,
+							item.refScheduleId,
+							item.startTime,
+							dateFormat.format(date),
+							dateFormat.format(date),
+							smtwtfs.join("")
+						];
+						if(closeEvent.detail == Alert.YES){
+							AMFService.send('Account.current', params, null, onFault);
+						}else if(closeEvent.detail == Alert.NO){
+							AMFService.send('Account.future', params, onFutureResult, onFault);
+						}
+					};
+					
+					Alert.buttonWidth = 120;
+	                Alert.yesLabel = Manager.bundle.getMessage("current");
+	                Alert.noLabel  = Manager.bundle.getMessage("future");
+	                Alert.show(
+	                	Manager.bundle.getMessage("Apply the changes to the current event only or to this and all future occurrences?"),
+	                	Manager.bundle.getMessage("Repeating Event"), Alert.YES|Alert.NO|Alert.CANCEL, this, alertClickHandler);
+	                
+	                // Set the labels back to normal:
+	                Alert.yesLabel = Manager.bundle.getMessage("yes");
+	                Alert.noLabel = Manager.bundle.getMessage("no");  
+                
+				}
+			}
+
+			private function onFutureResult(result:Object):void{
+				
+			}
+			
+			private function onFault(fault:Object):void{
+				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_schedule'));
+			}
 		]]>
 	</mx:Script>
 	<mx:Binding source="dateChooser.displayedMonth" destination="displayedMonthAndYear"/>
 	<mx:Binding source="dateChooser.displayedYear" destination="displayedMonthAndYear"/>
+	<mx:DateFormatter id="dateFormat" formatString="YYYY-MM-DD"/>
 	
 	<mx:Canvas width="100%" id="canvas">
 		<mx:VBox width="{canvas.width}" height="{canvas.height}" verticalAlign="middle" horizontalAlign="center">
@@ -212,6 +267,13 @@
 		</mx:VBox>
 		
 		<mx:Grid width="100%" borderSides="left top right" styleName="scheduleBorder" verticalGap="1" horizontalGap="1" backgroundColor="#F2F2F2">
+			<mx:GridRow width="100%" borderSides="bottom" styleName="scheduleBorder">
+				<mx:Repeater id="days" dataProvider="{dateChooser.dayNames}">
+					<mx:GridItem width="14.26%" borderSides="right" styleName="scheduleBorder" backgroundColor="#FCA34C">
+						<mx:Label width="100%" textAlign="center" fontWeight="bold" color="white" text="{Manager.bundle.getMessage('d' + days.currentIndex)}"/>
+					</mx:GridItem>
+				</mx:Repeater>
+			</mx:GridRow>
 			<mx:Repeater id="rows" dataProvider="{calendarData}">
 				<mx:GridRow width="100%" borderSides="bottom" styleName="scheduleBorder">
 					<mx:Repeater id="cols" dataProvider="{rows.currentItem}">
@@ -271,9 +333,10 @@
 									<mx:Label text="{isNaN(cols.currentItem) ? null : cols.currentItem}"/>						
 								</mx:HBox>
 								<mx:List width="100%" height="100%" creationComplete="onComplete(event)"
-										data="{cols.currentItem}" click="onClick(event)" labelFunction="labelFunctionHandler"
+										tabIndex="{cols.currentIndex}" data="{cols.currentItem}" 
+										click="onClick(event)" labelFunction="labelFunctionHandler"
 										itemRenderer="mx.controls.Label" backgroundAlpha="0" borderStyle="none" 
-										rollOverColor="#ffffffff" selectionColor="#ffffffff"
+										rollOverColor="#ffffffff" selectionColor="#ffffffff" dragComplete="onDragComplete(event)"
 										dropEnabled="true" dragMoveEnabled="true" dragEnabled="true"/>
 							</mx:VBox>
 						</mx:GridItem>
@@ -305,9 +368,6 @@
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('endDate')}:">
 						<mx:Label text="{$v(details.currentItem, 'endDate')}" width="85"/>
-					</mx:FormItem>
-					<mx:FormItem label="{Manager.bundle.getMessage('options')}:">
-						<mx:Label text="{$v(details.currentItem, 'options')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('note')}:">
 						<mx:Text text="{$v(details.currentItem, 'notes')}" width="85"/>
