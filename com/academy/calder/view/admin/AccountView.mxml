@@ -30,6 +30,12 @@
 			[Bindable]
 			private var _contact:ContactVO;
 			
+			private var _personId:String;
+			
+			public function get personId():String{
+				return _personId;
+			}
+			
 			public function onRefresh():void{
 				clean();
 				AMFService.send('CAM.persons', null, onPersonsResult, onFault);
@@ -50,9 +56,9 @@
 			}
 			
 			private function onLinksItemClick(event:ListEvent):void{
-				var personId:String = linkGrid.selectedItem.personId;
+				_personId = linkGrid.selectedItem.personId;
 				if(linkGrid.selectedItem.contacts == null){
-					AMFService.send('Account.contact', [personId], onContactResult, onFault);
+					AMFService.send('Account.contact', [_personId], onContactResult, onFault);
 				}else{
 					contactGrid.dataProvider = linkGrid.selectedItem.contacts;
 				}
