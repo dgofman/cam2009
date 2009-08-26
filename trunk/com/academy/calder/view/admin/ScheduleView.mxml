@@ -34,6 +34,7 @@
 			import mx.controls.Alert;
 			import mx.events.DragEvent;
 			import mx.events.CloseEvent;
+			import mx.managers.DragManager;
 			import mx.managers.PopUpManager;
 			import mx.collections.Sort;
 			import mx.collections.SortField;
@@ -47,7 +48,7 @@
 			private var calendarData:ArrayCollection;
 			
 			private var scheduleData:Object  = {};
-			private var recursiveData:Object = {};
+			private var recurringData:Object = {};
 			private var exceptionData:Object = {};
 			private var scheduleRefData:Object = {};
 			
@@ -81,6 +82,7 @@
 			
 			private function set displayedMonthAndYear(value:int):void{
 				var day:Number = NaN;
+				var startDate:Date, endDate:Date;
 				var displayedYear:int = dateChooser.displayedYear;				
 				var displayedMonth:int = dateChooser.displayedMonth;
 				var monthName:String = dateChooser.monthNames[displayedMonth];
@@ -96,26 +98,29 @@
 					function createGrid():void{
 						clearInterval(createDateInterval);						
 						scheduleData = {};
-						recursiveData = {};
+						recurringData = {};
 						exceptionData = {};
 						scheduleRefData = {};
 						
 						if(resultData is Array){
 							for(var i:uint = 0; i < resultData.length; i++){
 								var record:Object = resultData[i];
+								var ymd:Array = record.startDate.split('-');
+								startDate = new Date(ymd[0], ymd[1] - 1);
+								if(startDate.time > date.time)
+									continue;
 								scheduleRefData[record.scheduleId] = record;
-								if(record.endDate == null){
+								if(record.endDate == null || record.startDate != record.endDate){
 									for(var w:uint = 0; w < record.smtwtfs.length; w++){
 										if(record.smtwtfs.charAt(w) == "1"){
-											if(recursiveData[w] == null)
-												recursiveData[w] = [];
-											recursiveData[w].push(record);
+											if(recurringData[w] == null)
+												recurringData[w] = [];
+											recurringData[w].push(record);
 										}
 									}
 								}else{
-									var ymd:Array = record.startDate.split('-');
 									if(ymd[0] == displayedYear && ymd[1] == displayedMonth + 1){
-										var d:String = ymd[2];
+										var d:uint = ymd[2];
 										if(exceptionData[d] == null)
 											exceptionData[d] = [];
 										exceptionData[d].push(record);
@@ -137,15 +142,30 @@
 								
 								if(!isNaN(day)){
 									var $exceptions:Array = exceptionData[day];
-									var $recursives:Array = recursiveData[c];
-									if($recursives != null && $exceptions == null){
-										scheduleData[day] = $recursives;
+									var $recurrings:Array = recurringData[c];
+									if($recurrings != null && $exceptions == null){
+										var recursives:Array = [];
+										for(var v:uint = 0; v < $recurrings.length; v++){
+											var recur:Object = $recurrings[v];
+											ymd = recur.startDate.split('-');
+											startDate = new Date(ymd[0], ymd[1] - 1, ymd[2]);
+											if(startDate.time <= date.time + ((day - 1) * 86400000)){
+												if(recur.endDate != null){
+													ymd = recur.endDate.split('-');
+													endDate = new Date(ymd[0], ymd[1] - 1, ymd[2]);
+													if(date.time + ((day - 1) * 86400000) > endDate.time)
+														continue;
+												}
+												recursives.push(recur);
+											}
+										}
+										scheduleData[day] = recursives;
 									}else if($exceptions != null){
 										var $data:Array = [];
 										
-										if($recursives != null){
-											for(var i1:uint = 0; i1 < $recursives.length; i1++){
-												var $r:Object = $recursives[i1];
+										if($recurrings != null){
+											for(var i1:uint = 0; i1 < $recurrings.length; i1++){
+												var $r:Object = $recurrings[i1];
 												var add:Boolean = true;
 												for(var i2:uint = 0; i2 < $exceptions.length; i2++){
 													var $e:Object = $exceptions[i2];
@@ -161,16 +181,11 @@
 										
 										for(var i3:uint = 0; i3 < $exceptions.length; i3++){
 											$e = $exceptions[i3];
-											if($e.refScheduleId != null)
-												$e.refSchedule = scheduleRefData[$e.refScheduleId];
 											if($e.disposition != "canceled")
 												$data.push($e);
 										}
 										var listData:ArrayCollection = new ArrayCollection($data);
-										var sort:Sort = new Sort();
-				                        sort.fields = [new SortField("startTime")]; 
-				                        listData.sort = sort;
-				                        listData.refresh();
+										doSort(listData);
 										scheduleData[day] = listData.toArray();
 									}
 								}
@@ -192,66 +207,113 @@
 				}
 			}
 			
+			private function doSort(listData:ArrayCollection):void{
+				var sort:Sort = new Sort();
+                sort.fields = [new SortField("startTime")]; 
+                listData.sort = sort;
+                listData.refresh();
+			}
+			
 			//Repeater functions
 			private function $v(item:Object, prop:String):*{
+				if(prop == "refScheduleId")
+					return (item.refScheduleId == null ? null : scheduleRefData[item.refScheduleId]);
 				return item[prop];
 			}
 			
 			public function selectDate(startDate:String):void{
+				lastCreateDate = null;
+				
 				var d:Array = startDate.split('-');
 				dateChooser.selectedDate = new Date(d[0], d[1] - 1, d[2]);
 				if( dateChooser.displayedYear == dateChooser.selectedDate.fullYear &&
 					dateChooser.displayedMonth == dateChooser.selectedDate.month){
 					dateChooser.dispatchEvent(new Event(Event.CHANGE));
 				}else{
-					dateChooser.displayedYear = dateChooser.selectedDate.fullYear;
 					dateChooser.displayedMonth = dateChooser.selectedDate.month;
+					dateChooser.displayedYear = dateChooser.selectedDate.fullYear;
 				}
+			}
+			
+			private function onDragEnter(event:DragEvent):void{
+				var items:Array = event.dragSource.dataForFormat("items") as Array;
+				if(!items || items.length != 1 || uint(items[0].canReschedule) != 1)
+					event.preventDefault();
 			}
 			
 			private function onDragComplete(event:DragEvent):void{
 				var items:Array = event.dragSource.dataForFormat("items") as Array;
-				if(items && items.length == 1){
+				if(event.relatedObject != null && items && items.length == 1){
+					var item:Object = items[0];
+					var date:Date = new Date(dateChooser.displayedYear, dateChooser.displayedMonth, List(event.relatedObject).data);
+					var smtwtfs:Array = _smtwtfs.concat(); //clone
+					smtwtfs[date.day] = 1;
+						
+					function rollback(fault:Object=null):void{
+						var index:int = ArrayCollection(List(event.relatedObject).dataProvider).getItemIndex(item);
+						if(index != -1){
+							ArrayCollection(List(event.relatedObject).dataProvider).removeItemAt(index);
+							ArrayCollection(event.target.dataProvider).addItem(item);
+							doSort(event.target.dataProvider as ArrayCollection);
+						}
+					};
+					
+					function commit(result:Object):void{
+						item.startDate = dateFormat.format(date);
+						item.endDate = dateFormat.format(date);
+						item.smtwtfs = smtwtfs.join("");
+					};
 					
 					function alertClickHandler(closeEvent:CloseEvent):void{
-						var item:Object = items[0];
-						var date:Date = new Date(dateChooser.displayedYear, dateChooser.displayedMonth, List(event.relatedObject).data);
-						var smtwtfs:Array = _smtwtfs.concat(); //clone
-						smtwtfs[date.day] = 1;
-						
+						var type:uint;
+						if(item.refScheduleId != null)
+							type = 1;
+						else if(item.startDate == item.endDate)
+							type = 2;
+						else
+							type = 3;
+								
 						var params:Array = [
+							type,
 							item.scheduleId,
 							item.refScheduleId,
 							item.startTime,
 							dateFormat.format(date),
 							dateFormat.format(date),
-							smtwtfs.join("")
+							smtwtfs.join(""),
+							item.disposition,
+							item.notes
 						];
 						if(closeEvent.detail == Alert.YES){
-							AMFService.send('Account.current', params, null, onFault);
-						}else if(closeEvent.detail == Alert.NO){
-							AMFService.send('Account.future', params, onFutureResult, onFault);
+							AMFService.send('Account.current', params, commit, rollback);
+						}else if(closeEvent.detail == Alert.OK){
+							AMFService.send('Account.future', params, commit, rollback);
+						}else if(closeEvent.detail == Alert.NO || closeEvent.detail == Alert.CANCEL){
+							rollback();
 						}
 					};
 					
 					Alert.buttonWidth = 120;
-	                Alert.yesLabel = Manager.bundle.getMessage("current");
-	                Alert.noLabel  = Manager.bundle.getMessage("future");
-	                Alert.show(
-	                	Manager.bundle.getMessage("Apply the changes to the current event only or to this and all future occurrences?"),
-	                	Manager.bundle.getMessage("Repeating Event"), Alert.YES|Alert.NO|Alert.CANCEL, this, alertClickHandler);
-	                
-	                // Set the labels back to normal:
-	                Alert.yesLabel = Manager.bundle.getMessage("yes");
-	                Alert.noLabel = Manager.bundle.getMessage("no");  
-                
+					if(item.refScheduleId == null && item.endDate == null){
+						var labels:Array = [Alert.yesLabel, Alert.okLabel];
+		                Alert.yesLabel = Manager.bundle.getMessage("current");
+		                Alert.okLabel  = Manager.bundle.getMessage("future");
+		                Alert.show(
+		                	Manager.bundle.getMessage("Apply the changes to the current event only or to this and all future occurrences?"),
+		                	Manager.bundle.getMessage("Repeating Event"), Alert.YES|Alert.OK|Alert.CANCEL, this, alertClickHandler);
+		                
+		                // Set the labels back to normal:
+		                Alert.yesLabel = labels[0];
+		                Alert.okLabel = labels[1];  
+     				}else{
+     					Alert.show(
+		                	Manager.bundle.getMessage("Do you want to reschedule the current lesson?"),
+		                	Manager.bundle.getMessage("Reschedule Event"), Alert.YES|Alert.NO, this, alertClickHandler);
+		                
+     				}
 				}
 			}
 
-			private function onFutureResult(result:Object):void{
-				
-			}
-			
 			private function onFault(fault:Object):void{
 				Manager.error(fault.code + ": " + fault.description, Manager.bundle.getMessage('error_schedule'));
 			}
@@ -286,6 +348,8 @@
 										private function onComplete(event:Event):void{
 											var selectionColor:Number = dateChooser.getStyle('selectionColor');
 											var vbox:VBox = event.currentTarget.parent as VBox;	
+											if(vbox == null)
+												return;
 											event.target.dataProvider = scheduleData[event.target.data];
 
 											function selectedDateChanged(e:Event):void{
@@ -337,7 +401,7 @@
 										click="onClick(event)" labelFunction="labelFunctionHandler"
 										itemRenderer="mx.controls.Label" backgroundAlpha="0" borderStyle="none" 
 										rollOverColor="#ffffffff" selectionColor="#ffffffff" dragComplete="onDragComplete(event)"
-										dropEnabled="true" dragMoveEnabled="true" dragEnabled="true"/>
+										dropEnabled="true" dragMoveEnabled="true" dragEnabled="true" dragEnter="onDragEnter(event)"/>
 							</mx:VBox>
 						</mx:GridItem>
 					</mx:Repeater>
@@ -353,21 +417,23 @@
 					<mx:FormItem label="{Manager.bundle.getMessage('startTime')}:" fontWeight="bold">
 						<mx:Label text="{$v(details.currentItem, 'startTime')}" width="85"/>
 					</mx:FormItem>
-					<mx:FormItem toolTip="{$v($v(details.currentItem, 'refSchedule'), 'disposition')}" 
+					<mx:FormItem toolTip="{$v($v(details.currentItem, 'refScheduleId'), 'disposition')}" 
 							textDecoration="underline" color="blue" useHandCursor="true" buttonMode="true" mouseChildren="false"
-							visible="{$v(details.currentItem, 'refSchedule') != null}" includeInLayout="{$v(details.currentItem, 'refSchedule') != null}"
-							label="{$v($v(details.currentItem, 'refSchedule'), 'startDate')}" click="selectDate(event.target.label)">
-						<mx:Label text="{$v($v(details.currentItem, 'refSchedule'), 'startTime')}" width="85"/>
+							visible="{$v(details.currentItem, 'refScheduleId') != null}" includeInLayout="{$v(details.currentItem, 'refScheduleId') != null}"
+							label="{$v($v(details.currentItem, 'refScheduleId'), 'startDate')}" click="selectDate(event.target.label)">
+						<mx:Label text="{$v($v(details.currentItem, 'refScheduleId'), 'startTime')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('disposition')}:">
 						<mx:Label  text="{$v(details.currentItem, 'disposition')}" 
 								toolTip="{$v(details.currentItem, 'disposition')}" width="85"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('startDate')}:">
-						<mx:Label text="{$v(details.currentItem, 'startDate')}" width="85"/>
+						<mx:Label text="{$v(details.currentItem, 'startDate')}" width="85" useHandCursor="true" buttonMode="true" mouseChildren="false"
+							click="selectDate(event.target.text)" color="blue" textDecoration="underline"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('endDate')}:">
-						<mx:Label text="{$v(details.currentItem, 'endDate')}" width="85"/>
+						<mx:Label text="{$v(details.currentItem, 'endDate')}" width="85" useHandCursor="true" buttonMode="true" mouseChildren="false"
+							click="selectDate(event.target.text)" color="blue" textDecoration="underline"/>
 					</mx:FormItem>
 					<mx:FormItem label="{Manager.bundle.getMessage('note')}:">
 						<mx:Text text="{$v(details.currentItem, 'notes')}" width="85"/>

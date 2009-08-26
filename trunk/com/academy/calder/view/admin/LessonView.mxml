@@ -1,28 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" label="{_lesson.lesson}">
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%" label="{_lessonName}" 
+	paddingLeft="5" paddingBottom="5">
 	<mx:Script>
 		<![CDATA[
 			import mx.containers.TabNavigator;
-			import com.academy.calder.vo.LessonVO;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
 			
 			[Bindable]
-			private var _lesson:LessonVO;
+			private var _lessonName:String;
 			
-
 			private function set lessonData(value:Object):void{
-				_lesson = new LessonVO(value);
-				
 				var tabNav:TabNavigator = parent as TabNavigator;
-				if(tabNav && tabNav.getChildIndex(this) == 0){
-					tabNav.selectedChild = this;
-					tabNav.getTabAt(0).dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+				var accountView:AccountView = tabNav.document as AccountView;
+				if(value != null){
+					_lessonName = value.lesson;
+					
+					AMFService.send('Account.details', [accountView.personId, data.lessonTypeId], onLessonDetailsResult, onFault);
+
+					if(tabNav && tabNav.getChildIndex(this) == 0){
+						tabNav.selectedChild = this;
+						tabNav.getTabAt(0).dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+					}
 				}
 			}
 			
+			private function onSave():void{
+				
+			}
+			
 			private function openSchedule():void{
-				AMFService.send('Account.schedule', [_lesson.lessonControlId], onScheduleResult, onFault);
+				AMFService.send('Account.schedule', [info.selectedItem.lessonControlId], onScheduleResult, onFault);
+			}
+			
+			private function onLessonDetailsResult(result:Object):void{
+				info.dataProvider = result;
+				info.selectedIndex = 0;
 			}
 			
 			private function onScheduleResult(result:Object):void{
@@ -35,32 +48,24 @@
 		]]>
 	</mx:Script>
 	<mx:Binding source="data" destination="lessonData"/>
-	<mx:VBox width="100%" height="100%" verticalGap="0">
-		<mx:Form width="100%" height="100%" paddingBottom="0">
-			<mx:FormItem label="{Manager.bundle.getMessage('Teacher Information')}" fontWeight="bold"/>
-			<mx:FormItem label="{Manager.bundle.getMessage('first')}:">
-				<mx:Label text="{_lesson.first}"/>
-			</mx:FormItem>
-			<mx:FormItem label="{Manager.bundle.getMessage('last')}:">
-				<mx:Label text="{_lesson.last}"/>
-			</mx:FormItem>
-		</mx:Form>
 
-		<mx:Form width="100%" height="100%" paddingTop="0">
-			<mx:FormItem label="{Manager.bundle.getMessage('Lesson Deatils')}" fontWeight="bold"/>
-			<mx:FormItem label="{Manager.bundle.getMessage('lessonType')}:">
-				<mx:Label text="{_lesson.type}"/>
-			</mx:FormItem>
-			<mx:FormItem label="{Manager.bundle.getMessage('duration')}:">
-				<mx:Label text="{_lesson.duration}"/>
-			</mx:FormItem>
-			<mx:FormItem label="{Manager.bundle.getMessage('rate')}:">
-				<mx:Label text="{_lesson.rate }"/>
-			</mx:FormItem>
-		</mx:Form>
-	 </mx:VBox>
+	 <mx:DataGrid id="info" width="100%" height="100%">
+	 	<mx:columns>
+	 		<mx:Array>
+				<mx:DataGridColumn dataField="startDate" headerText="{Manager.bundle.getMessage('startDate')}"/>
+				<mx:DataGridColumn dataField="endDate" headerText="{Manager.bundle.getMessage('endDate')}"/>
+				<mx:DataGridColumn dataField="startTime" headerText="{Manager.bundle.getMessage('startTime')}"/>
+				<mx:DataGridColumn dataField="disposition" headerText="{Manager.bundle.getMessage('disposition')}"/>
+				<mx:DataGridColumn dataField="type" headerText="{Manager.bundle.getMessage('type')}"/>
+				<mx:DataGridColumn dataField="duration" headerText="{Manager.bundle.getMessage('duration')}"/>
+				<mx:DataGridColumn dataField="rate" headerText="{Manager.bundle.getMessage('rate')}"/>
+				<mx:DataGridColumn dataField="first" headerText="{Manager.bundle.getMessage('first')}"/>
+				<mx:DataGridColumn dataField="last" headerText="{Manager.bundle.getMessage('last')}"/>
+			</mx:Array>
+	 	</mx:columns>
+	 </mx:DataGrid>
 	 
 	 <mx:VBox height="100%" paddingRight="5">
-	 	<mx:Button label="{Manager.bundle.getMessage('schedule')}" click="openSchedule()"/>
+	 	<mx:Button label="{Manager.bundle.getMessage('schedule')}" click="openSchedule()" enabled="{info.selectedItem != null}"/>
 	 </mx:VBox>
 </mx:HBox>
