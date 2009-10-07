@@ -7,23 +7,16 @@
 	<mx:Script>
 		<![CDATA[
 			import mx.events.ListEvent;
-			import mx.events.CollectionEvent;
-			import com.academy.calder.vo.UserVO;
 			import com.academy.calder.vo.PersonVO;
 			import com.academy.calder.enum.Gender;
-			import com.academy.calder.enum.PrivilegeEnum;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
-			import com.academy.calder.enum.AccountStatus;
-			import com.academy.calder.enum.MessageStatusEnum;
-			
+
 			private static const FIELD_WIDTH:uint = 200;
 			private static const DEFAULT_LOCALE:String = "en_US";
 			
 			[Bindable]
 			private var _person:PersonVO;
-			[Bindable]
-			private var _user:UserVO;
 			[Bindable]
 			private var _localeIndex:uint;
 			[Bindable]
@@ -48,20 +41,7 @@
 			}
 			
 			private function onSubmit():void{
-				AMFService.send('CAM.updateRecord', [_person.userId,
-												   _person.personId,
-												   first.text,
-												   last.text,
-												   dob.text,
-												   lang.selectedItem.localeName,
-												   sex.selectedItem.value,
-												   pnotes.text,
-												   _user.username,
-												   _user.password,
-												   _user.privileges.value,
-												   _user.status.value,
-												   _user.notes,
-												   (updatePwd ? updatePwd.selected : false)], onSubmitDataResult, onFault);
+				Logger.alert("Not implemented");
 			}
 			
 			private function onEdit():void{
@@ -70,7 +50,6 @@
 			
 			private function onNew():void{
 				_person = new PersonVO()
-				_user = new UserVO();
 				_newrecord = true;
 				findLocaleIndex();
 				if(dataGrid) dataGrid.selectedIndex = -1;
@@ -80,47 +59,27 @@
 				_newrecord = false;
 				_editrecord = false;
 				_person = null;
-				_user = null;
 				findLocaleIndex();
 				if(dataGrid) dataGrid.selectedIndex = -1;
-				if(tabNav) tabNav.selectedIndex = 0;
 			}
 
 			private function onPersonsResult(result:Object):void{
 				dataGrid.dataProvider = result;
-				tabNav.selectedIndex = 0;
 			}
 			
 			private function onPersonResult(result:Object):void{
 				_person = new PersonVO(result);
 				result.cached = true;
 				dataGrid.dataProvider.setItemAt(result, dataGrid.selectedIndex);
-				tabNav.selectedIndex = 0;
 				findLocaleIndex();
 
 				if(_person.userId == Manager.instance.currentUser.userId)
 					Manager.instance.currentUser.personRef = _person;
-		
-				//update user data
-				if(_person.userId != null && _person.userId.length){
-					if(dataGrid.selectedItem.user is UserVO)
-						_user = dataGrid.selectedItem.user;
-					else
-						AMFService.send('CAM.user', [_person.userId], onUserResult, onFault);
-				}else{
-					_user = new UserVO();
-				}
-			}
-			
-			private function onUserResult(result:Object):void{
-				_user = new UserVO(result);
-				dataGrid.selectedItem.user = _user;
 			}
 
 			private function onSubmitDataResult(result:Object):void{
 				if(result != null){
 					_person = new PersonVO(result);
-					result.user = _user;
 					result.cached = true;
 
 					if(dataGrid.selectedIndex != -1){
@@ -133,7 +92,6 @@
 					_newrecord = false;
 					_editrecord = false;
 					findLocaleIndex();
-					tabNav.selectedIndex = 0;
 				}
 			}
 			
@@ -179,67 +137,34 @@
 			 </mx:columns>
 		</mx:DataGrid>
 	</mx:VBox>
-	<mx:TabNavigator id="tabNav" width="100%" height="100%">
-		<mx:VBox width="100%" height="100%" label="Person" id="personForm">
-			<mx:Form width="100%" height="100%" enabled="{_editrecord || _newrecord}">
-				<mx:FormItem label="{Manager.bundle.getMessage('first')}:">
-					<mx:TextInput width="{FIELD_WIDTH}" text="{_person.first}" id="first"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('last')}:">
-					<mx:TextInput width="{FIELD_WIDTH}" text="{_person.last}" id="last"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('dob')}:">
-					<mx:DateField width="{FIELD_WIDTH}" text="{_person.dateOfBirth == null ? '' : _person.dateOfBirth}" id="dob" formatString="YYYY-MM-DD"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('sex')}:">
-					<mx:ComboBox dataProvider="{Gender.list}" width="{FIELD_WIDTH}" selectedItem="{_person.sex}" id="sex"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('language')}:">
-					<mx:ComboBox dataProvider="{_languages}" width="{FIELD_WIDTH}" selectedIndex="{_localeIndex}" labelField="language" id="lang"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('notes')}:">
-					<mx:TextArea text="{_person.notes}" id="pnotes" width="{FIELD_WIDTH}" height="80"/>
-				</mx:FormItem>
-			</mx:Form>
-			<mx:HBox paddingLeft="60" paddingBottom="5">
-				<buttons:CreateButton label="New..." click="onNew()" enabled="{_newrecord == false}"/>
-				<buttons:ModifyButton label="{Manager.bundle.getMessage('edit')}" 
-					enabled="{dataGrid.selectedIndex != -1 &amp;&amp; _newrecord == false &amp;&amp; _editrecord == false}" click="onEdit()"/>
-				<buttons:ModifyButton label="{Manager.bundle.getMessage('submit')}" enabled="{_editrecord || _newrecord}" click="onSubmit()"/>
-				<mx:Button label="Cancel" enabled="{_editrecord || _newrecord}" click="clean()" />
-			</mx:HBox>
-		</mx:VBox>
-		<mx:VBox width="100%" height="100%" label="User Access">
-			<mx:Form width="100%" height="100%" enabled="{_editrecord || _newrecord}">
-				<mx:FormItem label="{Manager.bundle.getMessage('username')}:">
-					<mx:TextInput width="{FIELD_WIDTH}" text="{_user.username}" id="username"/>
-				</mx:FormItem>
-				<mx:FormItem>
-					<mx:CheckBox id="updatePwd" label="{Manager.bundle.getMessage('updatePwd')}"
-						 selected="{_person.userId == null}" visible="{_person.userId != null &amp;&amp; Manager.instance.currentUser.privileges == PrivilegeEnum.CRUDO}"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('password')}:" visible="{updatePwd.selected}" includeInLayout="{updatePwd.selected}">
-					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" text="{_user.password}" id="password"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('confirm')}:" visible="{updatePwd.selected}" includeInLayout="{updatePwd.selected}">
-					<mx:TextInput width="{FIELD_WIDTH}" displayAsPassword="true" text="{_user.password}" id="confirm"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('privileges')}:">
-					<mx:ComboBox dataProvider="{PrivilegeEnum.list}" width="{FIELD_WIDTH}" selectedItem="{_user.privileges}" id="privileges"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('userStatus')}:">
-					<mx:ComboBox dataProvider="{AccountStatus.list}" width="{FIELD_WIDTH}" enabled="{username.text.length > 0}"
-						selectedItem="{username.text.length == 0 ? AccountStatus.Inactive : _user.status}"
-						change="{_user.status = event.target.selectedItem as AccountStatus}" id="status"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('notes')}:">
-					<mx:TextArea text="{_user.notes}" id="unotes" width="{FIELD_WIDTH}" height="80"/>
-				</mx:FormItem>
-			</mx:Form>
-			<mx:HBox paddingLeft="60" paddingBottom="5">	
-				<buttons:ModifyButton label="{Manager.bundle.getMessage('submit')}" enabled="{_editrecord || _newrecord}" click="onSubmit()"/>
-				<mx:Button label="Cancel" enabled="{_editrecord || _newrecord}" click="clean()"/>
-			</mx:HBox>
-		</mx:VBox>
-	</mx:TabNavigator>
+
+	<mx:VBox width="100%" height="100%" label="Person" id="personForm">
+		<mx:Form width="100%" height="100%" enabled="{_editrecord || _newrecord}">
+			<mx:FormItem label="{Manager.bundle.getMessage('first')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_person.first}" id="first"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('last')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_person.last}" id="last"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('dob')}:">
+				<mx:DateField width="{FIELD_WIDTH}" text="{_person.dateOfBirth == null ? '' : _person.dateOfBirth}" id="dob" formatString="YYYY-MM-DD"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('sex')}:">
+				<mx:ComboBox dataProvider="{Gender.list}" width="{FIELD_WIDTH}" selectedItem="{_person.sex}" id="sex"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('language')}:">
+				<mx:ComboBox dataProvider="{_languages}" width="{FIELD_WIDTH}" selectedIndex="{_localeIndex}" labelField="language" id="lang"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('notes')}:">
+				<mx:TextArea text="{_person.notes}" id="pnotes" width="{FIELD_WIDTH}" height="80"/>
+			</mx:FormItem>
+		</mx:Form>
+		<mx:HBox paddingLeft="60" paddingBottom="5">
+			<buttons:CreateButton label="New..." click="onNew()" enabled="{_newrecord == false}"/>
+			<buttons:ModifyButton label="{Manager.bundle.getMessage('edit')}" 
+				enabled="{dataGrid.selectedIndex != -1 &amp;&amp; _newrecord == false &amp;&amp; _editrecord == false}" click="onEdit()"/>
+			<buttons:ModifyButton label="{Manager.bundle.getMessage('submit')}" enabled="{_editrecord || _newrecord}" click="onSubmit()"/>
+			<mx:Button label="Cancel" enabled="{_editrecord || _newrecord}" click="clean()" />
+		</mx:HBox>
+	</mx:VBox>
 </mx:HDividedBox>

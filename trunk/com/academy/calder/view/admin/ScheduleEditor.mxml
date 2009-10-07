@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="1125" height="676" layout="horizontal"
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" width="500" height="400" layout="horizontal"
 	horizontalScrollPolicy="off" verticalScrollPolicy="off" showCloseButton="true" close="closeWindow()"
 	paddingBottom="2" paddingTop="2" paddingLeft="2" paddingRight="2" preinitialize="init()" styleName="schedulePanel">
 	<mx:Style>
@@ -42,7 +42,8 @@
 			import mx.collections.ArrayCollection;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
-
+			import mx.controls.listClasses.IListItemRenderer;
+			
 			import flash.utils.getDefinitionByName;
 			
 			[Bindable]
@@ -54,21 +55,21 @@
 			private var scheduleRefData:Object = {};
 			
 			private var dirty:Boolean;
-			private var lessonView:LessonView;
+			private var scheduleView:ScheduleView;
 			private var resultData:Object;
 			private var lastCreateDate:Date;
 			private var createDateInterval:Number;
 			private var dateGrid:*;
 			
-			private static var _window:ScheduleView;
+			private static var _window:ScheduleEditor;
 			
 			private static const _smtwtfs:Array = [0, 0, 0, 0, 0, 0, 0]; 
 			
-			public static function openWindow(lessonView:LessonView, result:Object):ScheduleView{
+			public static function openWindow(scheduleView:ScheduleView, result:Object=null):ScheduleEditor{
 				if(_window == null)
-               		_window = PopUpManager.createPopUp(Manager.application as DisplayObject, ScheduleView, true) as ScheduleView;
+               		_window = PopUpManager.createPopUp(scheduleView, ScheduleEditor, true) as ScheduleEditor;
     			_window.resultData = result;
-    			_window.lessonView = lessonView;
+    			_window.scheduleView = scheduleView;
     			_window.dirty = false;
     			PopUpManager.centerPopUp(_window);
 			    return _window;
@@ -76,8 +77,8 @@
 			
 			public static function closeWindow():void{
 				if(_window){
-					if(_window.dirty == true)
-						_window.lessonView.getDetails();
+					//if(_window.dirty == true)
+					//	_window.scheduleView.getDetails();
 					PopUpManager.removePopUp(_window);
 				}
 				_window = null;
@@ -325,9 +326,9 @@
 			
 			private function openEdiPanel(event:Event):void{
 				if(event.target is UITextField){
-					ScheduleEditor.openWindow(this, event.target.parent.data);
+					var data:Object = event.target.parent.data;
 				}else{
-					ScheduleEditor.openWindow(this);
+					trace("2+"+event.target)
 				}
 			}
 			
