@@ -7,8 +7,7 @@
 	xmlns:guest="com.academy.calder.view.guest.*"
 	xmlns:student="com.academy.calder.view.student.*"
 	xmlns:teacher="com.academy.calder.view.teacher.*"
-	width="100%" 
-	height="100%"
+	width="100%" height="100%"
 	creationComplete="onComplete()"
 	styleName="defaultIcons">
 	

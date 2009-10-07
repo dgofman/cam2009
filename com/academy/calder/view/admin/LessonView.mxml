@@ -10,14 +10,22 @@
 			[Bindable]
 			private var _lessonName:String;
 			
+			private var _personId:String;
+			private var _lessonTypeId:String;
+			
+			public function getDetails():void{
+				AMFService.send('Account.details', [_personId, _lessonTypeId], onLessonDetailsResult, onFault);
+			}
+			
 			private function set lessonData(value:Object):void{
 				var tabNav:TabNavigator = parent as TabNavigator;
 				var accountView:AccountView = tabNav.document as AccountView;
 				if(value != null){
 					_lessonName = value.lesson;
+					_lessonTypeId = value.lessonTypeId;
+					_personId = accountView.personId;
+					getDetails();
 					
-					AMFService.send('Account.details', [accountView.personId, data.lessonTypeId], onLessonDetailsResult, onFault);
-
 					if(tabNav && tabNav.getChildIndex(this) == 0){
 						tabNav.selectedChild = this;
 						tabNav.getTabAt(0).dispatchEvent(new MouseEvent(MouseEvent.CLICK));
@@ -39,7 +47,7 @@
 			}
 			
 			private function onScheduleResult(result:Object):void{
-				ScheduleView.openWindow(result);
+				ScheduleView.openWindow(this, result);
 			}
 			
 			private function onFault(fault:Object):void{
