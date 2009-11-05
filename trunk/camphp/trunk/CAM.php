@@ -19,8 +19,10 @@ class CAM {
 		$this->UPDATE_USER="UPDATE user SET	username=%s, admin=%s, privileges='%s', status='%s', notes='%s' WHERE userId=%s";
 		$this->CREATE_PERSON="INSERT INTO person (first, last, sex, dateOfBirth, localeName, notes) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')";
 		$this->UPDATE_PERSON="UPDATE person SET first='%s', last='%s', sex='%s', dateOfBirth='%s', localeName='%s', notes='%s' WHERE personId=%s";
+		$this->CREATE_ADDRESS="INSERT INTO address (priority, address1, address2, city, stateProvince, postalCode, country, inactiveAsOfDate, notes) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')";
+		$this->UPDATE_ADDRESS="UPDATE address SET priority='%s', address1='%s', address2='%s', city='%s', stateProvince='%s', postalCode='%s', country='%s', inactiveAsOfDate='%s', notes='%s' WHERE addressId=%s";
 	}
-	
+
 	public function getSessionId($destory=false){
 		if($destory){
 			$_SESSION = array();
@@ -31,7 +33,7 @@ class CAM {
 	    @session_start();
 		return session_id();
 	}
-
+	
 	public function login($username, $password){
 		$mysql = MYSQL::getInstance();
 		$sql1 = escape($this->VALIDATE, $username, $this->LOGIN_TIMEOUT);
@@ -117,11 +119,23 @@ class CAM {
 		return $result;
 	}
 	
-	public function updateRecord($userId, $personId, $first, $last, $dateOfBirth, $localeName,
-								 $sex, $pnotes, $username, $password, $admin, $privileges, 
-								 $status, $unotes, $updatePwd){
+	public function updateRecord($userId, $personId, $first, $last, $dateOfBirth, $localeName, $sex, $pnotes, 
+								 $username, $password, $admin, $privileges, $status, $unotes, $updatePwd){
 												   
 		$mysql = MYSQL::getInstance();
+		
+		/*$addressId, $priority, $address1, $address2, $city,	
+								 $stateProvince, $postalCode, $country, $aInactiveAsOfDate, $anotes,
+								 $contactId, $type, $category, $available, $entry, $cInactiveAsOfDate, $cnotes,
+								 
+		if(isset($addressId)){
+			$sql = escape($this->UPDATE_ADDRESS, $priority, $address1, $address2, $city, $stateProvince, $postalCode, $country, $aInactiveAsOfDate, $anotes, $addressId);
+			$rs = $mysql->query($sql);
+		}else if((isset($address1) && !empty($address1)) || (isset($address2) && !empty($address2))){
+			$sql = escape($this->CREATE_ADDRESS, $priority, $address1, $address2, $city, $stateProvince, $postalCode, $country, $aInactiveAsOfDate, $anotes);
+			$rs = $mysql->query($sql);
+			$addressId = $mysql->insert();
+		}*/
 		
 		if(isset($userId)){
 			$sql = escape($this->UPDATE_USER, "'" . $username . "'" . ($updatePwd == TRUE ? ", password=PASSWORD('$password')" : ""), $admin, $privileges, $status, $unotes, $userId);
