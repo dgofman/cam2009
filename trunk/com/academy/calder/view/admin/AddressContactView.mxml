@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	<mx:Script>
+		<![CDATA[
+			import com.academy.calder.vo.ContactVO;
+			import com.academy.calder.vo.AddressVO;
+			import com.academy.calder.enum.ContactType;
+			import com.academy.calder.enum.ContactCategory;
+			import com.academy.calder.enum.ContactAvailability;
+			import com.academy.calder.enum.AddressPriority;
+			import com.academy.calder.business.Manager;
+			
+			public var personId:String;
+			
+			[Bindable]
+			public var _address:AddressVO;
+			[Bindable]
+			public var _contact:ContactVO;
+			
+			private var _addressId:String;
+			private var _contactId:String;
+			
+			private static const FIELD_WIDTH:uint = 200;
+			
+			public function get addressId():String{
+				return _addressId;
+			}
+			
+			public function get contactId():String{
+				return _contactId;
+			}
+			
+			public function onSave():void{
+				
+			}
+		]]>
+	</mx:Script>
+	<mx:DataGrid width="300" height="100%"/>
+	<mx:Accordion width="100%" height="100%">
+		<mx:Form width="100%" height="100%" label="Address">
+			<mx:FormItem label="{Manager.bundle.getMessage('priority')}:">
+				<mx:ComboBox dataProvider="{AddressPriority.list}" width="{FIELD_WIDTH}" selectedItem="{_address.priority == null ? AddressPriority.Residence : _address.priority}" id="priority"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('address1')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_address.address1}" id="address1"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('address2')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_address.address2}" id="address2"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('city')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_address.city}" id="city"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('stateProvince')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_address.stateProvince == null ? 'CA' : _address.stateProvince}" id="stateProvince"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('postalCode')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_address.postalCode}" id="postalCode"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('country')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_address.country == null ? 'USA' : _address.country}" id="country"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('inactiveAsOfDate')}:">
+				<mx:DateField width="{FIELD_WIDTH}" text="{_address.inactiveAsOfDate == null ? '' : _address.inactiveAsOfDate}" id="aInactiveAsOfDate" formatString="YYYY-MM-DD"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('notes')}:">
+				<mx:TextArea text="{_address.notes}" id="anotes" width="{FIELD_WIDTH}" height="80"/>
+			</mx:FormItem>
+		</mx:Form>
+		
+		<mx:Form width="100%" height="100%" label="Contact">
+			<mx:FormItem label="{Manager.bundle.getMessage('type')}:">
+				<mx:ComboBox dataProvider="{ContactType.list}" width="{FIELD_WIDTH}" selectedItem="{_contact.type == null ? ContactType.Cell : _contact.type}" id="type"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('available')}:">
+				<mx:ComboBox dataProvider="{ContactAvailability.list}" width="{FIELD_WIDTH}" selectedItem="{_contact.available == null ? ContactAvailability.Always : _contact.available}" id="available"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('category')}:">
+				<mx:ComboBox dataProvider="{ContactCategory.list}" width="{FIELD_WIDTH}" selectedItem="{_contact.category == null ? ContactAvailability.Always : _contact.category}" id="category"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('entry')}:">
+				<mx:TextInput width="{FIELD_WIDTH}" text="{_contact.entry}" id="entry"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('inactiveAsOfDate')}:">
+				<mx:DateField width="{FIELD_WIDTH}" text="{_contact.inactiveAsOfDate == null ? '' : _contact.inactiveAsOfDate}" id="cInactiveAsOfDate" formatString="YYYY-MM-DD"/>
+			</mx:FormItem>
+			<mx:FormItem label="{Manager.bundle.getMessage('notes')}:">
+				<mx:TextArea text="{_contact.notes}" id="cnotes" width="{FIELD_WIDTH}" height="80"/>
+			</mx:FormItem>
+		</mx:Form>
+	</mx:Accordion>
+</mx:HBox>

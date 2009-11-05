@@ -3,17 +3,15 @@
 				xmlns:home="com.academy.calder.view.admin.home.*"
 				xmlns:buttons="com.academy.calder.component.buttons.*"
 				xmlns:links="com.academy.calder.view.admin.links.*" styleName="innerView"
-				width="100%" height="100%" horizontalGap="6" activate="onRefresh()" creationComplete="onComplete()">
+				width="100%" height="100%" horizontalGap="6" activate="onRefresh()" creationComplete="onComplete()" xmlns:admin="com.academy.calder.view.admin.*">
 	<mx:Script>
 		<![CDATA[
 			import mx.events.ListEvent;
 			import mx.events.CollectionEvent;
 			import com.academy.calder.vo.UserVO;
 			import com.academy.calder.vo.PersonVO;
-			import com.academy.calder.vo.AddressVO;
 			import com.academy.calder.enum.Gender;
 			import com.academy.calder.enum.PrivilegeEnum;
-			import com.academy.calder.enum.AddressPriority;
 			import com.academy.calder.business.Manager;
 			import com.academy.calder.business.AMFService;
 			import com.academy.calder.enum.AccountStatus;
@@ -23,8 +21,6 @@
 
 			[Bindable]
 			private var _person:PersonVO;
-			[Bindable]
-			private var _address:AddressVO;
 			[Bindable]
 			private var _user:UserVO;
 
@@ -125,7 +121,6 @@
 			}
 			
 			private function onNew():void{
-				_address = new AddressVO();
 				_person = new PersonVO()
 				_user = new UserVO();
 				_newrecord = true;
@@ -134,11 +129,10 @@
 			}
 			
 			private function clean():void{
-				_newrecord = false;
-				_editrecord = false;
-				_address = null;
 				_person = null;
 				_user = null;
+				_newrecord = false;
+				_editrecord = false;
 				Manager.findLocaleIndex(_person);
 				if(dataGrid) dataGrid.selectedIndex = -1;
 				if(tabNav) tabNav.selectedIndex = 0;
@@ -158,18 +152,6 @@
 
 				if(_person.userId == Manager.instance.currentUser.userId)
 					Manager.instance.currentUser.personRef = _person;
-				
-				//update address
-				if(dataGrid.selectedItem.address is AddressVO)
-					_address = dataGrid.selectedItem.address;
-				else
-					AMFService.send('Account.address', [_person.personId], onAddressResult, onFault);
-			}
-			
-			private function onAddressResult(result:Object):void{
-				if(result is Array && result.length > 0)
-					_address = new AddressVO(result[0]);
-				dataGrid.selectedItem.address = _address;
 				
 				//update user data
 				if(_person.userId != null && _person.userId.length){
@@ -264,37 +246,10 @@
 				<mx:Button label="Cancel" enabled="{_editrecord || _newrecord}" click="clean()" />
 			</mx:HBox>
 		</mx:VBox>
-		<mx:VBox width="100%" height="100%" label="Address" id="addressForm">
-			<mx:Form width="100%" height="100%" enabled="{_editrecord || _newrecord}">
-				<mx:FormItem label="{Manager.bundle.getMessage('priority')}:">
-					<mx:ComboBox dataProvider="{AddressPriority.list}" width="{FIELD_WIDTH}" selectedItem="{_address.priority == null ? AddressPriority.Residence : _address.priority}" id="priority"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('address1')}:">
-					<mx:TextInput width="{FIELD_WIDTH}" text="{_address.address1}" id="address1"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('address2')}:">
-					<mx:TextInput width="{FIELD_WIDTH}" text="{_address.address2}" id="address2"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('city')}:">
-					<mx:TextInput width="{FIELD_WIDTH}" text="{_address.city}" id="city"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('stateProvince')}:">
-					<mx:TextInput width="{FIELD_WIDTH}" text="{_address.stateProvince == null ? 'CA' : _address.stateProvince}" id="stateProvince"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('postalCode')}:">
-					<mx:TextInput width="{FIELD_WIDTH}" text="{_address.postalCode}" id="postalCode"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('country')}:">
-					<mx:TextInput width="{FIELD_WIDTH}" text="{_address.country == null ? 'USA' : _address.country}" id="country"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('inactiveAsOfDate')}:">
-					<mx:DateField width="{FIELD_WIDTH}" text="{_address.inactiveAsOfDate == null ? '' : _address.inactiveAsOfDate}" id="inactiveAsOfDate" formatString="YYYY-MM-DD"/>
-				</mx:FormItem>
-				<mx:FormItem label="{Manager.bundle.getMessage('notes')}:">
-					<mx:TextArea text="{_address.notes}" id="anotes" width="{FIELD_WIDTH}" height="80"/>
-				</mx:FormItem>
-			</mx:Form>
-			<mx:HBox paddingLeft="60" paddingBottom="5">
+		<mx:VBox width="100%" height="100%" label="Address / Contact" id="addressForm">
+			<admin:AddressContactView id="ac" personId="{_person.personId}" width="100%" height="100%" enabled="{_editrecord || _newrecord}"/>
+			<mx:HBox width="100%" paddingBottom="5" paddingRight="10" horizontalAlign="right">
+				<buttons:ModifyButton label="{Manager.bundle.getMessage('save')}" enabled="{_editrecord || _newrecord}" click="ac.onSave()"/>
 				<buttons:ModifyButton label="{Manager.bundle.getMessage('submit')}" enabled="{_editrecord || _newrecord}" click="onSubmit()"/>
 				<mx:Button label="Cancel" enabled="{_editrecord || _newrecord}" click="clean()" />
 			</mx:HBox>
